@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 
 #include "Weapon/Turret.h"
 #include "Weapon/DefaultProjectile.h"
@@ -6,6 +6,7 @@
 #include "Weapon/DefaultProjectile.h"
 #include "Net/UnrealNetwork.h"
 #include "AI/AITurretController.h"
+#include "TimerManager.h"
 
 ATurret::ATurret()
 {
@@ -18,14 +19,19 @@ ATurret::ATurret()
     TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>("TurretMesh");
     TurretMesh->SetupAttachment(RootComponent);
 
+    AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
     AIControllerClass = AAITurretController::StaticClass();
 }
 
-void ATurret::RotateToTarget(const FRotator& Direction)
+void ATurret::RotateToTarget(const FRotator& Direction, float TimerRate)
 {
-    // float YawValue = GetActorRotation().Yaw + Amount;
-    //  SetActorRotation(FQuat(FRotator(0.f, YawValue, 0.f)));
-    PawnRootComponent->SetWorldRotation(FQuat(Direction));
+    Alpha = 0.f;
+    GetWorldTimerManager().ClearTimer(SmoothRotationTimer);
+
+    const auto FromRotation = PawnRootComponent->GetComponentRotation();
+    auto TimerDelegate = FTimerDelegate::CreateUObject(this, &ATurret::SmoothRotation, FromRotation, Direction);
+
+    GetWorldTimerManager().SetTimer(SmoothRotationTimer, TimerDelegate, TimerRate / 10.f, true);
 }
 
 void ATurret::Fire_OnServer_Implementation(bool bIsPressed)
@@ -48,6 +54,19 @@ void ATurret::BeginPlay()
 void ATurret::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+}
+
+void ATurret::SmoothRotation(FRotator FromRotation, FRotator ToRotation)
+{
+    if (Alpha > 1.f)
+    {
+        GetWorldTimerManager().ClearTimer(SmoothRotationTimer);
+        return;
+    }
+    const auto DeltaQuat = FQuat::Slerp(FQuat(FromRotation), FQuat(ToRotation), Alpha);
+    PawnRootComponent->SetWorldRotation(FQuat(DeltaQuat));
+
+    Alpha += 0.1f;
 }
 
 void ATurret::MakeShot()

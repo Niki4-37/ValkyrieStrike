@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 #pragma once
 #include "GameFramework/GameModeBase.h"
 #include "ValkiriaStrikeGameMode.generated.h"

@@ -1,8 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 
 #include "Weapon/DefaultProjectile.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
 ADefaultProjectile::ADefaultProjectile()
@@ -36,9 +37,32 @@ ADefaultProjectile::ADefaultProjectile()
 void ADefaultProjectile::BeginPlay()
 {
     Super::BeginPlay();
+
+    check(CollisionComponent);
+
+    CollisionComponent->OnComponentHit.AddDynamic(this, &ADefaultProjectile::ProjectileCollisionComponentHit);
 }
 
 void ADefaultProjectile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME(ADefaultProjectile, DamageAmount);
+    DOREPLIFETIME(ADefaultProjectile, LifeSeconds);
+}
+
+void ADefaultProjectile::ProjectileCollisionComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+    UGameplayStatics::ApplyPointDamage(Hit.GetActor(),                  //
+                                       DamageAmount,                    //
+                                       Hit.TraceStart,                  //
+                                       Hit, GetInstigatorController(),  //
+                                       GetOwner(),                      //
+                                       nullptr);
+
+    if (Hit.bBlockingHit && Hit.GetActor())
+    {
+        UE_LOG(LogTemp, Display, TEXT("%s"), *Hit.GetActor()->GetName());
+        Destroy();
+    }
 }

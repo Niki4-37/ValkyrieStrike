@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 
 #pragma once
 
@@ -7,6 +7,7 @@
 #include "AICharacter.generated.h"
 
 class UHealthComponent;
+class UAnimMontage;
 
 UCLASS()
 class VALKIRIASTRIKE_API AAICharacter : public ACharacter
@@ -16,14 +17,18 @@ class VALKIRIASTRIKE_API AAICharacter : public ACharacter
 public:
     AAICharacter();
 
+    virtual void Tick(float DeltaTime) override;
+    virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     UHealthComponent* HealthComponent;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    UAnimMontage* DeathMontage;
+
     virtual void BeginPlay() override;
 
-public:
-    virtual void Tick(float DeltaTime) override;
-
-    virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+private:
+    void OnDeath();
 };

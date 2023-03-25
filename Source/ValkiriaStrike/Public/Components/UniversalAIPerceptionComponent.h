@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 
 #pragma once
 
@@ -12,5 +12,5 @@ class VALKIRIASTRIKE_API UUniversalAIPerceptionComponent : public UAIPerceptionC
     GENERATED_BODY()
 
 public:
-    AActor* GetClosestEnemy(FRotator& Direction) const;
+    AActor* GetClosestEnemy() const;
 };

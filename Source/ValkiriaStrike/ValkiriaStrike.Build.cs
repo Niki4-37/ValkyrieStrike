@@ -15,9 +15,16 @@ public class ValkiriaStrike : ModuleRules
             "Engine",
             "InputCore",
             "PhysXVehicles",
-            "HeadMountedDisplay"
+            "GameplayTasks",
+            "Niagara",
+            "NavigationSystem"
         });
 
-        PublicDefinitions.Add("HMD_MODULE_INCLUDED=1");
+        //PublicIncludePaths.AddRange(new string[]
+        //{
+        //    "ValkiriaStrike/Public/Player"
+        //});
+
+        //PublicDefinitions.Add("HMD_MODULE_INCLUDED=1");
     }
 }

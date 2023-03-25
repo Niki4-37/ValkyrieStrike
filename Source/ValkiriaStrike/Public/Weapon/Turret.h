@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 
 #pragma once
 
@@ -8,6 +8,7 @@
 
 class UStaticMeshComponent;
 class ADefaultProjectile;
+class UBehaviorTree;
 
 UCLASS()
 class VALKIRIASTRIKE_API ATurret : public APawn
@@ -18,10 +19,13 @@ public:
     // Sets default values for this actor's properties
     ATurret();
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AI")
+    UBehaviorTree* BehaviorTreeAsset;
+
     UFUNCTION(Server, unreliable)
     void Fire_OnServer(bool bIsPressed);
 
-    void RotateToTarget(const FRotator& Direction);
+    void RotateToTarget(const FRotator& Direction, float TimerRate);
 
 protected:
     UPROPERTY(VisibleDefaultsOnly)
@@ -44,6 +48,12 @@ protected:
 
 private:
     FTimerHandle FireTimer;
+
+    FTimerHandle SmoothRotationTimer;
+
+    float Alpha{0.f};
+
+    void SmoothRotation(FRotator FromRotation, FRotator ToRotation);
 
     void MakeShot();
 };

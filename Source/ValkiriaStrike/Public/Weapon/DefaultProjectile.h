@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 
 #pragma once
 
@@ -29,6 +29,23 @@ protected:
     UPROPERTY(VisibleDefaultsOnly)
     UProjectileMovementComponent* ProjectileMovementComponent{nullptr};
 
+    UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+    float DamageAmount = 1.0f;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+    bool DoFullDamage = false;
+
+    UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+    float LifeSeconds = 5.0f;
+
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+public:
+    UFUNCTION()
+    virtual void ProjectileCollisionComponentHit(UPrimitiveComponent* HitComponent,  //
+                                                 AActor* OtherActor,                 //
+                                                 UPrimitiveComponent* OtherComp,     //
+                                                 FVector NormalImpulse,              //
+                                                 const FHitResult& Hit);
 };

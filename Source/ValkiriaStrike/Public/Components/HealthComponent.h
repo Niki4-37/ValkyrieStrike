@@ -1,10 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "HealthComponent.generated.h"
+
+DECLARE_MULTICAST_DELEGATE(FOnDeathSignature);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class VALKIRIASTRIKE_API UHealthComponent : public UActorComponent
@@ -13,6 +15,8 @@ class VALKIRIASTRIKE_API UHealthComponent : public UActorComponent
 
 public:
     UHealthComponent();
+
+    FOnDeathSignature OnDeath;
 
 protected:
     virtual void BeginPlay() override;
@@ -30,4 +34,7 @@ private:
     UPROPERTY(Replicated)
     float Health{0.f};
     float MaxHealth{100.f};
+
+    UFUNCTION()
+    void OnTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 };

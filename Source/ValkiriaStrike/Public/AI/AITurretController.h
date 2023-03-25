@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 
 #pragma once
 
@@ -17,16 +17,23 @@ class VALKIRIASTRIKE_API AAITurretController : public AAIController
 public:
     AAITurretController();
 
+    void SetAimActor(AActor* AimActor);
+
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     UUniversalAIPerceptionComponent* TurretPerceptionComponent;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    float TurretRotationValue{20.f};
+    float AimingUpdateRate{0.1f};
 
     virtual void OnPossess(APawn* InPawn) override;
     virtual void Tick(float DeltaTime) override;
 
 private:
+    FTimerHandle AimingTimer;
+
+    UPROPERTY()
     ATurret* TurretPawn{nullptr};
+
+    void RotateToTarget(AActor* AimActor);
 };

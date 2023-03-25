@@ -5,9 +5,8 @@
 #include "Components/HealthComponent.h"
 #include "AIController.h"
 
-AActor* UUniversalAIPerceptionComponent::GetClosestEnemy(FRotator& Direction) const
+AActor* UUniversalAIPerceptionComponent::GetClosestEnemy() const
 {
-    Direction = FRotator::ZeroRotator;
     TArray<AActor*> PercievedActors;
     GetCurrentlyPerceivedActors(UAISense_Sight::StaticClass(), PercievedActors);
     if (PercievedActors.Num() == 0) return nullptr;
@@ -33,12 +32,5 @@ AActor* UUniversalAIPerceptionComponent::GetClosestEnemy(FRotator& Direction) co
             }
         }
     }
-
-    /* find Direction to Enemy */
-    if (BestPawn)
-    {
-        Direction = FRotationMatrix::MakeFromX(BestPawn->GetActorLocation() - Pawn->GetActorLocation()).Rotator();
-    }
-
     return BestPawn;
 }

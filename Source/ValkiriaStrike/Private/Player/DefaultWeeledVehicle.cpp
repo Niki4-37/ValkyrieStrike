@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 
 #include "Player/DefaultWeeledVehicle.h"
 #include "../ValkiriaStrikeWheelFront.h"
@@ -42,9 +42,9 @@ ADefaultWeeledVehicle::ADefaultWeeledVehicle()
 
     // Create a spring arm component
     SpringArmComp = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
-    SpringArmComp->TargetOffset = FVector(0.f, 0.f, 1000.f);
+    SpringArmComp->TargetOffset = FVector(0.f, 0.f, 1500.f);
     SpringArmComp->SetupAttachment(RootComponent);
-    SpringArmComp->TargetArmLength = 1000.0f;
+    SpringArmComp->TargetArmLength = 1500.0f;
     SpringArmComp->SetUsingAbsoluteRotation(true);
     SpringArmComp->bInheritPitch = false;
     SpringArmComp->bInheritRoll = false;
@@ -84,10 +84,10 @@ void ADefaultWeeledVehicle::Tick(float Delta)
     // Setup the flag to say we are in reverse gear
     bInReverseGear = GetVehicleMovement()->GetCurrentGear() < 0;
 
-    //if (bIsAutoMoveForward)
+    // if (bIsAutoMoveForward)
     //{
-    //    GetVehicleMovementComponent()->SetThrottleInput(0.4f);
-    //}
+    //     GetVehicleMovementComponent()->SetThrottleInput(0.4f);
+    // }
 }
 
 void ADefaultWeeledVehicle::BeginPlay()
