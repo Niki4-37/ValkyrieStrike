@@ -3,7 +3,6 @@
 #include "AI/Services/FireService.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
-// include weapon component
 #include "Weapon/Turret.h"
 
 UFireService::UFireService()
@@ -20,11 +19,11 @@ void UFireService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory
 
     if (Controller)
     {
-        const auto TurretPawn = Cast<ATurret>(Controller->GetPawn());
-        if (TurretPawn)
-        {
-            HasAim ? TurretPawn->Fire_OnServer(true) : TurretPawn->Fire_OnServer(false);
-        }
+        // const auto TurretPawn = Cast<ATurret>(Controller->GetPawn());
+        // if (TurretPawn)
+        //{
+        //     HasAim ? TurretPawn->Fire_OnServer(true) : TurretPawn->Fire_OnServer(false);
+        // }
     }
 
     Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);

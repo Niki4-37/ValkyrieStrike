@@ -23,13 +23,31 @@ ATurret::ATurret()
     AIControllerClass = AAITurretController::StaticClass();
 }
 
-void ATurret::RotateToTarget(const FRotator& Direction, float TimerRate)
+void ATurret::RotateToTarget(AActor* AimActor, float TimerRate)
 {
     Alpha = 0.f;
     GetWorldTimerManager().ClearTimer(SmoothRotationTimer);
 
-    const auto FromRotation = PawnRootComponent->GetComponentRotation();
-    auto TimerDelegate = FTimerDelegate::CreateUObject(this, &ATurret::SmoothRotation, FromRotation, Direction);
+    AimActor ? Fire_OnServer(true) : Fire_OnServer(false);
+
+    FTimerDelegate TimerDelegate;
+    TimerDelegate.BindLambda(
+        [&, AimActor]()
+        {
+            if (Alpha > 1.f)
+            {
+                GetWorldTimerManager().ClearTimer(SmoothRotationTimer);
+                return;
+            }
+
+            const auto AimLocation = AimActor ? AimActor->GetActorLocation() : FVector::ZeroVector;
+            const auto TurretLocatiom = GetActorLocation();
+            const auto FromRotation = PawnRootComponent->GetComponentRotation();
+            const FRotator Direction = FRotationMatrix::MakeFromX(AimLocation - TurretLocatiom).Rotator();
+            FQuat DeltaQuat = FQuat::Slerp(FQuat(FromRotation), FQuat(Direction), Alpha);
+            PawnRootComponent->SetWorldRotation(DeltaQuat);
+            Alpha += 0.1f;
+        });
 
     GetWorldTimerManager().SetTimer(SmoothRotationTimer, TimerDelegate, TimerRate / 10.f, true);
 }
@@ -54,19 +72,6 @@ void ATurret::BeginPlay()
 void ATurret::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-}
-
-void ATurret::SmoothRotation(FRotator FromRotation, FRotator ToRotation)
-{
-    if (Alpha > 1.f)
-    {
-        GetWorldTimerManager().ClearTimer(SmoothRotationTimer);
-        return;
-    }
-    const auto DeltaQuat = FQuat::Slerp(FQuat(FromRotation), FQuat(ToRotation), Alpha);
-    PawnRootComponent->SetWorldRotation(FQuat(DeltaQuat));
-
-    Alpha += 0.1f;
 }
 
 void ATurret::MakeShot()

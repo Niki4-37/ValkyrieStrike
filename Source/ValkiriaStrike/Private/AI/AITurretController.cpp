@@ -11,36 +11,32 @@ AAITurretController::AAITurretController()
     SetPerceptionComponent(*TurretPerceptionComponent);
 }
 
-void AAITurretController::SetAimActor(AActor* AimActor)
+void AAITurretController::StartChoosingTarget()
 {
-    auto TimerDelegate = FTimerDelegate::CreateUObject(this, &AAITurretController::RotateToTarget, AimActor);
-    GetWorldTimerManager().SetTimer(AimingTimer, TimerDelegate, AimingUpdateRate, true);
-}
-
-void AAITurretController::RotateToTarget(AActor* AimActor)
-{
-    if (AimActor && TurretPawn)
-    {
-        const FVector AimLocation = AimActor->GetActorLocation();
-        const FVector TurretLocation = TurretPawn->GetActorLocation();
-        const FRotator Direction = FRotationMatrix::MakeFromX(AimLocation - TurretLocation).Rotator();
-
-        TurretPawn->RotateToTarget(Direction, AimingUpdateRate);
-    }
+    GetWorldTimerManager().SetTimer(ChoosingTargetTimer, this, &AAITurretController::RotateToTarget, AimingUpdateRate, true);
 }
 
 void AAITurretController::OnPossess(APawn* InPawn)
 {
     Super::OnPossess(InPawn);
 
+    StartChoosingTarget();
+
     TurretPawn = Cast<ATurret>(InPawn);
-    if (TurretPawn)
-    {
-        RunBehaviorTree(TurretPawn->BehaviorTreeAsset);
-    }
 }
 
 void AAITurretController::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+}
+
+void AAITurretController::RotateToTarget()
+{
+    if (!TurretPawn)
+    {
+        GetWorldTimerManager().ClearTimer(ChoosingTargetTimer);
+        return;
+    }
+
+    TurretPawn->RotateToTarget(TurretPerceptionComponent->GetClosestEnemy(), AimingUpdateRate);
 }

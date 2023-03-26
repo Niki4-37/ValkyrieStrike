@@ -9,6 +9,7 @@
 class UCameraComponent;
 class USpringArmComponent;
 class ATurret;
+class UWeaponComponent;
 
 UCLASS()
 class VALKIRIASTRIKE_API ADefaultWeeledVehicle : public AWheeledVehicle
@@ -19,21 +20,15 @@ public:
     ADefaultWeeledVehicle();
 
 protected:
-    /** Spring arm that will offset the camera */
     UPROPERTY(Category = Camera, EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
     USpringArmComponent* SpringArmComp;
 
-    /** Camera component that will be our viewpoint */
     UPROPERTY(Category = Camera, EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
     UCameraComponent* CameraComp;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    TSubclassOf<ATurret> TurretClass;
+    UWeaponComponent* WeaponComponent;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    FName TurretSocketName{"TurretSocket"};
-
-    /** Are we in reverse gear */
     UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly)
     bool bInReverseGear;
 
@@ -47,9 +42,6 @@ private:
     bool bIsLowFriction;
 
     bool bIsAutoMoveForward{true};
-
-    UPROPERTY()
-    ATurret* VehicleTurret{nullptr};
 
     /** Handle pressing forwards */
     void MoveForward(float Val);

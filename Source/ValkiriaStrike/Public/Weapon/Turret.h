@@ -16,16 +16,12 @@ class VALKIRIASTRIKE_API ATurret : public APawn
     GENERATED_BODY()
 
 public:
-    // Sets default values for this actor's properties
     ATurret();
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AI")
-    UBehaviorTree* BehaviorTreeAsset;
 
     UFUNCTION(Server, unreliable)
     void Fire_OnServer(bool bIsPressed);
 
-    void RotateToTarget(const FRotator& Direction, float TimerRate);
+    void RotateToTarget(AActor* AimActor, float TimerRate);
 
 protected:
     UPROPERTY(VisibleDefaultsOnly)
@@ -52,8 +48,6 @@ private:
     FTimerHandle SmoothRotationTimer;
 
     float Alpha{0.f};
-
-    void SmoothRotation(FRotator FromRotation, FRotator ToRotation);
 
     void MakeShot();
 };

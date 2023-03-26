@@ -17,7 +17,7 @@ class VALKIRIASTRIKE_API AAITurretController : public AAIController
 public:
     AAITurretController();
 
-    void SetAimActor(AActor* AimActor);
+    void StartChoosingTarget();
 
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -32,8 +32,10 @@ protected:
 private:
     FTimerHandle AimingTimer;
 
+    FTimerHandle ChoosingTargetTimer;
+
     UPROPERTY()
     ATurret* TurretPawn{nullptr};
 
-    void RotateToTarget(AActor* AimActor);
+    void RotateToTarget();
 };

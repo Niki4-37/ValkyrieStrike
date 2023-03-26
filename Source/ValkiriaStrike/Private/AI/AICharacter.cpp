@@ -2,6 +2,7 @@
 
 #include "AI/AICharacter.h"
 #include "Components/HealthComponent.h"
+#include "Components/CapsuleComponent.h"
 
 AAICharacter::AAICharacter()
 {
@@ -23,11 +24,11 @@ void AAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 void AAICharacter::BeginPlay()
 {
     Super::BeginPlay();
-
     check(HealthComponent) HealthComponent->OnDeath.AddUObject(this, &AAICharacter::OnDeath);
 }
 
 void AAICharacter::OnDeath()
 {
+    //GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
     PlayAnimMontage(DeathMontage);
 }

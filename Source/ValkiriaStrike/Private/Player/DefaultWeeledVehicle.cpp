@@ -4,6 +4,7 @@
 #include "../ValkiriaStrikeWheelFront.h"
 #include "../ValkiriaStrikeWheelRear.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/WeaponComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
@@ -13,7 +14,6 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Materials/Material.h"
 #include "GameFramework/Controller.h"
-#include "Weapon/Turret.h"
 #include "Net/UnrealNetwork.h"
 
 ADefaultWeeledVehicle::ADefaultWeeledVehicle()
@@ -40,7 +40,6 @@ ADefaultWeeledVehicle::ADefaultWeeledVehicle()
     Vehicle4W->WheelSetups[3].BoneName = FName("Wheel_Rear_Right");
     Vehicle4W->WheelSetups[3].AdditionalOffset = FVector(0.f, 12.f, 0.f);
 
-    // Create a spring arm component
     SpringArmComp = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
     SpringArmComp->TargetOffset = FVector(0.f, 0.f, 1500.f);
     SpringArmComp->SetupAttachment(RootComponent);
@@ -49,13 +48,14 @@ ADefaultWeeledVehicle::ADefaultWeeledVehicle()
     SpringArmComp->bInheritPitch = false;
     SpringArmComp->bInheritRoll = false;
 
-    // Create camera component
     CameraComp = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
     CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
     CameraComp->bUsePawnControlRotation = false;
     CameraComp->FieldOfView = 90.f;
 
     bInReverseGear = false;
+
+    WeaponComponent = CreateDefaultSubobject<UWeaponComponent>("WeaponComponent");
 }
 
 void ADefaultWeeledVehicle::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -81,7 +81,6 @@ void ADefaultWeeledVehicle::Tick(float Delta)
 {
     Super::Tick(Delta);
 
-    // Setup the flag to say we are in reverse gear
     bInReverseGear = GetVehicleMovement()->GetCurrentGear() < 0;
 
     // if (bIsAutoMoveForward)
@@ -93,26 +92,6 @@ void ADefaultWeeledVehicle::Tick(float Delta)
 void ADefaultWeeledVehicle::BeginPlay()
 {
     Super::BeginPlay();
-
-    // Should Make SpawnTurret on Server
-    if (!VehicleTurret)
-    {
-        FActorSpawnParameters SpawnParams;
-        SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-        SpawnParams.Owner = this;
-        VehicleTurret = GetWorld()->SpawnActor<ATurret>(TurretClass, SpawnParams);
-
-        if (VehicleTurret)
-        {
-            FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
-            VehicleTurret->AttachToComponent(GetMesh(), AttachmentRules, TurretSocketName);
-
-            if (!VehicleTurret->Controller)
-            {
-                VehicleTurret->SpawnDefaultController();
-            }
-        }
-    }
 }
 
 void ADefaultWeeledVehicle::MoveForward(float Val)
@@ -133,6 +112,5 @@ void ADefaultWeeledVehicle::OnHandbrakePressed(bool bIsUsed)
 
 void ADefaultWeeledVehicle::OnFireEvent(bool bIsEnabled)
 {
-    if (!VehicleTurret) return;
-    VehicleTurret->Fire_OnServer(bIsEnabled);
+    UE_LOG(LogTemp, Display, TEXT("Fire from alternative weapon!!!"));
 }

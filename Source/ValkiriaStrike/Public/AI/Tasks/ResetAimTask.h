@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
-#include "ClearAimActor.generated.h"
+#include "ResetAimTask.generated.h"
 
 /**
  *
  */
 UCLASS()
-class VALKIRIASTRIKE_API UClearAimActor : public UBTTaskNode
+class VALKIRIASTRIKE_API UResetAimTask : public UBTTaskNode
 {
     GENERATED_BODY()
 
 public:
-    UClearAimActor();
+    UResetAimTask();
 
 protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")

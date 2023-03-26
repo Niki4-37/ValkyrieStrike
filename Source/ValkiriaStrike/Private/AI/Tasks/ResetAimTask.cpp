@@ -1,14 +1,14 @@
 // Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 
-#include "AI/Tasks/ClearAimActor.h"
+#include "AI/Tasks/ResetAimTask.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
-UClearAimActor::UClearAimActor()
+UResetAimTask::UResetAimTask()
 {
     NodeName = "Clear Aiming Actor";
 }
 
-EBTNodeResult::Type UClearAimActor::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+EBTNodeResult::Type UResetAimTask::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
     const auto Blackboard = OwnerComp.GetBlackboardComponent();
     if (!Blackboard) return EBTNodeResult::Failed;

@@ -14,8 +14,8 @@ EBTNodeResult::Type UAimToTargetTask::ExecuteTask(UBehaviorTreeComponent& OwnerC
     const auto Blackboard = OwnerComp.GetBlackboardComponent();
     const auto TurretController = Cast<AAITurretController>(OwnerComp.GetAIOwner());
 
-    if (!Blackboard || !TurretController) return EBTNodeResult::Failed;
+    // if (!Blackboard || !TurretController) return EBTNodeResult::Failed;
 
-    TurretController->SetAimActor(Cast<AActor>(Blackboard->GetValueAsObject(AimActorKey.SelectedKeyName)));
+    // TurretController->SetAimActor(Cast<AActor>(Blackboard->GetValueAsObject(AimActorKey.SelectedKeyName)));
     return EBTNodeResult::Succeeded;
 }
