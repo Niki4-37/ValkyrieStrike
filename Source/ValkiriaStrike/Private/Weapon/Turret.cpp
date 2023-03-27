@@ -54,14 +54,10 @@ void ATurret::RotateToTarget(AActor* AimActor, float TimerRate)
 
 void ATurret::Fire_OnServer_Implementation(bool bIsPressed)
 {
-    if (bIsPressed)
-    {
-        GetWorldTimerManager().SetTimer(FireTimer, this, &ATurret::MakeShot, FireRate, true);
-    }
-    else
-    {
+    bIsPressed ?                                                                              //
+        GetWorldTimerManager().SetTimer(FireTimer, this, &ATurret::MakeShot, FireRate, true)  //
+        :                                                                                     //
         GetWorldTimerManager().ClearTimer(FireTimer);
-    }
 }
 
 void ATurret::BeginPlay()
