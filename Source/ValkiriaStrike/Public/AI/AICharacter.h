@@ -8,6 +8,8 @@
 
 class UHealthComponent;
 class UAnimMontage;
+class ADefaultWeapon;
+class UBehaviorTree;
 
 UCLASS()
 class VALKIRIASTRIKE_API AAICharacter : public ACharacter
@@ -17,8 +19,13 @@ class VALKIRIASTRIKE_API AAICharacter : public ACharacter
 public:
     AAICharacter();
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    UBehaviorTree* BehaviorTreeAsset;
+
     virtual void Tick(float DeltaTime) override;
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+    void StartFire(bool bIsPressed);
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -27,8 +34,19 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     UAnimMontage* DeathMontage;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    TSubclassOf<ADefaultWeapon> WeaponClass;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    FName WeaponSocketName{"WeaponSocket"};
+
     virtual void BeginPlay() override;
 
 private:
+    UPROPERTY()
+    ADefaultWeapon* OwnedWeapon;
+
     void OnDeath();
+
+    void SpawnAndAttachWeapon();
 };

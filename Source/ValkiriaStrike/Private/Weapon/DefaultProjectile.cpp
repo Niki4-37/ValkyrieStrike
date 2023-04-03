@@ -62,7 +62,7 @@ void ADefaultProjectile::ProjectileCollisionComponentHit(UPrimitiveComponent* Hi
 
     if (Hit.bBlockingHit && Hit.GetActor())
     {
-        UE_LOG(LogTemp, Display, TEXT("%s"), *Hit.GetActor()->GetName());
+        //UE_LOG(LogTemp, Display, TEXT("%s"), *Hit.GetActor()->GetName());
         Destroy();
     }
 }

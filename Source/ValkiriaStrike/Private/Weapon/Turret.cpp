@@ -73,7 +73,7 @@ void ATurret::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 void ATurret::MakeShot()
 {
     /* handled on server */
-    UE_LOG(LogTemp, Display, TEXT("Fire"));
+    //UE_LOG(LogTemp, Display, TEXT("Fire"));
     auto Rotation = GetActorForwardVector().Rotation();
 
     auto MuzzleLocation = GetActorLocation() + Rotation.RotateVector(MuzzleOffset);
@@ -82,7 +82,7 @@ void ATurret::MakeShot()
     auto Bullet = GetWorld()->SpawnActor<ADefaultProjectile>(DefaultProjectileClass, SpawningTransform);
     if (Bullet)
     {
-        UE_LOG(LogTemp, Display, TEXT("Location %s"), *Bullet->GetActorLocation().ToString());
+        //UE_LOG(LogTemp, Display, TEXT("Location %s"), *Bullet->GetActorLocation().ToString());
         Bullet->SetLifeSpan(1.f);
     }
 }

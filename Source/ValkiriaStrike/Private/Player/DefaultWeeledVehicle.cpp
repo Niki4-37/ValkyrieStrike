@@ -92,6 +92,8 @@ void ADefaultWeeledVehicle::Tick(float Delta)
 void ADefaultWeeledVehicle::BeginPlay()
 {
     Super::BeginPlay();
+
+    Tags.Add("Player");
 }
 
 void ADefaultWeeledVehicle::MoveForward(float Val)

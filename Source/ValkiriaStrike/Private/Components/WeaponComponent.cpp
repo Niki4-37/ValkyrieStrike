@@ -15,7 +15,7 @@ void UWeaponComponent::BeginPlay()
 {
     Super::BeginPlay();
 
-    InitWeapons_OnServer();
+    //InitWeapons_OnServer();
 }
 
 void UWeaponComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

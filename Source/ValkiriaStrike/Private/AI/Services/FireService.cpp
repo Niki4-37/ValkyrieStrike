@@ -3,7 +3,7 @@
 #include "AI/Services/FireService.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "Weapon/Turret.h"
+#include "AI/AIEnemyController.h"
 
 UFireService::UFireService()
 {
@@ -17,8 +17,9 @@ void UFireService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory
 
     const auto HasAim = Blackboard && Blackboard->GetValueAsObject(EnemyActorKey.SelectedKeyName);
 
-    if (Controller)
+    if (const auto AIEnemyController = Cast<AAIEnemyController>(Controller))
     {
+        AIEnemyController->StartFire(HasAim);
         // const auto TurretPawn = Cast<ATurret>(Controller->GetPawn());
         // if (TurretPawn)
         //{

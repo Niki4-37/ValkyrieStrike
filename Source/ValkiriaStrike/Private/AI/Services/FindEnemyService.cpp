@@ -20,6 +20,7 @@ void UFindEnemyService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
         if (PerceptionComponent)
         {
             Blackboard->SetValueAsObject(EnemyActorKey.SelectedKeyName, PerceptionComponent->GetClosestEnemy());
+            UE_LOG(LogTemp, Display, TEXT("EnemyFound"));
         }
     }
     Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);

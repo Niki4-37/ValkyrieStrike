@@ -21,16 +21,18 @@ AActor* UUniversalAIPerceptionComponent::GetClosestEnemy() const
     AActor* BestPawn = nullptr;
     for (const auto PercievedActor : PercievedActors)
     {
-        const auto HealthComponent = PercievedActor->FindComponentByClass<UHealthComponent>();
-        if (HealthComponent && !HealthComponent->IsDead())  // TODO: check if enemies or not
-        {
+        if (!PercievedActor->ActorHasTag("Player")) continue;
+
+        //const auto HealthComponent = PercievedActor->FindComponentByClass<UHealthComponent>();
+        //if (HealthComponent && !HealthComponent->IsDead())  // TODO: check if enemies or not
+        //{
             const auto CurrentDistance = (PercievedActor->GetActorLocation() - Pawn->GetActorLocation()).Size();
             if (CurrentDistance < BestDistance)
             {
                 BestDistance = CurrentDistance;
                 BestPawn = PercievedActor;
             }
-        }
+        //}
     }
     return BestPawn;
 }
