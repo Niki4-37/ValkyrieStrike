@@ -26,7 +26,7 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     UStaticMeshComponent* WeaponMesh;
 
-    UPROPERTY(EditAniwhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
     float BeemRadius = 50.f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)

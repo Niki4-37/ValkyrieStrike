@@ -16,8 +16,6 @@ UWeaponComponent::UWeaponComponent()
 
 void UWeaponComponent::ShootFromSecondWeapon()
 {
-    UE_LOG(WeaponComponent_LOG, Display, TEXT("Turret %s"), VehicleTurret ? TEXT("Enabled") : TEXT("Disabled"));
-
     if (!SecondWeapon) return;
     SecondWeapon->MakeShot_OnServer();
     UE_LOG(WeaponComponent_LOG, Display, TEXT("Fire from alternative weapon!!!"));
