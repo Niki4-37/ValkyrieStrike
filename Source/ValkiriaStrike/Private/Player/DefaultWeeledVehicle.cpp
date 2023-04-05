@@ -72,9 +72,7 @@ void ADefaultWeeledVehicle::SetupPlayerInputComponent(UInputComponent* PlayerInp
     PlayerInputComponent->BindAction<FOnPressingBreak>("Handbrake", IE_Pressed, this, &ADefaultWeeledVehicle::OnHandbrakePressed, true);
     PlayerInputComponent->BindAction<FOnPressingBreak>("Handbrake", IE_Released, this, &ADefaultWeeledVehicle::OnHandbrakePressed, false);
 
-    DECLARE_DELEGATE_OneParam(FOnFirePressed, bool);
-    PlayerInputComponent->BindAction<FOnFirePressed>("Fire", IE_Pressed, this, &ADefaultWeeledVehicle::OnFireEvent, true);
-    PlayerInputComponent->BindAction<FOnFirePressed>("Fire", IE_Released, this, &ADefaultWeeledVehicle::OnFireEvent, false);
+    PlayerInputComponent->BindAction("Fire", IE_Pressed, WeaponComponent, &UWeaponComponent::ShootFromSecondWeapon);
 }
 
 void ADefaultWeeledVehicle::Tick(float Delta)
@@ -112,7 +110,4 @@ void ADefaultWeeledVehicle::OnHandbrakePressed(bool bIsUsed)
     GetVehicleMovementComponent()->SetHandbrakeInput(bIsUsed);
 }
 
-void ADefaultWeeledVehicle::OnFireEvent(bool bIsEnabled)
-{
-    UE_LOG(LogTemp, Display, TEXT("Fire from alternative weapon!!!"));
-}
+void ADefaultWeeledVehicle::OnFireEvent(bool bIsEnabled) {}

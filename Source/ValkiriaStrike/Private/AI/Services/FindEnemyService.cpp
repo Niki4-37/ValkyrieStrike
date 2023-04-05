@@ -19,8 +19,8 @@ void UFindEnemyService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
         const auto PerceptionComponent = Controller->FindComponentByClass<UUniversalAIPerceptionComponent>();
         if (PerceptionComponent)
         {
-            Blackboard->SetValueAsObject(EnemyActorKey.SelectedKeyName, PerceptionComponent->GetClosestEnemy());
-            UE_LOG(LogTemp, Display, TEXT("EnemyFound"));
+            Blackboard->SetValueAsObject(EnemyActorKey.SelectedKeyName, PerceptionComponent->GetClosestEnemy(EnemyTag));
+            // UE_LOG(LogTemp, Display, TEXT("EnemyFound"));
         }
     }
     Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);

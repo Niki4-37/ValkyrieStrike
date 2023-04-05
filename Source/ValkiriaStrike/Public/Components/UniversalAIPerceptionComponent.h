@@ -12,5 +12,5 @@ class VALKIRIASTRIKE_API UUniversalAIPerceptionComponent : public UAIPerceptionC
     GENERATED_BODY()
 
 public:
-    AActor* GetClosestEnemy() const;
+    AActor* GetClosestEnemy(FName EnemyTag) const;
 };

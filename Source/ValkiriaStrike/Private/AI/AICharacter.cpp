@@ -45,7 +45,7 @@ void AAICharacter::BeginPlay()
 {
     Super::BeginPlay();
     check(HealthComponent) HealthComponent->OnDeath.AddUObject(this, &AAICharacter::OnDeath);
-
+    Tags.Add("Enemy");
     SpawnAndAttachWeapon();
 }
 

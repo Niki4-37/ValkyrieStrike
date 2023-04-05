@@ -5,7 +5,7 @@
 #include "Components/HealthComponent.h"
 #include "AIController.h"
 
-AActor* UUniversalAIPerceptionComponent::GetClosestEnemy() const
+AActor* UUniversalAIPerceptionComponent::GetClosestEnemy(FName EnemyTag) const
 {
     TArray<AActor*> PercievedActors;
     GetCurrentlyPerceivedActors(UAISense_Sight::StaticClass(), PercievedActors);
@@ -21,17 +21,17 @@ AActor* UUniversalAIPerceptionComponent::GetClosestEnemy() const
     AActor* BestPawn = nullptr;
     for (const auto PercievedActor : PercievedActors)
     {
-        if (!PercievedActor->ActorHasTag("Player")) continue;
+        if (!PercievedActor->ActorHasTag(EnemyTag)) continue;
 
-        //const auto HealthComponent = PercievedActor->FindComponentByClass<UHealthComponent>();
-        //if (HealthComponent && !HealthComponent->IsDead())  // TODO: check if enemies or not
+        // const auto HealthComponent = PercievedActor->FindComponentByClass<UHealthComponent>();
+        // if (HealthComponent && !HealthComponent->IsDead())  // TODO: check if enemies or not
         //{
-            const auto CurrentDistance = (PercievedActor->GetActorLocation() - Pawn->GetActorLocation()).Size();
-            if (CurrentDistance < BestDistance)
-            {
-                BestDistance = CurrentDistance;
-                BestPawn = PercievedActor;
-            }
+        const auto CurrentDistance = (PercievedActor->GetActorLocation() - Pawn->GetActorLocation()).Size();
+        if (CurrentDistance < BestDistance)
+        {
+            BestDistance = CurrentDistance;
+            BestPawn = PercievedActor;
+        }
         //}
     }
     return BestPawn;

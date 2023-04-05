@@ -2,8 +2,11 @@
 
 #include "Components/WeaponComponent.h"
 #include "Weapon/Turret.h"
+#include "Weapon/SecondVehicleWeapon.h"
 #include "WheeledVehicle.h"
 #include "Net/UnrealNetwork.h"
+
+DEFINE_LOG_CATEGORY_STATIC(WeaponComponent_LOG, All, All)
 
 UWeaponComponent::UWeaponComponent()
 {
@@ -11,11 +14,20 @@ UWeaponComponent::UWeaponComponent()
     SetIsReplicatedByDefault(true);
 }
 
+void UWeaponComponent::ShootFromSecondWeapon()
+{
+    UE_LOG(WeaponComponent_LOG, Display, TEXT("Turret %s"), VehicleTurret ? TEXT("Enabled") : TEXT("Disabled"));
+
+    if (!SecondWeapon) return;
+    SecondWeapon->MakeShot_OnServer();
+    UE_LOG(WeaponComponent_LOG, Display, TEXT("Fire from alternative weapon!!!"));
+}
+
 void UWeaponComponent::BeginPlay()
 {
     Super::BeginPlay();
 
-    //InitWeapons_OnServer();
+    InitWeapons_OnServer();
 }
 
 void UWeaponComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -23,6 +35,7 @@ void UWeaponComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME(UWeaponComponent, VehicleTurret);
+    DOREPLIFETIME(UWeaponComponent, SecondWeapon);
 }
 
 void UWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -32,22 +45,10 @@ void UWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 void UWeaponComponent::InitWeapons_OnServer_Implementation()
 {
-    if (VehicleTurret) return;
+    VehicleTurret = MountWeapon<ATurret>(TurretClass, TurretSocketName);
+    SecondWeapon = MountWeapon<ASecondVehicleWeapon>(SecondWeaponClass, SecondWeaponSocketName);
 
-    const auto WeeledVehicle = Cast<AWheeledVehicle>(GetOwner());
-    if (!WeeledVehicle) return;
-
-    FActorSpawnParameters SpawnParams;
-    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-    SpawnParams.Owner = GetOwner();
-    VehicleTurret = GetWorld()->SpawnActor<ATurret>(TurretClass, SpawnParams);
-
-    if (!VehicleTurret) return;
-
-    FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
-    VehicleTurret->AttachToComponent(WeeledVehicle->GetMesh(), AttachmentRules, TurretSocketName);
-
-    if (!VehicleTurret->Controller)
+    if (VehicleTurret && !VehicleTurret->Controller)
     {
         VehicleTurret->SpawnDefaultController();
     }

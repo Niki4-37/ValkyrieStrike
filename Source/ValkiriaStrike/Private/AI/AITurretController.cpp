@@ -38,5 +38,5 @@ void AAITurretController::RotateToTarget()
         return;
     }
 
-    TurretPawn->RotateToTarget(TurretPerceptionComponent->GetClosestEnemy(), AimingUpdateRate);
+    TurretPawn->RotateToTarget(TurretPerceptionComponent->GetClosestEnemy("Enemy"), AimingUpdateRate);
 }
