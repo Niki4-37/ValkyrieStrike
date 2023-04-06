@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameCoreTypes.h"
 #include "MenuCameraActor.generated.h"
 
-// class ACameraActor;
 class UCameraComponent;
 
 UCLASS()
@@ -17,16 +17,17 @@ class VALKIRIASTRIKE_API AMenuCameraActor : public AActor
 public:
     AMenuCameraActor();
 
+    EMenuState GetActorTypeForMenuState() const { return ActorTypeForMenuState; };
+
 protected:
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
     USceneComponent* ActorRootComponent;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
-    // ACameraActor* MenuActorCamera;
     UCameraComponent* CameraComp;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FName ActorTag;
+    EMenuState ActorTypeForMenuState;
 
     virtual void BeginPlay() override;
 };

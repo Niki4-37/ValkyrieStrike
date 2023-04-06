@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "GameCoreTypes.h"
 #include "MenuHUD.generated.h"
 
 UCLASS()
@@ -11,9 +12,23 @@ class VALKIRIASTRIKE_API AMenuHUD : public AHUD
 {
     GENERATED_BODY()
 
+public:
+    virtual void PostInitializeComponents() override;
+
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     TSubclassOf<UUserWidget> MenuWidgetClass;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    TSubclassOf<UUserWidget> GameConfigWidgetClass;
+
     virtual void BeginPlay() override;
+
+private:
+    TMap<EMenuState, UUserWidget*> MenuWidgetsMap;
+
+    UPROPERTY()
+    UUserWidget* ActiveWidget{nullptr};
+
+    void OnMenuStateChanged(EMenuState NewState);
 };

@@ -24,7 +24,7 @@ public class ValkiriaStrike : ModuleRules
         {
             "ValkiriaStrike/Public/Player",
             "ValkiriaStrike/Public/AI",
-            "ValkiriaStrike/Public/AI/Service",
+            "ValkiriaStrike/Public/AI/Services",
             "ValkiriaStrike/Public/Components",
             "ValkiriaStrike/Public/GameLevelsConfig",
             "ValkiriaStrike/Public/GameMenu",

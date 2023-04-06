@@ -4,23 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "GameCoreTypes.h"
-#include "MenuWidget.generated.h"
+#include "GameConfigWidget.generated.h"
 
 class UButton;
 
 UCLASS()
-class VALKIRIASTRIKE_API UMenuWidget : public UUserWidget
+class VALKIRIASTRIKE_API UGameConfigWidget : public UUserWidget
 {
     GENERATED_BODY()
 
 protected:
     UPROPERTY(meta = (BindWidget))
-    UButton* StartGameButton;
+    UButton* BackButton;
 
     virtual void NativeOnInitialized() override;
 
 private:
     UFUNCTION()
-    void OnStartGame();
+    void OnBackClicked();
 };

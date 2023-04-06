@@ -1,22 +1,22 @@
 // Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 
-#include "GameMenu/UI/MenuWidget.h"
+#include "GameMenu/UI/GameConfigWidget.h"
 #include "Components/Button.h"
 #include "GameMenu/MenuPlayerController.h"
 
-void UMenuWidget::NativeOnInitialized()
+void UGameConfigWidget::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
-    if (StartGameButton)
+    if (BackButton)
     {
-        StartGameButton->OnClicked.AddDynamic(this, &UMenuWidget::OnStartGame);
+        BackButton->OnClicked.AddDynamic(this, &UGameConfigWidget::OnBackClicked);
     }
 }
 
-void UMenuWidget::OnStartGame()
+void UGameConfigWidget::OnBackClicked()
 {
     if (const auto PlayerController = Cast<AMenuPlayerController>(GetOwningPlayer()))
     {
-        PlayerController->SetNewView(EMenuState::GameConfig);
+        PlayerController->SetNewView(EMenuState::MainMenu);
     }
 }

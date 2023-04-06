@@ -17,9 +17,4 @@ AMenuCameraActor::AMenuCameraActor()
 void AMenuCameraActor::BeginPlay()
 {
     Super::BeginPlay();
-
-    if (ActorTag != NAME_None)
-    {
-        Tags.Add(ActorTag);
-    }
 }

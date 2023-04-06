@@ -4,12 +4,13 @@
 #include "EngineUtils.h"
 #include "GameMenu/MenuCameraActor.h"
 
-void AMenuPlayerController::SetNewView()
+void AMenuPlayerController::SetNewView(EMenuState MenuState)
 {
-    if (SettingsCameraActor)
+    if (MenuCameraActorsMap.Contains(MenuState))
     {
-        SetViewTargetWithBlend(SettingsCameraActor, 2.f, EViewTargetBlendFunction::VTBlend_EaseIn, 1.f, true);
+        SetViewTargetWithBlend(MenuCameraActorsMap[MenuState], 1.f, EViewTargetBlendFunction::VTBlend_EaseIn, 0.5f, true);
     }
+    OnMenuStateChanged.Broadcast(MenuState);
 }
 
 void AMenuPlayerController::BeginPlay()
@@ -21,19 +22,12 @@ void AMenuPlayerController::BeginPlay()
 
     for (const auto CameraActor : TActorRange<AMenuCameraActor>(GetWorld()))
     {
-        if (CameraActor->ActorHasTag("Start"))
-        {
-            StartCameraActor = CameraActor;
-        }
-
-        if (CameraActor->ActorHasTag("Settings"))
-        {
-            SettingsCameraActor = CameraActor;
-        }
+        MenuCameraActorsMap.Add(CameraActor->GetActorTypeForMenuState(), CameraActor);
     }
 
-    if (StartCameraActor)
+    if (MenuCameraActorsMap.Contains(EMenuState::MainMenu))
     {
-        SetViewTargetWithBlend(StartCameraActor, 0.f, EViewTargetBlendFunction::VTBlend_Linear, 0.f, true);
+        SetViewTargetWithBlend(MenuCameraActorsMap[EMenuState::MainMenu], 0.f, EViewTargetBlendFunction::VTBlend_Linear, 0.f, true);
     }
+    OnMenuStateChanged.Broadcast(EMenuState::MainMenu);
 }
