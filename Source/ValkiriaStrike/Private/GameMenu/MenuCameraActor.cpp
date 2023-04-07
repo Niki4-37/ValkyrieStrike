@@ -9,7 +9,6 @@ AMenuCameraActor::AMenuCameraActor()
     PrimaryActorTick.bCanEverTick = false;
     ActorRootComponent = CreateDefaultSubobject<USceneComponent>("ActorRootComponent");
     SetRootComponent(ActorRootComponent);
-    // MenuActorCamera = CreateDefaultSubobject<ACameraActor>("MenuActorCamera");
     CameraComp = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
     CameraComp->SetupAttachment(ActorRootComponent);
 }

@@ -4,9 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "GameCoreTypes.h"
 #include "GameConfigWidget.generated.h"
 
 class UButton;
+class UHorizontalBox;
+class ULevelItemWidget;
 
 UCLASS()
 class VALKIRIASTRIKE_API UGameConfigWidget : public UUserWidget
@@ -17,9 +20,21 @@ protected:
     UPROPERTY(meta = (BindWidget))
     UButton* BackButton;
 
+    UPROPERTY(meta = (BindWidget))
+    UHorizontalBox* LevelItemsBox;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    TSubclassOf<UUserWidget> LevelItemWidgetClass;
+
     virtual void NativeOnInitialized() override;
 
 private:
+    UPROPERTY()
+    TArray<ULevelItemWidget*> LevelItemWidgets;
+
     UFUNCTION()
     void OnBackClicked();
+
+    void InitLevelItems();
+    void OnLevelSelected(const FLevelData& Data);
 };
