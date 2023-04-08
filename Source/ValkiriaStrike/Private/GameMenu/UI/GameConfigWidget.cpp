@@ -2,10 +2,12 @@
 
 #include "GameMenu/UI/GameConfigWidget.h"
 #include "Components/Button.h"
+#include "Components/Border.h"
 #include "GameMenu/MenuPlayerController.h"
 #include "ValkiriaGameInstance.h"
 #include "Components/HorizontalBox.h"
 #include "GameMenu/UI/LevelItemWidget.h"
+#include "GameMenu/UI/VehicleConfigWidget.h"
 
 void UGameConfigWidget::NativeOnInitialized()
 {
@@ -16,6 +18,15 @@ void UGameConfigWidget::NativeOnInitialized()
     }
 
     InitLevelItems();
+
+    if (VehicleConfigPosition)
+    {
+        const auto WidgetToAdd = CreateWidget<UVehicleConfigWidget>(GetOwningPlayer(), VehicleConfigWidgetClass);
+        if (WidgetToAdd)
+        {
+            VehicleConfigPosition->AddChild(WidgetToAdd);
+        }
+    }
 }
 
 void UGameConfigWidget::OnBackClicked()
@@ -28,6 +39,9 @@ void UGameConfigWidget::OnBackClicked()
 
 void UGameConfigWidget::InitLevelItems()
 {
+    checkf(LevelItemWidgetClass, TEXT("LevelItemWidgetClass not define!"));
+    checkf(VehicleConfigWidgetClass, TEXT("VehicleConfigWidgetClass not define!"));
+
     const auto ValkiriaGameInstance = GetGameInstance<UValkiriaGameInstance>();
     if (!ValkiriaGameInstance) return;
 

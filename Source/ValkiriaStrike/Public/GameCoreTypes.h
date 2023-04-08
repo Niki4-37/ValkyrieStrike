@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Engine/DataTable.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
 #include "GameCoreTypes.generated.h"
 
 class UTexture2D;
@@ -11,6 +13,14 @@ enum class EMenuState : uint8
     MainMenu UMETA(DispayName = "Show Menu"),
     GameSettings UMETA(DispayName = "Show Setings"),
     GameConfig UMETA(DispayName = "Show Game Config")
+};
+
+UENUM(BlueprintType)
+enum class EVehicleItemType : uint8
+{
+    Turret,
+    SecondWeapon,
+    Armor
 };
 //clang-format on
 
@@ -41,3 +51,24 @@ struct FLevelData
 };
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnLevelSelectedSignature, const FLevelData&);
+
+USTRUCT(BlueprintType)
+struct FVehicleItemData : public FTableRowBase
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    FName ItemName = NAME_None;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    UTexture2D* ItemTumb;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    TSubclassOf<AActor> ItemClass;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    EVehicleItemType ItemType;
+
+    UPROPERTY(EditDefaultsONly, BlueprintReadWrite)
+    bool bIsLocked{false};
+};

@@ -19,6 +19,9 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "Game", meta = (ToolTip = "Level names must be unique!"))
     TArray<FLevelData> LevelsData;
 
+    // UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Vehicle Settings")
+    // UDataTable* VehicleItemsTable;
+
 private:
     FLevelData StartupLevel;
 };

@@ -10,6 +10,7 @@
 class UButton;
 class UHorizontalBox;
 class ULevelItemWidget;
+class UBorder;
 
 UCLASS()
 class VALKIRIASTRIKE_API UGameConfigWidget : public UUserWidget
@@ -25,6 +26,12 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     TSubclassOf<UUserWidget> LevelItemWidgetClass;
+
+    UPROPERTY(meta = (BindWidget))
+    UBorder* VehicleConfigPosition;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    TSubclassOf<UUserWidget> VehicleConfigWidgetClass;
 
     virtual void NativeOnInitialized() override;
 

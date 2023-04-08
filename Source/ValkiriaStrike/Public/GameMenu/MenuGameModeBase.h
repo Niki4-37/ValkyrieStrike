@@ -4,7 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "GameCoreTypes.h"
 #include "MenuGameModeBase.generated.h"
+
+class AMenuVehicleActor;
+class APlayerStart;
 
 UCLASS()
 class VALKIRIASTRIKE_API AMenuGameModeBase : public AGameModeBase
@@ -13,4 +17,22 @@ class VALKIRIASTRIKE_API AMenuGameModeBase : public AGameModeBase
 
 public:
     AMenuGameModeBase();
+
+    virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+    virtual void StartPlay() override;
+
+    void MountVehicleItem(UClass* Class, EVehicleItemType Type);
+
+protected:
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    TSubclassOf<AMenuVehicleActor> MenuVehicleActorClass;
+
+private:
+    UPROPERTY()
+    TArray<APlayerStart*> SpawnPositions;
+
+    UPROPERTY()
+    AMenuVehicleActor* MenuVehicleActor;
+
+    void SpawnMenuVehicleActor();
 };

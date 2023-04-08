@@ -3,6 +3,7 @@
 #include "GameMenu/MenuPlayerController.h"
 #include "EngineUtils.h"
 #include "GameMenu/MenuCameraActor.h"
+#include "GameMenu/MenuGameModeBase.h"
 
 void AMenuPlayerController::SetNewView(EMenuState MenuState)
 {
@@ -11,6 +12,14 @@ void AMenuPlayerController::SetNewView(EMenuState MenuState)
         SetViewTargetWithBlend(MenuCameraActorsMap[MenuState], 1.f, EViewTargetBlendFunction::VTBlend_EaseIn, 0.5f, true);
     }
     OnMenuStateChanged.Broadcast(MenuState);
+}
+
+void AMenuPlayerController::MountVehicleItem(UClass* Class, EVehicleItemType Type)
+{
+    const auto MenuGM = Cast<AMenuGameModeBase>(GetWorld()->GetAuthGameMode());
+    if (!MenuGM) return;
+
+    MenuGM->MountVehicleItem(Class, Type);
 }
 
 void AMenuPlayerController::BeginPlay()
