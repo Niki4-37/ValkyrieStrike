@@ -33,8 +33,8 @@ void UVehicleItemWidget::NativeOnInitialized()
 
 void UVehicleItemWidget::OnItemClicked()
 {
-    const auto MenuPC = Cast<AMenuPlayerController>(GetOwningPlayer());
-    if (!MenuPC) return;
+    const auto MenuPlayerController = Cast<AMenuPlayerController>(GetOwningPlayer());
+    if (!MenuPlayerController) return;
 
-    MenuPC->MountVehicleItem(ItemData.ItemClass, ItemData.ItemType);
+    MenuPlayerController->MountVehicleItem(ItemData.ItemClass, ItemData.ItemType);
 }

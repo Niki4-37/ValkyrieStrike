@@ -5,6 +5,7 @@
 #include "Weapon/SecondVehicleWeapon.h"
 #include "WheeledVehicle.h"
 #include "Net/UnrealNetwork.h"
+#include "GameLevelsConfig/ValkiriaPlayerState.h"
 
 DEFINE_LOG_CATEGORY_STATIC(WeaponComponent_LOG, All, All)
 
@@ -43,8 +44,18 @@ void UWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 void UWeaponComponent::InitWeapons_OnServer_Implementation()
 {
-    VehicleTurret = MountWeapon<ATurret>(TurretClass, TurretSocketName);
-    SecondWeapon = MountWeapon<ASecondVehicleWeapon>(SecondWeaponClass, SecondWeaponSocketName);
+    if (!GetOwner() || !GetOwner()->GetInstigatorController()) return;
+    const auto PlayerState = Cast<AValkiriaPlayerState>(GetOwner()->GetInstigatorController()->PlayerState);
+    if (!PlayerState) return;
+
+    if (PlayerState->GetTurretClass())
+    {
+        VehicleTurret = MountWeapon<ATurret>(PlayerState->GetTurretClass(), TurretSocketName);
+    }
+    if (PlayerState->GetSecondWeaponClass())
+    {
+        SecondWeapon = MountWeapon<ASecondVehicleWeapon>(PlayerState->GetSecondWeaponClass(), SecondWeaponSocketName);
+    }
 
     if (VehicleTurret && !VehicleTurret->Controller)
     {

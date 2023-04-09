@@ -54,8 +54,6 @@ inline void AMenuVehicleActor::MountItemOnVehicle(UClass* Class, EVehicleItemTyp
 
     if (AttachedActorsMap.Contains(Type))
     {
-        //FDetachmentTransformRules DetachmentRules(EDetachmentRule::KeepWorld, false);
-        //AttachedActorsMap[Type]->DetachFromActor(DetachmentRules);
         AttachedActorsMap[Type]->Destroy();
     }
 

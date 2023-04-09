@@ -22,6 +22,9 @@ protected:
     UButton* BackButton;
 
     UPROPERTY(meta = (BindWidget))
+    UButton* BeginPlayButton;
+
+    UPROPERTY(meta = (BindWidget))
     UHorizontalBox* LevelItemsBox;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -41,6 +44,9 @@ private:
 
     UFUNCTION()
     void OnBackClicked();
+
+    UFUNCTION()
+    void OnBeginPlayClicked();
 
     void InitLevelItems();
     void OnLevelSelected(const FLevelData& Data);

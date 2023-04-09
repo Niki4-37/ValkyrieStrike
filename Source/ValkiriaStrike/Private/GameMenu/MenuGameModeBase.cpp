@@ -6,11 +6,17 @@
 #include "GameMenu/MenuVehicleActor.h"
 #include "EngineUtils.h"
 #include "GameFramework/PlayerStart.h"
+#include "GameLevelsConfig/ValkiriaPlayerState.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "ValkiriaGameInstance.h"
 
 AMenuGameModeBase::AMenuGameModeBase()
 {
     HUDClass = AMenuHUD::StaticClass();
     PlayerControllerClass = AMenuPlayerController::StaticClass();
+    PlayerStateClass = AValkiriaPlayerState::StaticClass();
+
+    bUseSeamlessTravel = true;
 }
 
 void AMenuGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
@@ -32,11 +38,27 @@ void AMenuGameModeBase::StartPlay()
     SpawnMenuVehicleActor();
 }
 
-void AMenuGameModeBase::MountVehicleItem(UClass* Class, EVehicleItemType Type)
+void AMenuGameModeBase::MountVehicleItem(UClass* Class, EVehicleItemType Type, APlayerController* PC)
 {
-    if (!MenuVehicleActor) return;
+    if (MenuVehicleActor)
+    {
+        MenuVehicleActor->MountItemOnVehicle(Class, Type);
+    }
+    if (const auto MenuPC = Cast<AMenuPlayerController>(PC))
+    {
+        if (const auto ValkiriaPlayerState = MenuPC->GetPlayerState<AValkiriaPlayerState>())
+        {
+            ValkiriaPlayerState->SaveMountedItem(Class, Type);
+        }
+    }
+}
 
-    MenuVehicleActor->MountItemOnVehicle(Class, Type);
+void AMenuGameModeBase::LaunchGame(APlayerController* PC)
+{
+    const auto ValkiriaGameInstance = GetGameInstance<UValkiriaGameInstance>();
+    if (!ValkiriaGameInstance) return;
+    const FString SelectedLevelName = "servertravel " + ValkiriaGameInstance->GetStartupLevel().LevelName.ToString();
+    UKismetSystemLibrary::ExecuteConsoleCommand(this, SelectedLevelName, PC);
 }
 
 void AMenuGameModeBase::SpawnMenuVehicleActor()

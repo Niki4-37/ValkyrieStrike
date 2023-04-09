@@ -15,12 +15,12 @@ class VALKIRIASTRIKE_API UValkiriaGameInstance : public UGameInstance
 public:
     TArray<FLevelData> GetLevelsData() const { return LevelsData; }
 
+    FLevelData GetStartupLevel() const { return StartupLevel; }
+    void SetStartupLevel(const FLevelData& Data) { StartupLevel = Data; }
+
 protected:
     UPROPERTY(EditDefaultsOnly, Category = "Game", meta = (ToolTip = "Level names must be unique!"))
     TArray<FLevelData> LevelsData;
-
-    // UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Vehicle Settings")
-    // UDataTable* VehicleItemsTable;
 
 private:
     FLevelData StartupLevel;

@@ -8,6 +8,7 @@
 #include "Components/HorizontalBox.h"
 #include "GameMenu/UI/LevelItemWidget.h"
 #include "GameMenu/UI/VehicleConfigWidget.h"
+#include "GameMenu/MenuGameModeBase.h"
 
 void UGameConfigWidget::NativeOnInitialized()
 {
@@ -15,6 +16,12 @@ void UGameConfigWidget::NativeOnInitialized()
     if (BackButton)
     {
         BackButton->OnClicked.AddDynamic(this, &UGameConfigWidget::OnBackClicked);
+    }
+
+    if (BeginPlayButton)
+    {
+        BeginPlayButton->OnClicked.AddDynamic(this, &UGameConfigWidget::OnBeginPlayClicked);
+        BeginPlayButton->SetIsEnabled(false);
     }
 
     InitLevelItems();
@@ -35,6 +42,14 @@ void UGameConfigWidget::OnBackClicked()
     {
         PlayerController->SetNewView(EMenuState::MainMenu);
     }
+}
+
+void UGameConfigWidget::OnBeginPlayClicked()
+{
+    const auto MenuGM = GetWorld()->GetAuthGameMode<AMenuGameModeBase>();
+    if (!MenuGM) return;
+
+    MenuGM->LaunchGame(GetOwningPlayer());
 }
 
 void UGameConfigWidget::InitLevelItems()
@@ -63,12 +78,17 @@ void UGameConfigWidget::InitLevelItems()
 
 void UGameConfigWidget::OnLevelSelected(const FLevelData& Data)
 {
-    // Set Star Level in GameInstance
-
     for (auto LevelItemWidget : LevelItemWidgets)
     {
         if (!LevelItemWidget) continue;
         const bool bIsSelected = Data.LevelName == LevelItemWidget->GetLevelData().LevelName;
         LevelItemWidget->SetSelected(bIsSelected);
+    }
+
+    const auto ValkiriaGameInstance = GetGameInstance<UValkiriaGameInstance>();
+    if (ValkiriaGameInstance)
+    {
+        ValkiriaGameInstance->SetStartupLevel(Data);
+        BeginPlayButton->SetIsEnabled(true);
     }
 }

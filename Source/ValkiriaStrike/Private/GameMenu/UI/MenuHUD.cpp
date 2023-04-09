@@ -8,6 +8,9 @@ void AMenuHUD::PostInitializeComponents()
 {
     Super::PostInitializeComponents();
 
+    checkf(MenuWidgetClass, TEXT("MenuWidgetClass not define!"));
+    checkf(GameConfigWidgetClass, TEXT("GameConfigWidgetClass not define!"));
+
     MenuWidgetsMap.Add(EMenuState::MainMenu, CreateWidget<UUserWidget>(GetWorld(), MenuWidgetClass));
     MenuWidgetsMap.Add(EMenuState::GameConfig, CreateWidget<UUserWidget>(GetWorld(), GameConfigWidgetClass));
 

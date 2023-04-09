@@ -19,7 +19,7 @@ void AMenuPlayerController::MountVehicleItem(UClass* Class, EVehicleItemType Typ
     const auto MenuGM = Cast<AMenuGameModeBase>(GetWorld()->GetAuthGameMode());
     if (!MenuGM) return;
 
-    MenuGM->MountVehicleItem(Class, Type);
+    MenuGM->MountVehicleItem(Class, Type, this);
 }
 
 void AMenuPlayerController::BeginPlay()
