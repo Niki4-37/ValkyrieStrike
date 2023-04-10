@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "SecondVehicleWeapon.generated.h"
+#include "SecondWeapon.generated.h"
 
 class UStaticMeshComponent;
 
 UCLASS()
-class VALKIRIASTRIKE_API ASecondVehicleWeapon : public AActor
+class VALKIRIASTRIKE_API ASecondWeapon : public AActor
 {
     GENERATED_BODY()
 
 public:
-    ASecondVehicleWeapon();
+    ASecondWeapon();
 
     UFUNCTION(Server, unreliable)
     void MakeShot_OnServer();

@@ -28,10 +28,13 @@ protected:
     USceneComponent* PawnRootComponent;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    UStaticMeshComponent* TurretMesh;
+    UStaticMeshComponent* TurretTower;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    FVector MuzzleOffset;
+    UStaticMeshComponent* TurretMuzzle;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FName MuzzleSocketName{"MuzzleSocket"};
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     float FireRate{0.5f};

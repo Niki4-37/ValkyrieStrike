@@ -1,13 +1,13 @@
 // Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 
-#include "Weapon/SecondVehicleWeapon.h"
+#include "Weapon/SecondWeapon.h"
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Net/UnrealNetwork.h"
 
 #include "DrawDebugHelpers.h"
 
-ASecondVehicleWeapon::ASecondVehicleWeapon()
+ASecondWeapon::ASecondWeapon()
 {
     PrimaryActorTick.bCanEverTick = false;
     bReplicates = true;
@@ -19,7 +19,7 @@ ASecondVehicleWeapon::ASecondVehicleWeapon()
     WeaponMesh->SetupAttachment(RootComponent);
 }
 
-void ASecondVehicleWeapon::MakeShot_OnServer_Implementation()
+void ASecondWeapon::MakeShot_OnServer_Implementation()
 {
     if (!bIsReady || !WeaponMesh) return;
 
@@ -30,10 +30,6 @@ void ASecondVehicleWeapon::MakeShot_OnServer_Implementation()
     FHitResult Hit;
     // FCollisionQueryParams CollisionParams;
     // GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, CollisionParams);
-
-    UKismetSystemLibrary::SphereTraceSingle(GetWorld(), TraceStart, TraceEnd, BeemRadius, UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility), false, {}, EDrawDebugTrace::ForDuration,
-                                            Hit, true);
-
     // if (Hit.bBlockingHit)
     //{
     //     DrawDebugLine(GetWorld(), TraceStart, Hit.ImpactPoint, FColor::Red, false, 3.0f, 0, 3.0f);
@@ -43,19 +39,30 @@ void ASecondVehicleWeapon::MakeShot_OnServer_Implementation()
     //     DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Blue, false, 3.0f, 0, 3.0f);
     // }
 
+    UKismetSystemLibrary::SphereTraceSingle(GetWorld(),                                                           //
+                                            TraceStart,                                                           //
+                                            TraceEnd,                                                             //
+                                            BeemRadius,                                                           //
+                                            UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility),  //
+                                            false,                                                                //
+                                            {GetOwner(), this},                                                   //
+                                            EDrawDebugTrace::ForDuration,                                         //
+                                            Hit,                                                                  //
+                                            true);
+
     FTimerDelegate TimerDelegate;
     TimerDelegate.BindLambda([&]() { bIsReady = true; });
     GetWorldTimerManager().SetTimer(ReloadingTimer, TimerDelegate, ReloadingTime, false);
 }
 
-void ASecondVehicleWeapon::BeginPlay()
+void ASecondWeapon::BeginPlay()
 {
     Super::BeginPlay();
 }
 
-void ASecondVehicleWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void ASecondWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-    DOREPLIFETIME(ASecondVehicleWeapon, bIsReady);
+    DOREPLIFETIME(ASecondWeapon, bIsReady);
 }

@@ -7,7 +7,7 @@
 #include "WeaponComponent.generated.h"
 
 class ATurret;
-class ASecondVehicleWeapon;
+class ASecondWeapon;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class VALKIRIASTRIKE_API UWeaponComponent : public UActorComponent
@@ -20,11 +20,12 @@ public:
     void ShootFromSecondWeapon();
 
 protected:
+    /* used in game level for debug */
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     TSubclassOf<ATurret> TurretClass;
-
+    /* used in game level for debug */
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    TSubclassOf<ASecondVehicleWeapon> SecondWeaponClass;
+    TSubclassOf<ASecondWeapon> SecondWeaponClass;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     FName TurretSocketName{"TurretSocket"};
@@ -43,7 +44,7 @@ private:
     ATurret* VehicleTurret{nullptr};
 
     UPROPERTY(Replicated)
-    ASecondVehicleWeapon* SecondWeapon{nullptr};
+    ASecondWeapon* SecondWeapon{nullptr};
 
     UFUNCTION(Server, reliable)
     void InitWeapons_OnServer();

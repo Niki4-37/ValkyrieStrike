@@ -16,11 +16,14 @@ ATurret::ATurret()
     PawnRootComponent = CreateDefaultSubobject<USceneComponent>("PawnRootComponent");
     SetRootComponent(PawnRootComponent);
 
-    TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>("TurretMesh");
-    TurretMesh->SetupAttachment(RootComponent);
+    TurretTower = CreateDefaultSubobject<UStaticMeshComponent>("TurretTower");
+    TurretTower->SetupAttachment(RootComponent);
 
-    AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-    AIControllerClass = AAITurretController::StaticClass();
+    TurretMuzzle = CreateDefaultSubobject<UStaticMeshComponent>("TurretMuzzle");
+    TurretMuzzle->SetupAttachment(RootComponent);
+
+    // AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+    // AIControllerClass = AAITurretController::StaticClass();
 }
 
 void ATurret::RotateToTarget(AActor* AimActor, float TimerRate)
@@ -42,10 +45,16 @@ void ATurret::RotateToTarget(AActor* AimActor, float TimerRate)
 
             const auto AimLocation = AimActor ? AimActor->GetActorLocation() : FVector::ZeroVector;
             const auto TurretLocatiom = GetActorLocation();
-            const auto FromRotation = PawnRootComponent->GetComponentRotation();
+            // const auto FromRotation = PawnRootComponent->GetComponentRotation();
+            const auto FromRotation = TurretMuzzle->GetComponentRotation();
             const FRotator Direction = FRotationMatrix::MakeFromX(AimLocation - TurretLocatiom).Rotator();
             FQuat DeltaQuat = FQuat::Slerp(FQuat(FromRotation), FQuat(Direction), Alpha);
-            PawnRootComponent->SetWorldRotation(DeltaQuat);
+            // PawnRootComponent->SetWorldRotation(DeltaQuat);
+
+            float YawValue = DeltaQuat.Rotator().Yaw;
+            TurretTower->SetWorldRotation(FRotator(0.f, YawValue, 0.f));
+            TurretMuzzle->SetWorldRotation(DeltaQuat);
+
             Alpha += 0.1f;
         });
 
@@ -73,16 +82,16 @@ void ATurret::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 void ATurret::MakeShot()
 {
     /* handled on server */
-    //UE_LOG(LogTemp, Display, TEXT("Fire"));
-    auto Rotation = GetActorForwardVector().Rotation();
+    // auto Rotation = GetActorForwardVector().Rotation();
+    auto Rotation = TurretMuzzle->GetSocketRotation(MuzzleSocketName);
 
-    auto MuzzleLocation = GetActorLocation() + Rotation.RotateVector(MuzzleOffset);
+    auto MuzzleLocation = TurretMuzzle->GetSocketLocation(MuzzleSocketName);
+    // auto MuzzleLocation = GetActorLocation() + Rotation.RotateVector(MuzzleOffset);
     FTransform SpawningTransform(Rotation, MuzzleLocation);
 
     auto Bullet = GetWorld()->SpawnActor<ADefaultProjectile>(DefaultProjectileClass, SpawningTransform);
     if (Bullet)
     {
-        //UE_LOG(LogTemp, Display, TEXT("Location %s"), *Bullet->GetActorLocation().ToString());
         Bullet->SetLifeSpan(1.f);
     }
 }

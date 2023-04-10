@@ -2,7 +2,7 @@
 
 #include "Components/WeaponComponent.h"
 #include "Weapon/Turret.h"
-#include "Weapon/SecondVehicleWeapon.h"
+#include "Weapon/SecondWeapon.h"
 #include "WheeledVehicle.h"
 #include "Net/UnrealNetwork.h"
 #include "GameLevelsConfig/ValkiriaPlayerState.h"
@@ -45,17 +45,28 @@ void UWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 void UWeaponComponent::InitWeapons_OnServer_Implementation()
 {
     if (!GetOwner() || !GetOwner()->GetInstigatorController()) return;
-    const auto PlayerState = Cast<AValkiriaPlayerState>(GetOwner()->GetInstigatorController()->PlayerState);
+    const auto PlayerState = GetOwner()->GetInstigatorController()->GetPlayerState<AValkiriaPlayerState>();
     if (!PlayerState) return;
 
-    if (PlayerState->GetTurretClass())
+    //if (PlayerState->GetTurretClass())
+    //{
+    //    VehicleTurret = MountWeapon<ATurret>(PlayerState->GetTurretClass(), TurretSocketName);
+    //}
+    //if (PlayerState->GetSecondWeaponClass())
+    //{
+    //    SecondWeapon = MountWeapon<ASecondWeapon>(PlayerState->GetSecondWeaponClass(), SecondWeaponSocketName);
+    //}
+
+    /* used in game level for debug */
+    if (TurretClass)
     {
-        VehicleTurret = MountWeapon<ATurret>(PlayerState->GetTurretClass(), TurretSocketName);
+        VehicleTurret = MountWeapon<ATurret>(TurretClass, TurretSocketName);
     }
-    if (PlayerState->GetSecondWeaponClass())
+    if  (SecondWeaponClass)
     {
-        SecondWeapon = MountWeapon<ASecondVehicleWeapon>(PlayerState->GetSecondWeaponClass(), SecondWeaponSocketName);
+        SecondWeapon = MountWeapon<ASecondWeapon>(SecondWeaponClass, SecondWeaponSocketName);
     }
+
 
     if (VehicleTurret && !VehicleTurret->Controller)
     {
