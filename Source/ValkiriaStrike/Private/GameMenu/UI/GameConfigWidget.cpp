@@ -24,8 +24,6 @@ void UGameConfigWidget::NativeOnInitialized()
         BeginPlayButton->SetIsEnabled(false);
     }
 
-    InitLevelItems();
-
     if (VehicleConfigPosition)
     {
         const auto WidgetToAdd = CreateWidget<UVehicleConfigWidget>(GetOwningPlayer(), VehicleConfigWidgetClass);
@@ -34,6 +32,8 @@ void UGameConfigWidget::NativeOnInitialized()
             VehicleConfigPosition->AddChild(WidgetToAdd);
         }
     }
+
+    InitLevelItems();
 }
 
 void UGameConfigWidget::OnBackClicked()

@@ -10,6 +10,7 @@ class UCameraComponent;
 class USpringArmComponent;
 class ATurret;
 class UWeaponComponent;
+class UVehicleIndicatorsComponent;
 
 UCLASS()
 class VALKIRIASTRIKE_API ADefaultWeeledVehicle : public AWheeledVehicle
@@ -28,6 +29,9 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     UWeaponComponent* WeaponComponent;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    UVehicleIndicatorsComponent* VehicleIndicatorsComp;
 
     UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly)
     bool bInReverseGear;

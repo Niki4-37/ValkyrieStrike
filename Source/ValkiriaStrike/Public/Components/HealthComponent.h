@@ -4,9 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "GameCoreTypes.h"
 #include "HealthComponent.generated.h"
-
-DECLARE_MULTICAST_DELEGATE(FOnDeathSignature);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class VALKIRIASTRIKE_API UHealthComponent : public UActorComponent
@@ -17,6 +16,8 @@ public:
     UHealthComponent();
 
     FOnDeathSignature OnDeath;
+    /* used in widget */
+    FOnHealthChangedSignature OnHealthChanged;
 
 protected:
     virtual void BeginPlay() override;
@@ -37,4 +38,7 @@ private:
 
     UFUNCTION()
     void OnTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+
+    UFUNCTION(Client, unreliable)
+    void OnHealthChanged_OnClient(float HealthPercentage);
 };

@@ -8,9 +8,6 @@ void AMenuHUD::PostInitializeComponents()
 {
     Super::PostInitializeComponents();
 
-    checkf(MenuWidgetClass, TEXT("MenuWidgetClass not define!"));
-    checkf(GameConfigWidgetClass, TEXT("GameConfigWidgetClass not define!"));
-
     MenuWidgetsMap.Add(EMenuState::MainMenu, CreateWidget<UUserWidget>(GetWorld(), MenuWidgetClass));
     MenuWidgetsMap.Add(EMenuState::GameConfig, CreateWidget<UUserWidget>(GetWorld(), GameConfigWidgetClass));
 
@@ -29,9 +26,25 @@ void AMenuHUD::PostInitializeComponents()
     }
 }
 
+void AMenuHUD::Destroyed()
+{
+    Super::Destroyed();
+
+    for (auto MenuWidgetPair : MenuWidgetsMap)
+    {
+        const auto MenuWidget = MenuWidgetPair.Value;
+        if (!MenuWidget) continue;
+
+        MenuWidget->RemoveFromParent();
+    }
+}
+
 void AMenuHUD::BeginPlay()
 {
     Super::BeginPlay();
+
+    checkf(MenuWidgetClass, TEXT("MenuWidgetClass not define!"));
+    checkf(GameConfigWidgetClass, TEXT("GameConfigWidgetClass not define!"));
 }
 
 void AMenuHUD::OnMenuStateChanged(EMenuState NewState)

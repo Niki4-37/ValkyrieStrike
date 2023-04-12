@@ -5,6 +5,7 @@
 #include "../ValkiriaStrikeWheelRear.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/WeaponComponent.h"
+#include "Components/VehicleIndicatorsComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
@@ -56,6 +57,7 @@ ADefaultWeeledVehicle::ADefaultWeeledVehicle()
     bInReverseGear = false;
 
     WeaponComponent = CreateDefaultSubobject<UWeaponComponent>("WeaponComponent");
+    VehicleIndicatorsComp = CreateDefaultSubobject<UVehicleIndicatorsComponent>("VehicleIndicatorsComp");
 }
 
 void ADefaultWeeledVehicle::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

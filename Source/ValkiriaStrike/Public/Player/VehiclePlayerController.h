@@ -6,12 +6,12 @@
 #include "GameFramework/PlayerController.h"
 #include "VehiclePlayerController.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class VALKIRIASTRIKE_API AVehiclePlayerController : public APlayerController
 {
-	GENERATED_BODY()
-	
+    GENERATED_BODY()
+
+protected:
+    virtual void BeginPlay() override;
+    virtual void OnPossess(APawn* InPawn) override;
 };

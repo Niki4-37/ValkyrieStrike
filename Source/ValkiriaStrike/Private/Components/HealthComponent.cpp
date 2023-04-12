@@ -42,7 +42,9 @@ void UHealthComponent::SetHealth(float NewHealth)
 {
     float DeltaHealth = NewHealth - Health;
     Health = FMath::Clamp(NewHealth, 0.f, MaxHealth);
-    // OnHealthChanged_OnClient(Health, MaxHealth, DeltaHealth);
+
+    float HelthPercentage = MaxHealth > 0 ? Health / MaxHealth : 0.f;
+    OnHealthChanged_OnClient(HelthPercentage);
     UE_LOG(HealthComponent_LOG, Display, TEXT("SetHealth: %f"), Health);
 }
 
@@ -56,4 +58,9 @@ void UHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const
         OnDeath.Broadcast();
         UE_LOG(HealthComponent_LOG, Display, TEXT("DEAD!"));
     }
+}
+
+void UHealthComponent::OnHealthChanged_OnClient_Implementation(float HealthPercentage)
+{
+    OnHealthChanged.Broadcast(HealthPercentage);
 }

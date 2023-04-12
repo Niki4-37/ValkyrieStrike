@@ -13,10 +13,10 @@ void UVehicleConfigWidget::NativeOnInitialized()
 
 void UVehicleConfigWidget::InitVehicleItems()
 {
+    checkf(VehicleItemWidgetClass, TEXT("VehicleItemWidgetClass not define!"));
+
     TArray<FVehicleItemData*> ItemPtrs;
     VehicleItemsTable->GetAllRows<FVehicleItemData>("", ItemPtrs);
-
-    checkf(VehicleItemWidgetClass, TEXT("VehicleItemWidgetClass not define!"));
 
     if (!TurretBox || !SecondWeaponBox) return;
 

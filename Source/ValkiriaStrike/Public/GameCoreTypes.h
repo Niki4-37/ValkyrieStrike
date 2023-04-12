@@ -72,3 +72,6 @@ struct FVehicleItemData : public FTableRowBase
     UPROPERTY(EditDefaultsONly, BlueprintReadWrite)
     bool bIsLocked{false};
 };
+
+DECLARE_MULTICAST_DELEGATE(FOnDeathSignature);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChangedSignature, float);

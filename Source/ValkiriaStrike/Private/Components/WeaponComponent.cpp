@@ -66,7 +66,7 @@ void UWeaponComponent::InitWeapons_OnServer_Implementation()
     {
         SecondWeapon = MountWeapon<ASecondWeapon>(SecondWeaponClass, SecondWeaponSocketName);
     }
-
+    /* end debug */
 
     if (VehicleTurret && !VehicleTurret->Controller)
     {
