@@ -17,7 +17,7 @@ class VALKIRIASTRIKE_API ADefaultWeapon : public AActor
 public:
     ADefaultWeapon();
 
-    void StartFire(bool bIsPressed);
+    void StartFire(bool bIsPressed, const FVector& AimPosition);
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -34,5 +34,6 @@ protected:
 private:
     FTimerHandle FiringTimer;
 
-    void MakeShot();
+    UFUNCTION()
+    void MakeShot(const FVector& AimPosition);
 };

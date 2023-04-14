@@ -11,11 +11,11 @@ AAIEnemyController::AAIEnemyController()
     SetPerceptionComponent(*AIPerceptionComponent);
 }
 
-void AAIEnemyController::StartFire(bool bEnabled)
+void AAIEnemyController::StartFire(AActor* AimActor)
 {
     const auto ControlledCharacter = Cast<AAICharacter>(GetPawn());
     if (!ControlledCharacter) return;
-    ControlledCharacter->StartFire(bEnabled);
+    ControlledCharacter->StartFire(AimActor);
 }
 
 void AAIEnemyController::OnPossess(APawn* InPawn)

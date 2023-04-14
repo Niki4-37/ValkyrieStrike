@@ -15,16 +15,14 @@ void UFireService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory
     const auto Controller = OwnerComp.GetAIOwner();
     const auto Blackboard = OwnerComp.GetBlackboardComponent();
 
-    const auto HasAim = Blackboard && Blackboard->GetValueAsObject(EnemyActorKey.SelectedKeyName);
-
-    if (const auto AIEnemyController = Cast<AAIEnemyController>(Controller))
+    if (Blackboard)
     {
-        AIEnemyController->StartFire(HasAim);
-        // const auto TurretPawn = Cast<ATurret>(Controller->GetPawn());
-        // if (TurretPawn)
-        //{
-        //     HasAim ? TurretPawn->Fire_OnServer(true) : TurretPawn->Fire_OnServer(false);
-        // }
+        const auto AimActor = Cast<AActor>(Blackboard->GetValueAsObject(EnemyActorKey.SelectedKeyName));
+
+        if (const auto AIEnemyController = Cast<AAIEnemyController>(Controller))
+        {
+            AIEnemyController->StartFire(AimActor);
+        }
     }
 
     Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);

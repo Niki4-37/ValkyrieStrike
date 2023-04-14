@@ -48,4 +48,6 @@ public:
                                                  UPrimitiveComponent* OtherComp,     //
                                                  FVector NormalImpulse,              //
                                                  const FHitResult& Hit);
+
+    void SetShootDirection(const FVector& Direction);
 };

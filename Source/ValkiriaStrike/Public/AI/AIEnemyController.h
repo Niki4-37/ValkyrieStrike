@@ -16,7 +16,7 @@ class VALKIRIASTRIKE_API AAIEnemyController : public AAIController
 public:
     AAIEnemyController();
 
-    void StartFire(bool bEnebled);
+    void StartFire(AActor* AimActor);
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

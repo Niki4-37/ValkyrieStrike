@@ -25,7 +25,7 @@ public:
     virtual void Tick(float DeltaTime) override;
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-    void StartFire(bool bIsPressed);
+    void StartFire(AActor* AimActor);
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

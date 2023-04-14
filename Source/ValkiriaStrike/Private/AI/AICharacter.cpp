@@ -6,6 +6,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Weapon/DefaultWeapon.h"
+#include "BrainComponent.h"
 
 AAICharacter::AAICharacter()
 {
@@ -35,24 +36,43 @@ void AAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
     Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void AAICharacter::StartFire(bool bIsPressed)
+void AAICharacter::StartFire(AActor* AimActor)
 {
     if (!OwnedWeapon) return;
-    OwnedWeapon->StartFire(bIsPressed);
+    const bool bCanFire = AimActor ? true : false;
+
+    FVector AimPosition = FVector::ZeroVector;
+    if (AimActor)
+    {
+        AimActor->GetVelocity();
+        AimPosition = AimActor->GetActorLocation() + AimActor->GetVelocity();
+    }
+
+    OwnedWeapon->StartFire(bCanFire, AimPosition);
 }
 
 void AAICharacter::BeginPlay()
 {
     Super::BeginPlay();
-    check(HealthComponent) HealthComponent->OnDeath.AddUObject(this, &AAICharacter::OnDeath);
+    check(HealthComponent);
+    HealthComponent->OnDeath.AddUObject(this, &AAICharacter::OnDeath);
     Tags.Add("Enemy");
     SpawnAndAttachWeapon();
 }
 
 void AAICharacter::OnDeath()
 {
-    // GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+    GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
     PlayAnimMontage(DeathMontage);
+    GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+    OwnedWeapon->StartFire(false, FVector::ZeroVector);
+
+    const auto STUController = Cast<AAIController>(Controller);
+    if (STUController && STUController->BrainComponent)
+    {
+        STUController->BrainComponent->Cleanup();
+    }
 }
 
 void AAICharacter::SpawnAndAttachWeapon()

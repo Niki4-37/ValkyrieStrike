@@ -62,7 +62,12 @@ void ADefaultProjectile::ProjectileCollisionComponentHit(UPrimitiveComponent* Hi
 
     if (Hit.bBlockingHit && Hit.GetActor())
     {
-        //UE_LOG(LogTemp, Display, TEXT("%s"), *Hit.GetActor()->GetName());
+        // UE_LOG(LogTemp, Display, TEXT("%s"), *Hit.GetActor()->GetName());
         Destroy();
     }
+}
+
+void ADefaultProjectile::SetShootDirection(const FVector& Direction)
+{
+    ProjectileMovementComponent->Velocity = Direction * ProjectileMovementComponent->InitialSpeed;
 }
