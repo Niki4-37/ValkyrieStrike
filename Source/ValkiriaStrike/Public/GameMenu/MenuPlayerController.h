@@ -19,7 +19,7 @@ public:
 
     FOnMenuStateChangedSignature OnMenuStateChanged;
 
-    void MountVehicleItem(UClass* Class, EVehicleItemType Type);
+    void MountVehicleItem(const FVehicleItemData& VehicleItemData);
 
 protected:
     virtual void BeginPlay() override;

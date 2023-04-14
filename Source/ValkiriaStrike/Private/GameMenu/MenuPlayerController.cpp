@@ -14,12 +14,12 @@ void AMenuPlayerController::SetNewView(EMenuState MenuState)
     OnMenuStateChanged.Broadcast(MenuState);
 }
 
-void AMenuPlayerController::MountVehicleItem(UClass* Class, EVehicleItemType Type)
+void AMenuPlayerController::MountVehicleItem(const FVehicleItemData& VehicleItemData)
 {
     const auto MenuGM = Cast<AMenuGameModeBase>(GetWorld()->GetAuthGameMode());
     if (!MenuGM) return;
 
-    MenuGM->MountVehicleItem(Class, Type, this);
+    MenuGM->MountVehicleItem(VehicleItemData, this);
 }
 
 void AMenuPlayerController::BeginPlay()

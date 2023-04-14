@@ -15,13 +15,10 @@ class VALKIRIASTRIKE_API AValkiriaPlayerState : public APlayerState
 public:
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-    void SaveMountedItem(UClass* Class, EVehicleItemType Type);
+    void SaveMountedItem(const FVehicleItemData& VehicleItemData);
 
-    UClass* GetTurretClass() const { return TurretClass; }
-    void SetTurretClass(UClass* Class) { TurretClass = Class; }
-
-    UClass* GetSecondWeaponClass() const { return SecondWeaponClass; }
-    void SetSecondWeaponClass(UClass* Class) { SecondWeaponClass = Class; }
+    const TArray<FVehicleItemData>& GetVehicleItems() const { return VehicleItems; };
+    void SetVehicleItems(const TArray<FVehicleItemData>& Items) { VehicleItems = Items; };
 
 protected:
     UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadWrite)
@@ -32,7 +29,5 @@ protected:
 
 private:
     UPROPERTY(Transient, Replicated)
-    UClass* TurretClass;
-    UPROPERTY(Transient, Replicated)
-    UClass* SecondWeaponClass;
+    TArray<FVehicleItemData> VehicleItems;  // Use reserve, update EVehicleItemType add MAX
 };

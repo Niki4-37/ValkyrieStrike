@@ -48,24 +48,27 @@ void UWeaponComponent::InitWeapons_OnServer_Implementation()
     const auto PlayerState = GetOwner()->GetInstigatorController()->GetPlayerState<AValkiriaPlayerState>();
     if (!PlayerState) return;
 
-    //if (PlayerState->GetTurretClass())
-    //{
-    //    VehicleTurret = MountWeapon<ATurret>(PlayerState->GetTurretClass(), TurretSocketName);
-    //}
-    //if (PlayerState->GetSecondWeaponClass())
-    //{
-    //    SecondWeapon = MountWeapon<ASecondWeapon>(PlayerState->GetSecondWeaponClass(), SecondWeaponSocketName);
-    //}
+    for (auto& VeicleItem : PlayerState->GetVehicleItems())
+    {
+        if (VeicleItem.ItemType == EVehicleItemType::Turret && VeicleItem.ItemClass)
+        {
+            VehicleTurret = MountWeapon<ATurret>(VeicleItem.ItemClass, TurretSocketName);
+        }
+        if (VeicleItem.ItemType == EVehicleItemType::SecondWeapon && VeicleItem.ItemClass)
+        {
+            SecondWeapon = MountWeapon<ASecondWeapon>(VeicleItem.ItemClass, SecondWeaponSocketName);
+        }
+    }
 
     /* used in game level for debug */
-    if (TurretClass)
-    {
-        VehicleTurret = MountWeapon<ATurret>(TurretClass, TurretSocketName);
-    }
-    if  (SecondWeaponClass)
-    {
-        SecondWeapon = MountWeapon<ASecondWeapon>(SecondWeaponClass, SecondWeaponSocketName);
-    }
+    // if (TurretClass)
+    //{
+    //     VehicleTurret = MountWeapon<ATurret>(TurretClass, TurretSocketName);
+    // }
+    // if (SecondWeaponClass)
+    //{
+    //    SecondWeapon = MountWeapon<ASecondWeapon>(SecondWeaponClass, SecondWeaponSocketName);
+    //}
     /* end debug */
 
     if (VehicleTurret && !VehicleTurret->Controller)

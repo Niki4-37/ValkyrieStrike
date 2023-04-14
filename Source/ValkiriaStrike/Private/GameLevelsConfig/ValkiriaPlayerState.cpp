@@ -10,22 +10,13 @@ void AValkiriaPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME(AValkiriaPlayerState, Lives);
-    DOREPLIFETIME(AValkiriaPlayerState, TurretClass);
-    DOREPLIFETIME(AValkiriaPlayerState, SecondWeaponClass);
+    DOREPLIFETIME(AValkiriaPlayerState, VehicleItems);
 }
 
-void AValkiriaPlayerState::SaveMountedItem(UClass* Class, EVehicleItemType Type)
+void AValkiriaPlayerState::SaveMountedItem(const FVehicleItemData& VehicleItemData)
 {
-    if (!Class) return;
-
-    switch (Type)
-    {
-        case EVehicleItemType::Turret: TurretClass = Class; break;
-        case EVehicleItemType::SecondWeapon: SecondWeaponClass = Class; break;
-        default: return;
-    }
-
-    UE_LOG(ValkiriaPlayerState_LOG, Display, TEXT("SaveMountedItem %s"), *Class->GetName());
+    const auto ItemPtr = VehicleItems.FindByPredicate([&](FVehicleItemData Data) { return Data.ItemType == VehicleItemData.ItemType; });
+    ItemPtr ? (*ItemPtr = VehicleItemData) : VehicleItems.Add_GetRef(VehicleItemData);
 }
 
 void AValkiriaPlayerState::CopyProperties(APlayerState* PlayerState)
@@ -34,8 +25,7 @@ void AValkiriaPlayerState::CopyProperties(APlayerState* PlayerState)
 
     if (auto ValkiriaPlayerState = Cast<AValkiriaPlayerState>(PlayerState))
     {
-        ValkiriaPlayerState->SetTurretClass(TurretClass);
-        ValkiriaPlayerState->SetSecondWeaponClass(SecondWeaponClass);
+        ValkiriaPlayerState->SetVehicleItems(VehicleItems);
     }
 }
 
@@ -43,9 +33,8 @@ void AValkiriaPlayerState::OverrideWith(APlayerState* PlayerState)
 {
     Super::OverrideWith(PlayerState);
 
-     if (auto ValkiriaPlayerState = Cast<AValkiriaPlayerState>(PlayerState))
+    if (auto ValkiriaPlayerState = Cast<AValkiriaPlayerState>(PlayerState))
     {
-         SetTurretClass(ValkiriaPlayerState->GetTurretClass());
-         SetSecondWeaponClass(ValkiriaPlayerState->GetSecondWeaponClass());
-     }
+        SetVehicleItems(ValkiriaPlayerState->GetVehicleItems());
+    }
 }

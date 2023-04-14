@@ -38,17 +38,17 @@ void AMenuGameModeBase::StartPlay()
     SpawnMenuVehicleActor();
 }
 
-void AMenuGameModeBase::MountVehicleItem(UClass* Class, EVehicleItemType Type, APlayerController* PC)
+void AMenuGameModeBase::MountVehicleItem(const FVehicleItemData& VehicleItemData, APlayerController* PC)
 {
     if (MenuVehicleActor)
     {
-        MenuVehicleActor->MountItemOnVehicle(Class, Type);
+        MenuVehicleActor->MountItemOnVehicle(VehicleItemData.ItemClass, VehicleItemData.ItemType);
     }
     if (const auto MenuPC = Cast<AMenuPlayerController>(PC))
     {
         if (const auto ValkiriaPlayerState = MenuPC->GetPlayerState<AValkiriaPlayerState>())
         {
-            ValkiriaPlayerState->SaveMountedItem(Class, Type);
+            ValkiriaPlayerState->SaveMountedItem(VehicleItemData);
         }
     }
 }
