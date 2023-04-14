@@ -15,7 +15,7 @@ void UHealthComponent::BeginPlay()
 {
     Super::BeginPlay();
 
-    SetHealth(MaxHealth);
+    SetHealth(MaxHealth);  // Server?
 
     const auto ComponentOwner = GetOwner();
     if (ComponentOwner)

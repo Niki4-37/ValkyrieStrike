@@ -13,4 +13,19 @@ class VALKIRIASTRIKE_API UVehicleIndicatorsComponent : public UHealthComponent
 
 public:
     UVehicleIndicatorsComponent();
+
+    FOnFuelValueChangedSignature OnFuelValueChanged;
+
+protected:
+    virtual void BeginPlay() override;
+    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+private:
+    UPROPERTY(Replicated)
+    float FuelValue;
+    float MaxFuelValue{100.f};
+
+    FTimerHandle FuelChangeTimer;
+
+    void ChangeFuelValue();
 };

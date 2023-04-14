@@ -23,5 +23,8 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     TSubclassOf<UUserWidget> VehicleEndurenceWidgetClass;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    TSubclassOf<UUserWidget> FuelGaugeWidgetClass;
+
     virtual void NativeOnInitialized() override;
 };
