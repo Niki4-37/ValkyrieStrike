@@ -20,11 +20,17 @@ protected:
     UPROPERTY(meta = (BindWidget))
     UBorder* VehicleEndurancePosition;
 
+    UPROPERTY(meta = (BindWidget))
+    UBorder* VehicleConfigPosition;
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     TSubclassOf<UUserWidget> VehicleEndurenceWidgetClass;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     TSubclassOf<UUserWidget> FuelGaugeWidgetClass;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    TSubclassOf<UUserWidget> InGameVehicleConfigWidgetClass;
 
     virtual void NativeOnInitialized() override;
 };

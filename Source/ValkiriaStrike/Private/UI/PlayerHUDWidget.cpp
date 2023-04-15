@@ -7,6 +7,7 @@ void UPlayerHUDWidget::NativeOnInitialized()
 {
     checkf(VehicleEndurenceWidgetClass, TEXT("VehicleEndurenceWidgetClass not define!"));
     checkf(FuelGaugeWidgetClass, TEXT("FuelGaugeWidgetClass not define!"));
+    checkf(InGameVehicleConfigWidgetClass, TEXT("InGameVehicleConfigWidgetClass not define!"));
 
     if (VehicleEndurancePosition)
     {
@@ -23,6 +24,15 @@ void UPlayerHUDWidget::NativeOnInitialized()
         if (EnduranceWidget)
         {
             VehicleFuelPosition->AddChild(EnduranceWidget);
+        }
+    }
+
+    if (VehicleConfigPosition)
+    {
+        const auto ConfigWidget = CreateWidget(GetWorld(), InGameVehicleConfigWidgetClass);
+        if (VehicleConfigPosition)
+        {
+            VehicleConfigPosition->AddChild(ConfigWidget);
         }
     }
 }

@@ -73,6 +73,8 @@ void AAICharacter::OnDeath()
     {
         STUController->BrainComponent->Cleanup();
     }
+
+    Tags.Empty();
 }
 
 void AAICharacter::SpawnAndAttachWeapon()

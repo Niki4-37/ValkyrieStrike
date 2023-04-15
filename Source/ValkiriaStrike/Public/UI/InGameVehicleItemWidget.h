@@ -5,35 +5,27 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "GameCoreTypes.h"
-#include "VehicleItemWidget.generated.h"
+#include "InGameVehicleItemWidget.generated.h"
 
-class UButton;
 class UImage;
-class UTextBlock;
+class UProgressBar;
 
 UCLASS()
-class VALKIRIASTRIKE_API UVehicleItemWidget : public UUserWidget
+class VALKIRIASTRIKE_API UInGameVehicleItemWidget : public UUserWidget
 {
     GENERATED_BODY()
 
 public:
     void SetItemData(const FVehicleItemData& Data);
+    void UpdateAmmoCapacityBar(int32 NewValue);
 
 protected:
     UPROPERTY(meta = (BindWidget))
-    UButton* ItemSelectButton;
+    UImage* ItemImage;
 
     UPROPERTY(meta = (BindWidget))
-    UTextBlock* LevelNameTextBlock;
-
-    UPROPERTY(meta = (BindWidget))
-    UImage* ItemImage = nullptr;
-
-    virtual void NativeOnInitialized() override;
+    UProgressBar* AmmoCapacityBar;
 
 private:
-    FVehicleItemData ItemData;
-
-    UFUNCTION()
-    void OnItemClicked();
+    int32 MaxAmmoCapacity;
 };

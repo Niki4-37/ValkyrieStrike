@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "GameCoreTypes.h"
 #include "WeaponComponent.generated.h"
 
 class ATurret;
@@ -16,6 +17,9 @@ class VALKIRIASTRIKE_API UWeaponComponent : public UActorComponent
 
 public:
     UWeaponComponent();
+
+    FOnItemMountSignature OnItemMount;
+    FOnWeaponMakeShotSignature OnWeaponMakeShot;
 
     void ShootFromSecondWeapon();
 
@@ -48,6 +52,9 @@ private:
 
     UFUNCTION(Server, reliable)
     void InitWeapons_OnServer();
+
+    UFUNCTION(Client, unreliable)
+    void OnItemMount_Client(const FVehicleItemData& Data);
 
     template <class T>
     T* MountWeapon(UClass* Class, FName SocketName);

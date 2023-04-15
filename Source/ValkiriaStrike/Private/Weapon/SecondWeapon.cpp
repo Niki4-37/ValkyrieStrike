@@ -19,9 +19,15 @@ ASecondWeapon::ASecondWeapon()
     WeaponMesh->SetupAttachment(RootComponent);
 }
 
+void ASecondWeapon::ChangeAmmoCapacity(int32 Value)
+{
+    /** handled on server */
+    AmmoCapacity = FMath::Clamp(AmmoCapacity + Value, 0, WeaponData.MaxAmmoCapacity);
+}
+
 void ASecondWeapon::MakeShot_OnServer_Implementation()
 {
-    if (!bIsReady || !WeaponMesh) return;
+    if (!bIsReady || !WeaponMesh || IsEmpty()) return;
 
     bIsReady = false;
 
@@ -50,9 +56,11 @@ void ASecondWeapon::MakeShot_OnServer_Implementation()
                                             Hit,                                                                  //
                                             true);
 
+    ChangeAmmoCapacity(-1);
+
     FTimerDelegate TimerDelegate;
     TimerDelegate.BindLambda([&]() { bIsReady = true; });
-    GetWorldTimerManager().SetTimer(ReloadingTimer, TimerDelegate, ReloadingTime, false);
+    GetWorldTimerManager().SetTimer(ReloadingTimer, TimerDelegate, WeaponData.ReloadingTime, false);
 }
 
 void ASecondWeapon::BeginPlay()
@@ -65,4 +73,5 @@ void ASecondWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME(ASecondWeapon, bIsReady);
+    DOREPLIFETIME(ASecondWeapon, AmmoCapacity);
 }

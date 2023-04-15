@@ -71,8 +71,17 @@ struct FVehicleItemData : public FTableRowBase
 
     UPROPERTY(EditDefaultsONly, BlueprintReadWrite)
     bool bIsLocked{false};
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    int32 MaxAmmoCapacity{10};
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    float ReloadingTime{2.f};
 };
 
 DECLARE_MULTICAST_DELEGATE(FOnDeathSignature);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChangedSignature, float);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnFuelValueChangedSignature, float);
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnItemMountSignature, const FVehicleItemData&);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnWeaponMakeShotSignature, EVehicleItemType, int32);

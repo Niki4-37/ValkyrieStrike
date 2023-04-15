@@ -14,10 +14,10 @@ void UVehicleItemWidget::SetItemData(const FVehicleItemData& Data)
     {
         LevelNameTextBlock->SetText(FText::FromName(Data.ItemName));
     }
-    if (ItemlImage)
+    if (ItemImage)
     {
-        ItemlImage->SetBrushFromTexture(Data.ItemTumb);
-        ItemlImage->SetBrushSize(FVector2D(200.f));
+        ItemImage->SetBrushFromTexture(Data.ItemTumb);
+        ItemImage->SetBrushSize(FVector2D(200.f));
     }
 }
 

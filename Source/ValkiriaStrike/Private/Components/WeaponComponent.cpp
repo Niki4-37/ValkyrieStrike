@@ -20,6 +20,8 @@ void UWeaponComponent::ShootFromSecondWeapon()
     if (!SecondWeapon) return;
     SecondWeapon->MakeShot_OnServer();
     UE_LOG(WeaponComponent_LOG, Display, TEXT("Fire from alternative weapon!!!"));
+
+    OnWeaponMakeShot.Broadcast(EVehicleItemType::SecondWeapon, SecondWeapon->GetAmmoCapacity());
 }
 
 void UWeaponComponent::BeginPlay()
@@ -48,16 +50,19 @@ void UWeaponComponent::InitWeapons_OnServer_Implementation()
     const auto PlayerState = GetOwner()->GetInstigatorController()->GetPlayerState<AValkiriaPlayerState>();
     if (!PlayerState) return;
 
-    for (auto& VeicleItem : PlayerState->GetVehicleItems())
+    for (auto& VehicleItem : PlayerState->GetVehicleItems())
     {
-        if (VeicleItem.ItemType == EVehicleItemType::Turret && VeicleItem.ItemClass)
+        if (VehicleItem.ItemType == EVehicleItemType::Turret && VehicleItem.ItemClass)
         {
-            VehicleTurret = MountWeapon<ATurret>(VeicleItem.ItemClass, TurretSocketName);
+            VehicleTurret = MountWeapon<ATurret>(VehicleItem.ItemClass, TurretSocketName);
         }
-        if (VeicleItem.ItemType == EVehicleItemType::SecondWeapon && VeicleItem.ItemClass)
+        if (VehicleItem.ItemType == EVehicleItemType::SecondWeapon && VehicleItem.ItemClass)
         {
-            SecondWeapon = MountWeapon<ASecondWeapon>(VeicleItem.ItemClass, SecondWeaponSocketName);
+            SecondWeapon = MountWeapon<ASecondWeapon>(VehicleItem.ItemClass, SecondWeaponSocketName);
+            SecondWeapon->SetWeaponData(VehicleItem);
+            SecondWeapon->ChangeAmmoCapacity(VehicleItem.MaxAmmoCapacity);
         }
+        OnItemMount_Client(VehicleItem);
     }
 
     /* used in game level for debug */
@@ -75,4 +80,9 @@ void UWeaponComponent::InitWeapons_OnServer_Implementation()
     {
         VehicleTurret->SpawnDefaultController();
     }
+}
+
+void UWeaponComponent::OnItemMount_Client_Implementation(const FVehicleItemData& Data)
+{
+    OnItemMount.Broadcast(Data);
 }
