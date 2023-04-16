@@ -8,6 +8,7 @@
 #include "MenuVehicleActor.generated.h"
 
 class USkeletalMeshComponent;
+class UCameraComponent;
 
 UCLASS()
 class VALKIRIASTRIKE_API AMenuVehicleActor : public AActor
@@ -19,9 +20,15 @@ public:
 
     void MountItemOnVehicle(UClass* Class, EVehicleItemType Type);
 
+    UFUNCTION(Server, reliable)
+    void MountVehicleItem_OnSever(const FVehicleItemData& VehicleItemData);
+
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     USceneComponent* ActorRootComp;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    UCameraComponent* CameraComp;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     USkeletalMeshComponent* Mesh;
@@ -33,32 +40,12 @@ protected:
     FName SecondWeaponSocketName{"SecondWeaponSocket"};
 
     virtual void BeginPlay() override;
+    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
+    UPROPERTY()
     TMap<EVehicleItemType, AActor*> AttachedActorsMap;
+
+    UFUNCTION(NetMulticast, reliable)
+    void MountVehicleItem_Multicast(const FVehicleItemData& VehicleItemData);
 };
-
-inline void AMenuVehicleActor::MountItemOnVehicle(UClass* Class, EVehicleItemType Type)
-{
-    auto VehicleItem = GetWorld()->SpawnActor(Class);
-
-    if (!VehicleItem) return;
-
-    FName SocketName = NAME_None;
-    switch (Type)
-    {
-        case EVehicleItemType::Turret: SocketName = TurretSocketName; break;
-        case EVehicleItemType::SecondWeapon: SocketName = SecondWeaponSocketName; break;
-    }
-    if (SocketName.IsNone()) return;
-
-    if (AttachedActorsMap.Contains(Type))
-    {
-        AttachedActorsMap[Type]->Destroy();
-    }
-
-    AttachedActorsMap.Add(Type, VehicleItem);
-
-    FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
-    AttachedActorsMap[Type]->AttachToComponent(Mesh, AttachmentRules, SocketName);
-}

@@ -36,5 +36,5 @@ void UVehicleItemWidget::OnItemClicked()
     const auto MenuPlayerController = Cast<AMenuPlayerController>(GetOwningPlayer());
     if (!MenuPlayerController) return;
 
-    MenuPlayerController->MountVehicleItem(ItemData);
+    MenuPlayerController->VehicleItemHasSelected_OnServer(ItemData);
 }

@@ -4,22 +4,37 @@
 #include "EngineUtils.h"
 #include "GameMenu/MenuCameraActor.h"
 #include "GameMenu/MenuGameModeBase.h"
+#include "GameMenu/MenuVehicleActor.h"
+#include "Net/UnrealNetwork.h"
 
 void AMenuPlayerController::SetNewView(EMenuState MenuState)
 {
+    if (MenuState == EMenuState::GameConfig && MenuVehicleActor)
+    {
+        SetViewTargetWithBlend(MenuVehicleActor, 1.f, EViewTargetBlendFunction::VTBlend_EaseIn, 0.5f, true);
+    }
+
     if (MenuCameraActorsMap.Contains(MenuState))
     {
         SetViewTargetWithBlend(MenuCameraActorsMap[MenuState], 1.f, EViewTargetBlendFunction::VTBlend_EaseIn, 0.5f, true);
     }
+
     OnMenuStateChanged.Broadcast(MenuState);
 }
 
-void AMenuPlayerController::MountVehicleItem(const FVehicleItemData& VehicleItemData)
+void AMenuPlayerController::VehicleItemHasSelected_OnServer_Implementation(const FVehicleItemData& VehicleItemData)
 {
     const auto MenuGM = Cast<AMenuGameModeBase>(GetWorld()->GetAuthGameMode());
     if (!MenuGM) return;
 
     MenuGM->MountVehicleItem(VehicleItemData, this);
+}
+
+void AMenuPlayerController::MountVehicleItem_OnServer_Implementation(const FVehicleItemData& VehicleItemData)
+{
+    if (!MenuVehicleActor) return;
+
+    MenuVehicleActor->MountVehicleItem_OnSever(VehicleItemData);
 }
 
 void AMenuPlayerController::BeginPlay()
@@ -39,4 +54,11 @@ void AMenuPlayerController::BeginPlay()
         SetViewTargetWithBlend(MenuCameraActorsMap[EMenuState::MainMenu], 0.f, EViewTargetBlendFunction::VTBlend_Linear, 0.f, true);
     }
     OnMenuStateChanged.Broadcast(EMenuState::MainMenu);
+}
+
+void AMenuPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME(AMenuPlayerController, MenuVehicleActor);
 }

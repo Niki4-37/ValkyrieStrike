@@ -9,10 +9,15 @@
 #include "GameMenu/UI/LevelItemWidget.h"
 #include "GameMenu/UI/VehicleConfigWidget.h"
 #include "GameMenu/MenuGameModeBase.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 void UGameConfigWidget::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
+
+    checkf(LevelItemWidgetClass, TEXT("LevelItemWidgetClass not define!"));
+    checkf(VehicleConfigWidgetClass, TEXT("VehicleConfigWidgetClass not define!"));
+
     if (BackButton)
     {
         BackButton->OnClicked.AddDynamic(this, &UGameConfigWidget::OnBackClicked);
@@ -21,7 +26,7 @@ void UGameConfigWidget::NativeOnInitialized()
     if (BeginPlayButton)
     {
         BeginPlayButton->OnClicked.AddDynamic(this, &UGameConfigWidget::OnBeginPlayClicked);
-        BeginPlayButton->SetIsEnabled(false);
+        UKismetSystemLibrary::IsServer(GetWorld()) ? BeginPlayButton->SetIsEnabled(false) : BeginPlayButton->SetVisibility(ESlateVisibility::Collapsed);
     }
 
     if (VehicleConfigPosition)
@@ -54,14 +59,13 @@ void UGameConfigWidget::OnBeginPlayClicked()
 
 void UGameConfigWidget::InitLevelItems()
 {
-    checkf(LevelItemWidgetClass, TEXT("LevelItemWidgetClass not define!"));
-    checkf(VehicleConfigWidgetClass, TEXT("VehicleConfigWidgetClass not define!"));
+    if (!LevelItemsBox) return;
+    LevelItemsBox->ClearChildren();
+
+    if (!UKismetSystemLibrary::IsServer(GetWorld())) return;
 
     const auto ValkiriaGameInstance = GetGameInstance<UValkiriaGameInstance>();
-    if (!ValkiriaGameInstance) return;
-
-    if (!LevelItemsBox || ValkiriaGameInstance->GetLevelsData().Num() == 0) return;
-    LevelItemsBox->ClearChildren();
+    if (!ValkiriaGameInstance || ValkiriaGameInstance->GetLevelsData().Num() == 0) return;
 
     for (const auto& LevelData : ValkiriaGameInstance->GetLevelsData())
     {

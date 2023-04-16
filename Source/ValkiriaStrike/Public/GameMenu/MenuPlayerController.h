@@ -8,6 +8,7 @@
 #include "MenuPlayerController.generated.h"
 
 class AMenuCameraActor;
+class AMenuVehicleActor;
 
 UCLASS()
 class VALKIRIASTRIKE_API AMenuPlayerController : public APlayerController
@@ -19,12 +20,22 @@ public:
 
     FOnMenuStateChangedSignature OnMenuStateChanged;
 
-    void MountVehicleItem(const FVehicleItemData& VehicleItemData);
+    UFUNCTION(Server, reliable)
+    void VehicleItemHasSelected_OnServer(const FVehicleItemData& VehicleItemData);
+
+    UFUNCTION(Server, reliable)
+    void MountVehicleItem_OnServer(const FVehicleItemData& VehicleItemData);
+
+    void SetMenuVehicleActor(AMenuVehicleActor* MenuVehicle) { MenuVehicleActor = MenuVehicle; }
 
 protected:
     virtual void BeginPlay() override;
+    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
     UPROPERTY()
     TMap<EMenuState, AMenuCameraActor*> MenuCameraActorsMap;
+
+    UPROPERTY(Replicated)
+    AMenuVehicleActor* MenuVehicleActor{nullptr};
 };

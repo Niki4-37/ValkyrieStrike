@@ -10,6 +10,8 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "ValkiriaGameInstance.h"
 
+#include "Engine.h"
+
 AMenuGameModeBase::AMenuGameModeBase()
 {
     HUDClass = AMenuHUD::StaticClass();
@@ -27,26 +29,22 @@ void AMenuGameModeBase::InitGame(const FString& MapName, const FString& Options,
 
     for (const auto& FoundActor : TActorRange<APlayerStart>(GetWorld()))
     {
-        SpawnPositions.Add(FoundActor);
+        SpawnPositionsMap.Add(FoundActor, false);
     }
 }
 
 void AMenuGameModeBase::StartPlay()
 {
     Super::StartPlay();
-
-    SpawnMenuVehicleActor();
 }
 
 void AMenuGameModeBase::MountVehicleItem(const FVehicleItemData& VehicleItemData, APlayerController* PC)
 {
-    if (MenuVehicleActor)
+    if (const auto MenuPlayerController = Cast<AMenuPlayerController>(PC))
     {
-        MenuVehicleActor->MountItemOnVehicle(VehicleItemData.ItemClass, VehicleItemData.ItemType);
-    }
-    if (const auto MenuPC = Cast<AMenuPlayerController>(PC))
-    {
-        if (const auto ValkiriaPlayerState = MenuPC->GetPlayerState<AValkiriaPlayerState>())
+        MenuPlayerController->MountVehicleItem_OnServer(VehicleItemData);
+
+        if (const auto ValkiriaPlayerState = MenuPlayerController->GetPlayerState<AValkiriaPlayerState>())
         {
             ValkiriaPlayerState->SaveMountedItem(VehicleItemData);
         }
@@ -61,10 +59,39 @@ void AMenuGameModeBase::LaunchGame(APlayerController* PC)
     UKismetSystemLibrary::ExecuteConsoleCommand(this, SelectedLevelName, PC);
 }
 
-void AMenuGameModeBase::SpawnMenuVehicleActor()
+void AMenuGameModeBase::PostLogin(APlayerController* NewPlayer)
 {
-    if (!SpawnPositions[0]) return;
-    FTransform SpawnTransform = SpawnPositions[0]->GetActorTransform();
+    Super::PostLogin(NewPlayer);
 
-    MenuVehicleActor = GetWorld()->SpawnActor<AMenuVehicleActor>(MenuVehicleActorClass, SpawnTransform);
+    const auto MenuPlayerController = Cast<AMenuPlayerController>(NewPlayer);
+    if (MenuPlayerController)
+    {
+        Controllers.Add(MenuPlayerController);
+        SpawnMenuVehicleActor(MenuPlayerController);
+    }
+
+    GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::FromInt(Controllers.Num()));
+}
+
+void AMenuGameModeBase::SpawnMenuVehicleActor(AMenuPlayerController* Controller)
+{
+    if (!Controller) return;
+
+    bool bCanSpawnVehicleActor{false};
+    for (TPair<APlayerStart*, bool>& Pair : SpawnPositionsMap)
+    {
+        if (const bool bIsOccupied = Pair.Value == true) continue;
+        auto FoundEmptyPosition = Pair.Key;
+        if (!FoundEmptyPosition) continue;
+        FTransform SpawnTransform = FoundEmptyPosition->GetActorTransform();
+        auto VehicleActor = GetWorld()->SpawnActor<AMenuVehicleActor>(MenuVehicleActorClass, SpawnTransform);
+        Controller->SetMenuVehicleActor(VehicleActor);
+        bCanSpawnVehicleActor = true;
+        Pair.Value = true;
+        break;
+    }
+    if (!bCanSpawnVehicleActor)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Can't find Empty Position");
+    }
 }

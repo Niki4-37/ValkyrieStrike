@@ -9,6 +9,7 @@
 
 class AMenuVehicleActor;
 class APlayerStart;
+class AMenuPlayerController;
 
 UCLASS()
 class VALKIRIASTRIKE_API AMenuGameModeBase : public AGameModeBase
@@ -25,16 +26,18 @@ public:
 
     void LaunchGame(APlayerController* PC);
 
+    virtual void PostLogin(APlayerController* NewPlayer);
+
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     TSubclassOf<AMenuVehicleActor> MenuVehicleActorClass;
 
 private:
     UPROPERTY()
-    TArray<APlayerStart*> SpawnPositions;
+    TMap<APlayerStart*, bool> SpawnPositionsMap;
 
     UPROPERTY()
-    AMenuVehicleActor* MenuVehicleActor;
+    TArray<AMenuPlayerController*> Controllers;
 
-    void SpawnMenuVehicleActor();
+    void SpawnMenuVehicleActor(AMenuPlayerController* Controller);
 };
