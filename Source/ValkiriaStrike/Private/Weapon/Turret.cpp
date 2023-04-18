@@ -18,9 +18,11 @@ ATurret::ATurret()
 
     TurretTower = CreateDefaultSubobject<UStaticMeshComponent>("TurretTower");
     TurretTower->SetupAttachment(RootComponent);
+    TurretTower->SetIsReplicated(true);
 
     TurretMuzzle = CreateDefaultSubobject<UStaticMeshComponent>("TurretMuzzle");
     TurretMuzzle->SetupAttachment(RootComponent);
+    TurretMuzzle->SetIsReplicated(true);
 
     // AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
     // AIControllerClass = AAITurretController::StaticClass();
@@ -45,15 +47,14 @@ void ATurret::RotateToTarget(AActor* AimActor, float TimerRate)
 
             const auto AimLocation = AimActor ? AimActor->GetActorLocation() : FVector::ZeroVector;
             const auto TurretLocatiom = GetActorLocation();
-            // const auto FromRotation = PawnRootComponent->GetComponentRotation();
             const auto FromRotation = TurretMuzzle->GetComponentRotation();
             const FRotator Direction = FRotationMatrix::MakeFromX(AimLocation - TurretLocatiom).Rotator();
             FQuat DeltaQuat = FQuat::Slerp(FQuat(FromRotation), FQuat(Direction), Alpha);
-            // PawnRootComponent->SetWorldRotation(DeltaQuat);
 
             float YawValue = DeltaQuat.Rotator().Yaw;
             TurretTower->SetWorldRotation(FRotator(0.f, YawValue, 0.f));
             TurretMuzzle->SetWorldRotation(DeltaQuat);
+            RotateTurret_OnServer(DeltaQuat);
 
             Alpha += 0.1f;
         });
@@ -82,16 +83,30 @@ void ATurret::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 void ATurret::MakeShot()
 {
     /* handled on server */
-    // auto Rotation = GetActorForwardVector().Rotation();
+
     auto Rotation = TurretMuzzle->GetSocketRotation(MuzzleSocketName);
 
     auto MuzzleLocation = TurretMuzzle->GetSocketLocation(MuzzleSocketName);
-    // auto MuzzleLocation = GetActorLocation() + Rotation.RotateVector(MuzzleOffset);
     FTransform SpawningTransform(Rotation, MuzzleLocation);
 
     auto Bullet = GetWorld()->SpawnActor<ADefaultProjectile>(DefaultProjectileClass, SpawningTransform);
     if (Bullet)
     {
         Bullet->SetLifeSpan(1.f);
+    }
+}
+
+void ATurret::RotateTurret_OnServer_Implementation(const FQuat& Value)
+{
+    RotateTurret_Multicast(Value);
+}
+
+void ATurret::RotateTurret_Multicast_Implementation(const FQuat& Value)
+{
+    if (Controller && !Controller->IsLocalPlayerController())
+    {
+        float YawValue = Value.Rotator().Yaw;
+        TurretTower->SetWorldRotation(FRotator(0.f, YawValue, 0.f));
+        TurretMuzzle->SetWorldRotation(Value);
     }
 }

@@ -53,4 +53,10 @@ private:
     float Alpha{0.f};
 
     void MakeShot();
+
+    UFUNCTION(Server, unreliable)
+    void RotateTurret_OnServer(const FQuat& Value);
+
+    UFUNCTION(NetMulticast, unreliable)
+    void RotateTurret_Multicast(const FQuat& Value);
 };

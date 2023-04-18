@@ -62,8 +62,9 @@ void AAICharacter::BeginPlay()
 
 void AAICharacter::OnDeath()
 {
+    /** handled on server */
     GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-    PlayAnimMontage(DeathMontage);
+    PlayAnimMontage_Multicast(DeathMontage);
     GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
     OwnedWeapon->StartFire(false, FVector::ZeroVector);
@@ -90,4 +91,9 @@ void AAICharacter::SpawnAndAttachWeapon()
 
     FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
     OwnedWeapon->AttachToComponent(GetMesh(), AttachmentRules, WeaponSocketName);
+}
+
+void AAICharacter::PlayAnimMontage_Multicast_Implementation(UAnimMontage* Animation)
+{
+    PlayAnimMontage(Animation);
 }

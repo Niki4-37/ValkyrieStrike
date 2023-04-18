@@ -49,4 +49,7 @@ private:
     void OnDeath();
 
     void SpawnAndAttachWeapon();
+
+    UFUNCTION(NetMulticast, unreliable)
+    void PlayAnimMontage_Multicast(UAnimMontage* Animation);
 };
