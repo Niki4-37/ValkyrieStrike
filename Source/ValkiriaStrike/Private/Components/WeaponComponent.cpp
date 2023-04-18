@@ -7,6 +7,8 @@
 #include "Net/UnrealNetwork.h"
 #include "GameLevelsConfig/ValkiriaPlayerState.h"
 
+#include "Engine.h"
+
 DEFINE_LOG_CATEGORY_STATIC(WeaponComponent_LOG, All, All)
 
 UWeaponComponent::UWeaponComponent()
@@ -85,4 +87,6 @@ void UWeaponComponent::InitWeapons_OnServer_Implementation()
 void UWeaponComponent::OnItemMount_Client_Implementation(const FVehicleItemData& Data)
 {
     OnItemMount.Broadcast(Data);
+
+    GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "UWeaponComponent: OnItemMount");
 }

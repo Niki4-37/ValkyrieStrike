@@ -53,7 +53,7 @@ private:
     UFUNCTION(Server, reliable)
     void InitWeapons_OnServer();
 
-    UFUNCTION(Client, unreliable)
+    UFUNCTION(Client, reliable)
     void OnItemMount_Client(const FVehicleItemData& Data);
 
     template <class T>

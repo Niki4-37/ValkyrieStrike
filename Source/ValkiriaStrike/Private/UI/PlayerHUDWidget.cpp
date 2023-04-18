@@ -20,17 +20,17 @@ void UPlayerHUDWidget::NativeOnInitialized()
 
     if (VehicleFuelPosition)
     {
-        const auto EnduranceWidget = CreateWidget(GetWorld(), FuelGaugeWidgetClass);
-        if (EnduranceWidget)
+        const auto FuelGaugeWidget = CreateWidget(GetWorld(), FuelGaugeWidgetClass);
+        if (FuelGaugeWidget)
         {
-            VehicleFuelPosition->AddChild(EnduranceWidget);
+            VehicleFuelPosition->AddChild(FuelGaugeWidget);
         }
     }
 
     if (VehicleConfigPosition)
     {
         const auto ConfigWidget = CreateWidget(GetWorld(), InGameVehicleConfigWidgetClass);
-        if (VehicleConfigPosition)
+        if (ConfigWidget)
         {
             VehicleConfigPosition->AddChild(ConfigWidget);
         }

@@ -5,6 +5,8 @@
 #include "Components/VerticalBox.h"
 #include "UI/InGameVehicleItemWidget.h"
 
+#include "Engine.h"
+
 void UInGameVehicleConfigWidget::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
@@ -16,6 +18,8 @@ void UInGameVehicleConfigWidget::NativeOnInitialized()
         GetOwningPlayer()->GetOnNewPawnNotifier().AddUObject(this, &UInGameVehicleConfigWidget::OnNewPawn);
         OnNewPawn(GetOwningPlayerPawn());
     }
+
+    GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "InGameVehicleConfigWidget: NativeOnInitialized");
 }
 
 void UInGameVehicleConfigWidget::OnNewPawn(APawn* NewPawn)
@@ -35,6 +39,8 @@ void UInGameVehicleConfigWidget::OnNewPawn(APawn* NewPawn)
 
 void UInGameVehicleConfigWidget::OnItemMount(const FVehicleItemData& Data)
 {
+    GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, Data.ItemName.ToString());
+
     const auto ItemWidget = CreateWidget<UInGameVehicleItemWidget>(GetWorld(), InGameVehicleItemWidgetClass);
     if (ItemsBox && ItemWidget)
     {

@@ -6,7 +6,10 @@
 void AGameHUD::PostInitializeComponents()
 {
     Super::PostInitializeComponents();
+}
 
+void AGameHUD::CreateGameHUDWidgets()
+{
     const auto PlayerHUDWidget = CreateWidget<UUserWidget>(GetWorld(), PlayerHUDWidgetClass);
     if (PlayerHUDWidget)
     {
@@ -19,4 +22,6 @@ void AGameHUD::BeginPlay()
     Super::BeginPlay();
 
     checkf(PlayerHUDWidgetClass, TEXT("PlayerHUDWidgetClass not define!"));
+
+    CreateGameHUDWidgets();
 }

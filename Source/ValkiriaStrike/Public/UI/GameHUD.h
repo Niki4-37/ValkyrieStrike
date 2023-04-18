@@ -14,6 +14,8 @@ class VALKIRIASTRIKE_API AGameHUD : public AHUD
 public:
     virtual void PostInitializeComponents() override;
 
+    void CreateGameHUDWidgets();
+
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     TSubclassOf<UUserWidget> PlayerHUDWidgetClass;
