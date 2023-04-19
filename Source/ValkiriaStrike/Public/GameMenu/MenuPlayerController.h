@@ -23,9 +23,6 @@ public:
     UFUNCTION(Server, reliable)
     void VehicleItemHasSelected_OnServer(const FVehicleItemData& VehicleItemData);
 
-    UFUNCTION(Server, reliable)
-    void MountVehicleItem_OnServer(const FVehicleItemData& VehicleItemData);
-
     void SetMenuVehicleActor(AMenuVehicleActor* MenuVehicle) { MenuVehicleActor = MenuVehicle; }
 
 protected:

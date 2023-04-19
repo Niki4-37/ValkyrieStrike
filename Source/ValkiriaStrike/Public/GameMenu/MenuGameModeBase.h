@@ -22,8 +22,6 @@ public:
     virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
     virtual void StartPlay() override;
 
-    void MountVehicleItem(const FVehicleItemData& VehicleItemData, APlayerController* PC);
-
     void LaunchGame(APlayerController* PC);
 
     virtual void PostLogin(APlayerController* NewPlayer);

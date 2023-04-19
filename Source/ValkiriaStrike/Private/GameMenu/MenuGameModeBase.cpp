@@ -38,19 +38,6 @@ void AMenuGameModeBase::StartPlay()
     Super::StartPlay();
 }
 
-void AMenuGameModeBase::MountVehicleItem(const FVehicleItemData& VehicleItemData, APlayerController* PC)
-{
-    if (const auto MenuPlayerController = Cast<AMenuPlayerController>(PC))
-    {
-        MenuPlayerController->MountVehicleItem_OnServer(VehicleItemData);
-
-        if (const auto ValkiriaPlayerState = MenuPlayerController->GetPlayerState<AValkiriaPlayerState>())
-        {
-            ValkiriaPlayerState->SaveMountedItem(VehicleItemData);
-        }
-    }
-}
-
 void AMenuGameModeBase::LaunchGame(APlayerController* PC)
 {
     const auto ValkiriaGameInstance = GetGameInstance<UValkiriaGameInstance>();

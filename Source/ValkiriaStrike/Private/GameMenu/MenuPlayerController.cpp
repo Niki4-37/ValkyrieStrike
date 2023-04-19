@@ -7,6 +7,8 @@
 #include "GameMenu/MenuVehicleActor.h"
 #include "Net/UnrealNetwork.h"
 
+#include "GameLevelsConfig/ValkiriaPlayerState.h"
+
 void AMenuPlayerController::SetNewView(EMenuState MenuState)
 {
     if (MenuState == EMenuState::GameConfig && MenuVehicleActor)
@@ -24,17 +26,15 @@ void AMenuPlayerController::SetNewView(EMenuState MenuState)
 
 void AMenuPlayerController::VehicleItemHasSelected_OnServer_Implementation(const FVehicleItemData& VehicleItemData)
 {
-    const auto MenuGM = Cast<AMenuGameModeBase>(GetWorld()->GetAuthGameMode());
-    if (!MenuGM) return;
+    if (MenuVehicleActor)
+    {
+        MenuVehicleActor->MountVehicleItem_OnSever(VehicleItemData);
+    }
 
-    MenuGM->MountVehicleItem(VehicleItemData, this);
-}
-
-void AMenuPlayerController::MountVehicleItem_OnServer_Implementation(const FVehicleItemData& VehicleItemData)
-{
-    if (!MenuVehicleActor) return;
-
-    MenuVehicleActor->MountVehicleItem_OnSever(VehicleItemData);
+    if (const auto ValkiriaPlayerState = GetPlayerState<AValkiriaPlayerState>())
+    {
+        ValkiriaPlayerState->SaveMountedItem(VehicleItemData);
+    }
 }
 
 void AMenuPlayerController::BeginPlay()
