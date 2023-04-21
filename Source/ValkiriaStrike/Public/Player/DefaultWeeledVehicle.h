@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "WheeledVehicle.h"
+#include "Interfaces/GameInterface.h"
+#include "GameCoreTypes.h"
 #include "DefaultWeeledVehicle.generated.h"
 
 class UCameraComponent;
@@ -13,12 +15,15 @@ class UWeaponComponent;
 class UVehicleIndicatorsComponent;
 
 UCLASS()
-class VALKIRIASTRIKE_API ADefaultWeeledVehicle : public AWheeledVehicle
+class VALKIRIASTRIKE_API ADefaultWeeledVehicle : public AWheeledVehicle, public IGameInterface
 {
     GENERATED_BODY()
 
 public:
     ADefaultWeeledVehicle();
+
+    /** Interface function */
+    virtual bool AddAmount(const FInteractionData& Data) override;
 
 protected:
     UPROPERTY(Category = Camera, EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

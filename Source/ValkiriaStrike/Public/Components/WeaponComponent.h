@@ -22,6 +22,7 @@ public:
     FOnWeaponMakeShotSignature OnWeaponMakeShot;
 
     void ShootFromSecondWeapon();
+    bool AddAmmo(int32 Amount);
 
 protected:
     /* used in game level for debug */

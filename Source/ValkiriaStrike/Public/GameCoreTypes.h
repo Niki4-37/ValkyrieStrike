@@ -22,6 +22,15 @@ enum class EVehicleItemType : uint8
     SecondWeapon,
     Armor
 };
+
+UENUM(BlueprintType)
+enum class EItemPropertyType : uint8
+{
+    Ammo,
+    Endurance,
+    Armor,
+    Money
+};
 //clang-format on
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnMenuStateChangedSignature, EMenuState);
@@ -85,3 +94,15 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnFuelValueChangedSignature, float);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnItemMountSignature, const FVehicleItemData&);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnWeaponMakeShotSignature, EVehicleItemType, int32);
+
+USTRUCT(BlueprintType)
+struct FInteractionData
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    EItemPropertyType Type;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    int32 Amount;
+};

@@ -6,6 +6,7 @@
 #include "Net/UnrealNetwork.h"
 
 #include "DrawDebugHelpers.h"
+#include "Engine.h"
 
 ASecondWeapon::ASecondWeapon()
 {
@@ -19,10 +20,20 @@ ASecondWeapon::ASecondWeapon()
     WeaponMesh->SetupAttachment(RootComponent);
 }
 
-void ASecondWeapon::ChangeAmmoCapacity(int32 Value)
+bool ASecondWeapon::ChangeAmmoCapacity(int32 Value)
 {
     /** handled on server */
+
+    bool bCanChanged {true};
+    if (AmmoCapacity == WeaponData.MaxAmmoCapacity)
+    {
+        bCanChanged = false;
+    }
     AmmoCapacity = FMath::Clamp(AmmoCapacity + Value, 0, WeaponData.MaxAmmoCapacity);
+
+    GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::FromInt(AmmoCapacity));
+
+    return bCanChanged;
 }
 
 void ASecondWeapon::MakeShot_OnServer_Implementation()

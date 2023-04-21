@@ -17,6 +17,8 @@
 #include "GameFramework/Controller.h"
 #include "Net/UnrealNetwork.h"
 
+#include "Engine.h"
+
 ADefaultWeeledVehicle::ADefaultWeeledVehicle()
 {
     bReplicates = true;
@@ -58,6 +60,19 @@ ADefaultWeeledVehicle::ADefaultWeeledVehicle()
 
     WeaponComponent = CreateDefaultSubobject<UWeaponComponent>("WeaponComponent");
     VehicleIndicatorsComp = CreateDefaultSubobject<UVehicleIndicatorsComponent>("VehicleIndicatorsComp");
+}
+
+bool ADefaultWeeledVehicle::AddAmount(const FInteractionData& Data)
+{
+    // GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::FromInt(Amount));
+
+    bool bResult{false};
+    switch (Data.Type)
+    {
+        case EItemPropertyType::Ammo: bResult = WeaponComponent->AddAmmo(Data.Amount);
+    }
+
+    return bResult;
 }
 
 void ADefaultWeeledVehicle::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

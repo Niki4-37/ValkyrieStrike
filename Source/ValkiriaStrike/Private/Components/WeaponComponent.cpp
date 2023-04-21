@@ -26,6 +26,18 @@ void UWeaponComponent::ShootFromSecondWeapon()
     OnWeaponMakeShot.Broadcast(EVehicleItemType::SecondWeapon, SecondWeapon->GetAmmoCapacity());
 }
 
+bool UWeaponComponent::AddAmmo(int32 Amount)
+{
+    /** handled on server. Pickup->DefaultWeeledVehicle */
+    bool bCanAdd {false};
+    if (SecondWeapon)
+    {
+        bCanAdd = SecondWeapon->ChangeAmmoCapacity(Amount);
+        OnWeaponMakeShot.Broadcast(EVehicleItemType::SecondWeapon, SecondWeapon->GetAmmoCapacity());
+    }
+    return bCanAdd;
+}
+
 void UWeaponComponent::BeginPlay()
 {
     Super::BeginPlay();

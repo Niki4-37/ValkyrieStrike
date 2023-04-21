@@ -1,0 +1,42 @@
+// Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Interactables/InteractionActor.h"
+#include "GameCoreTypes.h"
+#include "PickupActor.generated.h"
+
+class USphereComponent;
+
+UCLASS()
+class VALKIRIASTRIKE_API APickupActor : public AInteractionActor
+{
+    GENERATED_BODY()
+
+public:
+    APickupActor();
+
+protected:
+    UPROPERTY(VisibleAnywhere)
+    USphereComponent* CollisionComponent;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FInteractionData Data;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    float MoveRate{1.f};
+
+    virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
+    virtual void NotifyActorEndOverlap(AActor* OtherActor) override;
+
+private:
+    UPROPERTY()
+    TArray<AActor*> SavedActors;
+
+    float Alpha{0.f};
+
+    FTimerHandle MoveTimer;
+
+    bool IsAppliedToActor(AActor* OtherActor);
+};

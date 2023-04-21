@@ -20,7 +20,7 @@ public:
     UFUNCTION(Server, unreliable)
     void MakeShot_OnServer();
 
-    void ChangeAmmoCapacity(int32 Value);
+    bool ChangeAmmoCapacity(int32 Value);
     int32 GetAmmoCapacity() const { return AmmoCapacity; };
 
     void SetWeaponData(const FVehicleItemData& Data) { WeaponData = Data; };
