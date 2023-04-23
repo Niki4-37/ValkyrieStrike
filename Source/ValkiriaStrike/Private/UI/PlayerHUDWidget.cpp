@@ -8,6 +8,7 @@ void UPlayerHUDWidget::NativeOnInitialized()
     checkf(VehicleEndurenceWidgetClass, TEXT("VehicleEndurenceWidgetClass not define!"));
     checkf(FuelGaugeWidgetClass, TEXT("FuelGaugeWidgetClass not define!"));
     checkf(InGameVehicleConfigWidgetClass, TEXT("InGameVehicleConfigWidgetClass not define!"));
+    checkf(CoinsValueWidgetClass, TEXT("CoinsValueWidgetClass not define!"));
 
     if (VehicleEndurancePosition)
     {
@@ -33,6 +34,15 @@ void UPlayerHUDWidget::NativeOnInitialized()
         if (ConfigWidget)
         {
             VehicleConfigPosition->AddChild(ConfigWidget);
+        }
+    }
+
+    if (CoinsValuePosition)
+    {
+        const auto CoinsWidget = CreateWidget(GetWorld(), CoinsValueWidgetClass);
+        if (CoinsWidget)
+        {
+            CoinsValuePosition->AddChild(CoinsWidget);
         }
     }
 }

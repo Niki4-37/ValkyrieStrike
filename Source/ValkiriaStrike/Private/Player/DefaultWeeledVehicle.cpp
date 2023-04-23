@@ -69,7 +69,12 @@ bool ADefaultWeeledVehicle::AddAmount(const FInteractionData& Data)
     bool bResult{false};
     switch (Data.Type)
     {
-        case EItemPropertyType::Ammo: bResult = WeaponComponent->AddAmmo(Data.Amount);
+        case EItemPropertyType::Ammo: bResult = WeaponComponent->AddAmmo(Data.Amount); break;
+        case EItemPropertyType::Money:
+            VehicleIndicatorsComp->AddCoins(Data.Amount);
+            bResult = true;
+            break;
+        case EItemPropertyType::Fuel: bResult = VehicleIndicatorsComp->AddFuel(Data.Amount); break;
     }
 
     return bResult;
@@ -107,6 +112,9 @@ void ADefaultWeeledVehicle::Tick(float Delta)
 void ADefaultWeeledVehicle::BeginPlay()
 {
     Super::BeginPlay();
+
+    check(WeaponComponent);
+    check(VehicleIndicatorsComp);
 
     Tags.Add("Player");
 }

@@ -23,6 +23,9 @@ protected:
     UPROPERTY(meta = (BindWidget))
     UBorder* VehicleConfigPosition;
 
+    UPROPERTY(meta = (BindWidget))
+    UBorder* CoinsValuePosition;
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     TSubclassOf<UUserWidget> VehicleEndurenceWidgetClass;
 
@@ -31,6 +34,9 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     TSubclassOf<UUserWidget> InGameVehicleConfigWidgetClass;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    TSubclassOf<UUserWidget> CoinsValueWidgetClass;
 
     virtual void NativeOnInitialized() override;
 };

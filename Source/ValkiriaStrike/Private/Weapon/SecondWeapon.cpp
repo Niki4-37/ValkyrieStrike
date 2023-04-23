@@ -24,7 +24,7 @@ bool ASecondWeapon::ChangeAmmoCapacity(int32 Value)
 {
     /** handled on server */
 
-    bool bCanChanged {true};
+    bool bCanChanged{true};
     if (AmmoCapacity == WeaponData.MaxAmmoCapacity)
     {
         bCanChanged = false;
@@ -44,7 +44,7 @@ void ASecondWeapon::MakeShot_OnServer_Implementation()
 
     const FVector TraceStart = WeaponMesh->GetSocketLocation(MuzzleSocketName);
     const FVector TraceEnd = TraceStart + WeaponMesh->GetSocketRotation(MuzzleSocketName).Vector() * 2000.f;
-    FHitResult Hit;
+    // FHitResult Hit;
     // FCollisionQueryParams CollisionParams;
     // GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, CollisionParams);
     // if (Hit.bBlockingHit)
@@ -56,16 +56,33 @@ void ASecondWeapon::MakeShot_OnServer_Implementation()
     //     DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Blue, false, 3.0f, 0, 3.0f);
     // }
 
-    UKismetSystemLibrary::SphereTraceSingle(GetWorld(),                                                           //
-                                            TraceStart,                                                           //
-                                            TraceEnd,                                                             //
-                                            BeemRadius,                                                           //
-                                            UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility),  //
-                                            false,                                                                //
-                                            {GetOwner(), this},                                                   //
-                                            EDrawDebugTrace::ForDuration,                                         //
-                                            Hit,                                                                  //
-                                            true);
+    // UKismetSystemLibrary::SphereTraceSingle(GetWorld(),                                                           //
+    //                                         TraceStart,                                                           //
+    //                                         TraceEnd,                                                             //
+    //                                         BeemRadius,                                                           //
+    //                                         UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility),  //
+    //                                         false,                                                                //
+    //                                         {GetOwner(), this},                                                   //
+    //                                         EDrawDebugTrace::ForDuration,                                         //
+    //                                         Hit,                                                                  //
+    //                                         true);
+
+    TArray<FHitResult> Hits;
+    UKismetSystemLibrary::SphereTraceMulti(GetWorld(),                                                           //
+                                           TraceStart,                                                           //
+                                           TraceEnd,                                                             //
+                                           BeemRadius,                                                           //
+                                           UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility),  //
+                                           false,                                                                //
+                                           {GetOwner(), this},                                                   //
+                                           EDrawDebugTrace::ForDuration,                                         //
+                                           Hits,                                                                 //
+                                           true);
+    /* debug */
+    for (auto& Hit : Hits)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, Hit.GetActor()->GetName());
+    }
 
     ChangeAmmoCapacity(-1);
 

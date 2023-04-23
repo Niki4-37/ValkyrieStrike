@@ -29,7 +29,8 @@ enum class EItemPropertyType : uint8
     Ammo,
     Endurance,
     Armor,
-    Money
+    Money,
+    Fuel
 };
 //clang-format on
 
@@ -100,9 +101,11 @@ struct FInteractionData
 {
     GENERATED_USTRUCT_BODY()
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
     EItemPropertyType Type;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
     int32 Amount;
 };
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnCoinsChangedSignature, int32);

@@ -8,14 +8,33 @@ UVehicleIndicatorsComponent::UVehicleIndicatorsComponent()
     SetIsReplicatedByDefault(true);
 }
 
+void UVehicleIndicatorsComponent::AddCoins(int32 Value)
+{
+    Coins += Value;
+    OnCoinsChanged.Broadcast(Coins);
+}
+
+bool UVehicleIndicatorsComponent::AddFuel(int32 Value)
+{
+    bool bCanChanged{true};
+    if (FuelValue == MaxFuelValue)
+    {
+        bCanChanged = false;
+    }
+
+    FuelValue = FMath::Clamp(FuelValue + static_cast<float>(Value), 0.f, MaxFuelValue);
+    OnFuelValueChanged.Broadcast(FuelValue / MaxFuelValue);
+    return bCanChanged;
+}
+
 void UVehicleIndicatorsComponent::BeginPlay()
 {
     Super::BeginPlay();
 
     checkf(MaxFuelValue > 0, TEXT("MaxFuelValue can't be less or equals 0!"));
     FuelValue = MaxFuelValue;  // Server?
-
-    GetWorld()->GetTimerManager().SetTimer(FuelChangeTimer, this, &UVehicleIndicatorsComponent::ChangeFuelValue, 1.f, true);
+    OnFuelValueChanged.Broadcast(FuelValue / MaxFuelValue);
+    GetWorld()->GetTimerManager().SetTimer(FuelChangeTimer, this, &UVehicleIndicatorsComponent::SpendFuel, 1.f, true);
 }
 
 void UVehicleIndicatorsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -23,9 +42,10 @@ void UVehicleIndicatorsComponent::GetLifetimeReplicatedProps(TArray<FLifetimePro
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME(UVehicleIndicatorsComponent, FuelValue);
+    DOREPLIFETIME(UVehicleIndicatorsComponent, Coins);
 }
 
-void UVehicleIndicatorsComponent::ChangeFuelValue()
+void UVehicleIndicatorsComponent::SpendFuel()
 {
     const float NewValue = --FuelValue;
     FuelValue = FMath::Clamp(NewValue, 0.f, MaxFuelValue);
