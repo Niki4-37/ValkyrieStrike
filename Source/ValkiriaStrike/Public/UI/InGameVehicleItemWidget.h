@@ -18,6 +18,7 @@ class VALKIRIASTRIKE_API UInGameVehicleItemWidget : public UUserWidget
 public:
     void SetItemData(const FVehicleItemData& Data);
     void UpdateAmmoCapacityBar(int32 NewValue);
+    void StartReloading();
 
 protected:
     UPROPERTY(meta = (BindWidget))
@@ -26,6 +27,14 @@ protected:
     UPROPERTY(meta = (BindWidget))
     UProgressBar* AmmoCapacityBar;
 
+    UPROPERTY(meta = (BindWidget))
+    UProgressBar* ReloadingProgress;
+
 private:
     int32 MaxAmmoCapacity;
+    float ReloadingTime;
+    FTimerHandle ReloadingTimer;
+    FTimerHandle ProgressTimer;
+
+    void EndReloading();
 };

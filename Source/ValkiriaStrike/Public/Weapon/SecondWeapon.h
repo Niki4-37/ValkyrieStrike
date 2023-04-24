@@ -17,11 +17,12 @@ class VALKIRIASTRIKE_API ASecondWeapon : public AActor
 public:
     ASecondWeapon();
 
-    UFUNCTION(Server, unreliable)
-    void MakeShot_OnServer();
+    bool MakeShot();
 
     bool ChangeAmmoCapacity(int32 Value);
     int32 GetAmmoCapacity() const { return AmmoCapacity; };
+    bool IsEmpty() const { return AmmoCapacity == 0; };
+    void ReloadWeapon();
 
     void SetWeaponData(const FVehicleItemData& Data) { WeaponData = Data; };
     const FVehicleItemData& GetWeaponData() const { return WeaponData; };
@@ -53,6 +54,4 @@ private:
 
     UPROPERTY(Replicated)
     int32 AmmoCapacity;
-
-    bool IsEmpty() const { return AmmoCapacity == 0; };
 };

@@ -94,7 +94,7 @@ void ADefaultWeeledVehicle::SetupPlayerInputComponent(UInputComponent* PlayerInp
     PlayerInputComponent->BindAction<FOnPressingBreak>("Handbrake", IE_Pressed, this, &ADefaultWeeledVehicle::OnHandbrakePressed, true);
     PlayerInputComponent->BindAction<FOnPressingBreak>("Handbrake", IE_Released, this, &ADefaultWeeledVehicle::OnHandbrakePressed, false);
 
-    PlayerInputComponent->BindAction("Fire", IE_Pressed, WeaponComponent, &UWeaponComponent::ShootFromSecondWeapon);
+    PlayerInputComponent->BindAction("Fire", IE_Pressed, WeaponComponent, &UWeaponComponent::ShootFromSecondWeapon_OnServer);
 }
 
 void ADefaultWeeledVehicle::Tick(float Delta)

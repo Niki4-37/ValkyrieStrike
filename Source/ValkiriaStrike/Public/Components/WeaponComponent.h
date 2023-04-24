@@ -19,9 +19,11 @@ public:
     UWeaponComponent();
 
     FOnItemMountSignature OnItemMount;
-    FOnWeaponMakeShotSignature OnWeaponMakeShot;
+    FOnChangeAmmoSignature OnChangeAmmo;
+    FOnOnStartReloadingSignature OnStartReloading;
 
-    void ShootFromSecondWeapon();
+    UFUNCTION(Server, reliable)
+    void ShootFromSecondWeapon_OnServer();
     bool AddAmmo(int32 Amount);
 
 protected:
@@ -56,6 +58,12 @@ private:
 
     UFUNCTION(Client, reliable)
     void OnItemMount_Client(const FVehicleItemData& Data);
+
+    UFUNCTION(Client, reliable)
+    void OnChangeAmmo_Client(EVehicleItemType Type, int32 Amount);
+
+    UFUNCTION(Client, reliable)
+    void OnStartReloading_Client(EVehicleItemType Type);
 
     template <class T>
     T* MountWeapon(UClass* Class, FName SocketName);

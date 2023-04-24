@@ -36,9 +36,16 @@ bool ASecondWeapon::ChangeAmmoCapacity(int32 Value)
     return bCanChanged;
 }
 
-void ASecondWeapon::MakeShot_OnServer_Implementation()
+void ASecondWeapon::ReloadWeapon()
 {
-    if (!bIsReady || !WeaponMesh || IsEmpty()) return;
+    FTimerDelegate TimerDelegate;
+    TimerDelegate.BindLambda([&]() { bIsReady = true; });
+    GetWorldTimerManager().SetTimer(ReloadingTimer, TimerDelegate, WeaponData.ReloadingTime, false);
+}
+
+bool ASecondWeapon::MakeShot()
+{
+    if (!bIsReady || !WeaponMesh || IsEmpty()) return false;
 
     bIsReady = false;
 
@@ -81,14 +88,18 @@ void ASecondWeapon::MakeShot_OnServer_Implementation()
     /* debug */
     for (auto& Hit : Hits)
     {
+        if (!Hit.GetActor()) continue;
         GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, Hit.GetActor()->GetName());
     }
 
     ChangeAmmoCapacity(-1);
 
-    FTimerDelegate TimerDelegate;
-    TimerDelegate.BindLambda([&]() { bIsReady = true; });
-    GetWorldTimerManager().SetTimer(ReloadingTimer, TimerDelegate, WeaponData.ReloadingTime, false);
+    if (!IsEmpty())
+    {
+        ReloadWeapon();
+    }
+
+    return true;
 }
 
 void ASecondWeapon::BeginPlay()

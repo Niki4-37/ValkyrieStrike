@@ -31,9 +31,14 @@ void UInGameVehicleConfigWidget::OnNewPawn(APawn* NewPawn)
         WeaponComponent->OnItemMount.AddUObject(this, &UInGameVehicleConfigWidget::OnItemMount);
     }
 
-    if (WeaponComponent && !WeaponComponent->OnWeaponMakeShot.IsBoundToObject(this))
+    if (WeaponComponent && !WeaponComponent->OnChangeAmmo.IsBoundToObject(this))
     {
-        WeaponComponent->OnWeaponMakeShot.AddUObject(this, &UInGameVehicleConfigWidget::OnWeaponMakeShot);
+        WeaponComponent->OnChangeAmmo.AddUObject(this, &UInGameVehicleConfigWidget::OnChangeAmmo);
+    }
+
+    if (WeaponComponent && !WeaponComponent->OnStartReloading.IsBoundToObject(this))
+    {
+        WeaponComponent->OnStartReloading.AddUObject(this, &UInGameVehicleConfigWidget::OnStartReloading);
     }
 }
 
@@ -50,7 +55,12 @@ void UInGameVehicleConfigWidget::OnItemMount(const FVehicleItemData& Data)
     }
 }
 
-void UInGameVehicleConfigWidget::OnWeaponMakeShot(EVehicleItemType Type, int32 NewValue)
+void UInGameVehicleConfigWidget::OnChangeAmmo(EVehicleItemType Type, int32 NewValue)
 {
     ItemsMap.FindChecked(Type)->UpdateAmmoCapacityBar(NewValue);
+}
+
+void UInGameVehicleConfigWidget::OnStartReloading(EVehicleItemType Type)
+{
+    ItemsMap.FindChecked(Type)->StartReloading();
 }

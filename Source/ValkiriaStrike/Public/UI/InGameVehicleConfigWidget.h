@@ -27,7 +27,8 @@ protected:
 private:
     void OnNewPawn(APawn* NewPawn);
     void OnItemMount(const FVehicleItemData& Data);
-    void OnWeaponMakeShot(EVehicleItemType Type, int32 NewValue);
+    void OnChangeAmmo(EVehicleItemType Type, int32 NewValue);
+    void OnStartReloading(EVehicleItemType Type);
 
     UPROPERTY()
     TMap<EVehicleItemType, UInGameVehicleItemWidget*> ItemsMap;

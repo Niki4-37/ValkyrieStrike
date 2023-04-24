@@ -17,24 +17,38 @@ UWeaponComponent::UWeaponComponent()
     SetIsReplicatedByDefault(true);
 }
 
-void UWeaponComponent::ShootFromSecondWeapon()
+void UWeaponComponent::ShootFromSecondWeapon_OnServer_Implementation()
 {
     if (!SecondWeapon) return;
-    SecondWeapon->MakeShot_OnServer();
-    UE_LOG(WeaponComponent_LOG, Display, TEXT("Fire from alternative weapon!!!"));
-
-    OnWeaponMakeShot.Broadcast(EVehicleItemType::SecondWeapon, SecondWeapon->GetAmmoCapacity());
+    if (SecondWeapon->MakeShot())
+    {
+        OnChangeAmmo_Client(EVehicleItemType::SecondWeapon, SecondWeapon->GetAmmoCapacity());
+        if (!SecondWeapon->IsEmpty())
+        {
+            OnStartReloading_Client(EVehicleItemType::SecondWeapon);
+        }
+    }
 }
 
 bool UWeaponComponent::AddAmmo(int32 Amount)
 {
     /** handled on server. Pickup->DefaultWeeledVehicle */
-    bool bCanAdd {false};
+    bool bCanAdd{false};
     if (SecondWeapon)
     {
-        bCanAdd = SecondWeapon->ChangeAmmoCapacity(Amount);
-        OnWeaponMakeShot.Broadcast(EVehicleItemType::SecondWeapon, SecondWeapon->GetAmmoCapacity());
+        if (SecondWeapon->IsEmpty() && SecondWeapon->ChangeAmmoCapacity(Amount))
+        {
+            SecondWeapon->ReloadWeapon();
+            OnStartReloading_Client(EVehicleItemType::SecondWeapon);
+            bCanAdd = true;
+        }
+        else
+        {
+            bCanAdd = SecondWeapon->ChangeAmmoCapacity(Amount);
+        }
+        OnChangeAmmo_Client(EVehicleItemType::SecondWeapon, SecondWeapon->GetAmmoCapacity());
     }
+
     return bCanAdd;
 }
 
@@ -101,4 +115,14 @@ void UWeaponComponent::OnItemMount_Client_Implementation(const FVehicleItemData&
     OnItemMount.Broadcast(Data);
 
     GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "UWeaponComponent: OnItemMount");
+}
+
+void UWeaponComponent::OnChangeAmmo_Client_Implementation(EVehicleItemType Type, int32 Amount)
+{
+    OnChangeAmmo.Broadcast(Type, Amount);
+}
+
+void UWeaponComponent::OnStartReloading_Client_Implementation(EVehicleItemType Type)
+{
+    OnStartReloading.Broadcast(Type);
 }
