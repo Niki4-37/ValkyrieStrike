@@ -25,7 +25,7 @@ public:
     virtual void Tick(float DeltaTime) override;
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-    void StartFire(AActor* AimActor);
+    virtual void AttackEnemy(AActor* AimActor);
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -34,22 +34,14 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     UAnimMontage* DeathMontage;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    TSubclassOf<ADefaultWeapon> WeaponClass;
-
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     FName WeaponSocketName{"WeaponSocket"};
 
     virtual void BeginPlay() override;
 
+    virtual void OnDeath();
+
 private:
-    UPROPERTY()
-    ADefaultWeapon* OwnedWeapon;
-
-    void OnDeath();
-
-    void SpawnAndAttachWeapon();
-
     UFUNCTION(NetMulticast, unreliable)
     void PlayAnimMontage_Multicast(UAnimMontage* Animation);
 };

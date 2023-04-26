@@ -15,7 +15,7 @@ void AAIEnemyController::StartFire(AActor* AimActor)
 {
     const auto ControlledCharacter = Cast<AAICharacter>(GetPawn());
     if (!ControlledCharacter) return;
-    ControlledCharacter->StartFire(AimActor);
+    ControlledCharacter->AttackEnemy(AimActor);
 }
 
 void AAIEnemyController::OnPossess(APawn* InPawn)

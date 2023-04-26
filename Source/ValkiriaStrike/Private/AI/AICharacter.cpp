@@ -5,7 +5,6 @@
 #include "Components/HealthComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Weapon/DefaultWeapon.h"
 #include "BrainComponent.h"
 
 AAICharacter::AAICharacter()
@@ -36,20 +35,7 @@ void AAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
     Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void AAICharacter::StartFire(AActor* AimActor)
-{
-    if (!OwnedWeapon) return;
-    const bool bCanFire = AimActor ? true : false;
-
-    FVector AimPosition = FVector::ZeroVector;
-    if (AimActor)
-    {
-        AimActor->GetVelocity();
-        AimPosition = AimActor->GetActorLocation() + AimActor->GetVelocity();
-    }
-
-    OwnedWeapon->StartFire(bCanFire, AimPosition);
-}
+void AAICharacter::AttackEnemy(AActor* AimActor) {}
 
 void AAICharacter::BeginPlay()
 {
@@ -57,7 +43,6 @@ void AAICharacter::BeginPlay()
     check(HealthComponent);
     HealthComponent->OnDeath.AddUObject(this, &AAICharacter::OnDeath);
     Tags.Add("Enemy");
-    SpawnAndAttachWeapon();
 }
 
 void AAICharacter::OnDeath()
@@ -67,8 +52,6 @@ void AAICharacter::OnDeath()
     PlayAnimMontage_Multicast(DeathMontage);
     GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-    OwnedWeapon->StartFire(false, FVector::ZeroVector);
-
     const auto STUController = Cast<AAIController>(Controller);
     if (STUController && STUController->BrainComponent)
     {
@@ -76,21 +59,6 @@ void AAICharacter::OnDeath()
     }
 
     Tags.Empty();
-}
-
-void AAICharacter::SpawnAndAttachWeapon()
-{
-    if (OwnedWeapon) return;
-
-    FActorSpawnParameters SpawnParams;
-    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-    SpawnParams.Owner = GetOwner();
-    OwnedWeapon = GetWorld()->SpawnActor<ADefaultWeapon>(WeaponClass, SpawnParams);
-
-    if (!OwnedWeapon) return;
-
-    FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
-    OwnedWeapon->AttachToComponent(GetMesh(), AttachmentRules, WeaponSocketName);
 }
 
 void AAICharacter::PlayAnimMontage_Multicast_Implementation(UAnimMontage* Animation)
