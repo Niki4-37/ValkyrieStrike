@@ -22,8 +22,13 @@ class VALKIRIASTRIKE_API ADefaultWeeledVehicle : public AWheeledVehicle, public 
 public:
     ADefaultWeeledVehicle();
 
-    /** Interface function */
+    /* for workshop widget */
+    FOnWorkshopTasksUpdatedSignature OnWorkshopTasksUpdated;
+
+    /** Interface functions */
     virtual bool AddAmount(const FInteractionData& Data) override;
+    virtual bool MakeMaintenance(EItemPropertyType Type) override;
+    virtual bool SetWorkshopTasksData(const TArray<FInteractionData>& Tasks) override;
 
 protected:
     UPROPERTY(Category = Camera, EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -41,6 +46,8 @@ protected:
     UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly)
     bool bInReverseGear;
 
+    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 public:
     virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
     virtual void Tick(float Delta) override;
@@ -51,6 +58,9 @@ private:
     bool bIsLowFriction;
 
     bool bIsAutoMoveForward{true};
+
+    /* */
+    TArray<FInteractionData> WorkshopTasks;
 
     /** Handle pressing forwards */
     void MoveForward(float Val);

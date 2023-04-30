@@ -6,13 +6,13 @@
 
 class UTexture2D;
 
-//clang-format off
+// clang-format off
 UENUM(BlueprintType)
 enum class EMenuState : uint8
 {
-    MainMenu UMETA(DispayName = "Show Menu"),
-    GameSettings UMETA(DispayName = "Show Setings"),
-    GameConfig UMETA(DispayName = "Show Game Config")
+    MainMenu        UMETA(DispayName = "Show Menu"),
+    GameSettings    UMETA(DispayName = "Show Setings"),
+    GameConfig      UMETA(DispayName = "Show Game Config")
 };
 
 UENUM(BlueprintType)
@@ -30,9 +30,19 @@ enum class EItemPropertyType : uint8
     Endurance,
     Armor,
     Money,
-    Fuel
+    Fuel,
+    NoType,
+
+    Begin = Ammo    UMETA(Hidden),
+    End = NoType    UMETA(Hidden)
 };
-//clang-format on
+// clang-format on
+
+static EItemPropertyType& operator++(EItemPropertyType& EType)
+{
+    EType = EItemPropertyType(static_cast<std::underlying_type<EItemPropertyType>::type>(EType) + 1);
+    return EType;
+}
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnMenuStateChangedSignature, EMenuState);
 
@@ -90,7 +100,7 @@ struct FVehicleItemData : public FTableRowBase
 };
 
 DECLARE_MULTICAST_DELEGATE(FOnDeathSignature);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChangedSignature, float);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnHealthChangedSignature, float, float);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnFuelValueChangedSignature, float);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnItemMountSignature, const FVehicleItemData&);
@@ -107,6 +117,36 @@ struct FInteractionData
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     int32 Amount;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    UTexture2D* ItemTumb;
+
+    FInteractionData(EItemPropertyType InType, int32 InAmount, UTexture2D* InItemTumb) : Type(InType), Amount(InAmount), ItemTumb(InItemTumb) {}
+    FInteractionData()
+    {
+        Type = EItemPropertyType::NoType;
+        Amount = 0;
+        ItemTumb = nullptr;
+    }
 };
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnWorkshopTasksUpdatedSignature, const TArray<FInteractionData>&);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnCoinsChangedSignature, int32);
+
+USTRUCT(BlueprintType)
+struct FWorkshopPriceData
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 EndurancePerUnit;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 ArmorPerUnit;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 AmmoPerUnit;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 FuelPerUnit;
+};

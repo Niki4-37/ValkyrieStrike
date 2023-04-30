@@ -15,7 +15,10 @@ void UHealthComponent::BeginPlay()
 {
     Super::BeginPlay();
 
-    SetHealth(MaxHealth);  // Server?
+    if (GetOwnerRole() == ENetRole::ROLE_Authority)  //(GetOwner()->HasAuthority())
+    {
+        SetHealth(MaxHealth);
+    }
 
     const auto ComponentOwner = GetOwner();
     if (ComponentOwner)
@@ -31,6 +34,7 @@ void UHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME(UHealthComponent, Health);
+    DOREPLIFETIME(UHealthComponent, MaxHealth);
 }
 
 void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -40,11 +44,9 @@ void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 void UHealthComponent::SetHealth(float NewHealth)
 {
-    float DeltaHealth = NewHealth - Health;
     Health = FMath::Clamp(NewHealth, 0.f, MaxHealth);
 
-    float HelthPercentage = MaxHealth > 0 ? Health / MaxHealth : 0.f;
-    OnHealthChanged_OnClient(HelthPercentage);
+    OnHealthChanged_OnClient(Health, MaxHealth);
     UE_LOG(HealthComponent_LOG, Display, TEXT("SetHealth: %f"), Health);
 }
 
@@ -60,7 +62,7 @@ void UHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const
     }
 }
 
-void UHealthComponent::OnHealthChanged_OnClient_Implementation(float HealthPercentage)
+void UHealthComponent::OnHealthChanged_OnClient_Implementation(float Value, float MaxValue)
 {
-    OnHealthChanged.Broadcast(HealthPercentage);
+    OnHealthChanged.Broadcast(Value, MaxValue);
 }

@@ -20,6 +20,6 @@ protected:
     virtual void NativeOnInitialized() override;
 
 private:
-    void OnHealthChanged(float HealthPercentage);
+    void OnHealthChanged(float Health, float MaxHealth);
     void OnNewPawn(APawn* NewPawn);
 };

@@ -8,3 +8,13 @@ bool IGameInterface::AddAmount(const FInteractionData&)
 {
     return false;
 }
+
+bool IGameInterface::MakeMaintenance(EItemPropertyType)
+{
+    return false;
+}
+
+bool IGameInterface::SetWorkshopTasksData(const TArray<FInteractionData>&)
+{
+    return false;
+}

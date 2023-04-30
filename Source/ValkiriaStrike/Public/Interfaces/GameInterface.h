@@ -22,4 +22,6 @@ class VALKIRIASTRIKE_API IGameInterface
 
 public:
     virtual bool AddAmount(const FInteractionData&);
+    virtual bool MakeMaintenance(EItemPropertyType);
+    virtual bool SetWorkshopTasksData(const TArray<FInteractionData>&);
 };

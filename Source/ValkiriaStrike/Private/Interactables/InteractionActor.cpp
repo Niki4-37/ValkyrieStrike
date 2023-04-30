@@ -1,6 +1,7 @@
 // Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 
 #include "Interactables/InteractionActor.h"
+#include "Net/UnrealNetwork.h"
 
 AInteractionActor::AInteractionActor()
 {
@@ -18,4 +19,11 @@ AInteractionActor::AInteractionActor()
 void AInteractionActor::BeginPlay()
 {
     Super::BeginPlay();
+}
+
+void AInteractionActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME(AInteractionActor, bHasOwner);
 }

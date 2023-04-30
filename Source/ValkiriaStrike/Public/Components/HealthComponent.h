@@ -30,15 +30,17 @@ public:
 
     float GetHealth() const { return Health; };
     bool IsDead() const { return Health <= 0.f; };
+    int32 GetNeededHealth() const { return static_cast<int32>(MaxHealth - Health); }
 
 private:
     UPROPERTY(Replicated)
     float Health{0.f};
+    UPROPERTY(Replicated)
     float MaxHealth{100.f};
 
     UFUNCTION()
     void OnTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
     UFUNCTION(Client, unreliable)
-    void OnHealthChanged_OnClient(float HealthPercentage);
+    void OnHealthChanged_OnClient(float Value, float MaxValue);
 };

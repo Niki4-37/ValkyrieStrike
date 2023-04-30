@@ -23,5 +23,9 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     UStaticMeshComponent* MeshComponent;
 
+    UPROPERTY(Replicated)
+    bool bHasOwner{false};
+
     virtual void BeginPlay() override;
+    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

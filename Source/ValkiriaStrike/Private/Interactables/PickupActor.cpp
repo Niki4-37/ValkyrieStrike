@@ -8,6 +8,8 @@
 
 APickupActor::APickupActor()
 {
+    bReplicates = true;
+
     CollisionComponent = CreateDefaultSubobject<USphereComponent>("SphereComponent");
     CollisionComponent->InitSphereRadius(300.f);
     CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -19,9 +21,9 @@ void APickupActor::NotifyActorBeginOverlap(AActor* OtherActor)
 {
     GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, "APickupActor::NotifyActorBeginOverlap");
 
-    if (!OtherActor || SavedActors.Contains(OtherActor) || !OtherActor->ActorHasTag("Player")) return;
+    if (!OtherActor || bHasOwner || SavedActors.Contains(OtherActor) || !OtherActor->ActorHasTag("Player")) return;
     Alpha = 0.f;
-
+    bHasOwner = true;
     SavedActors.Add(OtherActor);
 
     const FVector FromLocation = GetActorLocation();
@@ -57,6 +59,7 @@ bool APickupActor::IsAppliedToActor(AActor* OtherActor)
         Destroy();
     }
 
+    bHasOwner = false;
     GetWorldTimerManager().ClearTimer(MoveTimer);
     return true;
 }

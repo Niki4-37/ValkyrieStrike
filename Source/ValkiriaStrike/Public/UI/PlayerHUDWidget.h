@@ -26,6 +26,9 @@ protected:
     UPROPERTY(meta = (BindWidget))
     UBorder* CoinsValuePosition;
 
+    UPROPERTY(meta = (BindWidget))
+    UBorder* WorkshopPosition;
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     TSubclassOf<UUserWidget> VehicleEndurenceWidgetClass;
 
@@ -37,6 +40,9 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     TSubclassOf<UUserWidget> CoinsValueWidgetClass;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    TSubclassOf<UUserWidget> WorkshopWidgetClass;
 
     virtual void NativeOnInitialized() override;
 };

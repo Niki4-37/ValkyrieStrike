@@ -80,6 +80,66 @@ bool ADefaultWeeledVehicle::AddAmount(const FInteractionData& Data)
     return bResult;
 }
 
+bool ADefaultWeeledVehicle::MakeMaintenance(EItemPropertyType Type)
+{
+    const int32 EnabledCoins = VehicleIndicatorsComp->GetCoins();
+    if (!EnabledCoins) return false;
+
+    const auto ItemPrice = WorkshopTasks.FindByPredicate([&](const FInteractionData& Data) { return Data.Type == Type; })->Amount;
+
+    switch (Type)
+    {
+        case EItemPropertyType::Ammo:                         //
+            if (EnabledCoins < ItemPrice) return false;       //
+            WeaponComponent->AddAmmo(1);                      //
+            VehicleIndicatorsComp->AddCoins(-ItemPrice);      //
+            break;                                            //
+        case EItemPropertyType::Endurance:                    //
+            VehicleIndicatorsComp->RepairVehicle(ItemPrice);  //
+            break;                                            //
+        case EItemPropertyType::Armor:                        //
+            VehicleIndicatorsComp->RepairArmor(ItemPrice);    //
+            break;                                            //
+        case EItemPropertyType::Fuel:                         //
+            VehicleIndicatorsComp->Refuel(ItemPrice);         //
+            break;                                            //
+        default: break;
+    }
+
+    return true;
+}
+
+bool ADefaultWeeledVehicle::SetWorkshopTasksData(const TArray<FInteractionData>& Tasks)
+{
+    WorkshopTasks = Tasks;
+
+    TArray<FInteractionData> WorkshopCost;
+    for (auto& Task : Tasks)
+    {
+        if (Task.Type == EItemPropertyType::NoType) continue;
+
+        UE_LOG(LogTemp, Display, TEXT("Task: %s"), *UEnum::GetValueAsString(Task.Type));
+
+        if (Task.Type == EItemPropertyType::Ammo)
+        {
+            WorkshopCost.Add(Task);
+        }
+        else
+        {
+            WorkshopCost.Add(FInteractionData(Task.Type, Task.Amount * VehicleIndicatorsComp->GetNeededValue(Task.Type), Task.ItemTumb));
+        }
+    }
+    OnWorkshopTasksUpdated.Broadcast(WorkshopCost);
+    return false;
+}
+
+void ADefaultWeeledVehicle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    // DOREPLIFETIME(ADefaultWeeledVehicle, Pricies);
+}
+
 void ADefaultWeeledVehicle::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);

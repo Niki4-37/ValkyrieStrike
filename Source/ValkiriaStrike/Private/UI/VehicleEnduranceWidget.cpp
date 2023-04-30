@@ -15,11 +15,11 @@ void UVehicleEnduranceWidget::NativeOnInitialized()
     }
 }
 
-void UVehicleEnduranceWidget::OnHealthChanged(float HealthPercentage)
+void UVehicleEnduranceWidget::OnHealthChanged(float Health, float MaxHealth)
 {
     if (HealthBar)
     {
-        HealthBar->SetPercent(HealthPercentage);
+        MaxHealth > 0.f ? HealthBar->SetPercent(Health / MaxHealth) : HealthBar->SetPercent(0.f);
     }
 }
 
