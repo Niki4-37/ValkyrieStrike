@@ -2,7 +2,7 @@
 
 #include "UI/CoinsValueWidget.h"
 #include "Components/TextBlock.h"
-#include "Components/VehicleIndicatorsComponent.h"
+#include "Components/WorkshopComponent.h"
 
 void UCoinsValueWidget::NativeOnInitialized()
 {
@@ -23,10 +23,10 @@ void UCoinsValueWidget::NativeOnInitialized()
 void UCoinsValueWidget::OnNewPawn(APawn* NewPawn)
 {
     if (!NewPawn) return;
-    const auto VehicleIndicatorsComp = NewPawn->FindComponentByClass<UVehicleIndicatorsComponent>();
-    if (VehicleIndicatorsComp && !VehicleIndicatorsComp->OnCoinsChanged.IsBoundToObject(this))
+    const auto WorkshopComponent = NewPawn->FindComponentByClass<UWorkshopComponent>();
+    if (WorkshopComponent && !WorkshopComponent->OnCoinsChanged.IsBoundToObject(this))
     {
-        VehicleIndicatorsComp->OnCoinsChanged.AddUObject(this, &UCoinsValueWidget::OnCoinsChanged);
+        WorkshopComponent->OnCoinsChanged.AddUObject(this, &UCoinsValueWidget::OnCoinsChanged);
     }
 }
 

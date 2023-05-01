@@ -10,9 +10,9 @@
 
 class UCameraComponent;
 class USpringArmComponent;
-class ATurret;
 class UWeaponComponent;
 class UVehicleIndicatorsComponent;
+class UWorkshopComponent;
 
 UCLASS()
 class VALKIRIASTRIKE_API ADefaultWeeledVehicle : public AWheeledVehicle, public IGameInterface
@@ -43,6 +43,9 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     UVehicleIndicatorsComponent* VehicleIndicatorsComp;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    UWorkshopComponent* WorkshopComponent;
+
     UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly)
     bool bInReverseGear;
 
@@ -58,9 +61,6 @@ private:
     bool bIsLowFriction;
 
     bool bIsAutoMoveForward{true};
-
-    /* */
-    TArray<FInteractionData> WorkshopTasks;
 
     /** Handle pressing forwards */
     void MoveForward(float Val);

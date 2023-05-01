@@ -15,20 +15,22 @@ void UVehicleEnduranceWidget::NativeOnInitialized()
     }
 }
 
-void UVehicleEnduranceWidget::OnHealthChanged(float Health, float MaxHealth)
-{
-    if (HealthBar)
-    {
-        MaxHealth > 0.f ? HealthBar->SetPercent(Health / MaxHealth) : HealthBar->SetPercent(0.f);
-    }
-}
-
 void UVehicleEnduranceWidget::OnNewPawn(APawn* NewPawn)
 {
     if (!NewPawn) return;
     const auto VehicleIndicatorsComp = NewPawn->FindComponentByClass<UVehicleIndicatorsComponent>();
-    if (VehicleIndicatorsComp && !VehicleIndicatorsComp->OnHealthChanged.IsBoundToObject(this))
+    if (VehicleIndicatorsComp && !VehicleIndicatorsComp->OnItemValueChanged.IsBoundToObject(this))
     {
-        VehicleIndicatorsComp->OnHealthChanged.AddUObject(this, &UVehicleEnduranceWidget::OnHealthChanged);
+        VehicleIndicatorsComp->OnItemValueChanged.AddUObject(this, &UVehicleEnduranceWidget::OnHealthChanged);
+    }
+}
+
+void UVehicleEnduranceWidget::OnHealthChanged(EItemPropertyType Type, float Health, float MaxHealth)
+{
+    if (Type != EItemPropertyType::Endurance) return;
+
+    if (HealthBar)
+    {
+        MaxHealth > 0.f ? HealthBar->SetPercent(Health / MaxHealth) : HealthBar->SetPercent(0.f);
     }
 }

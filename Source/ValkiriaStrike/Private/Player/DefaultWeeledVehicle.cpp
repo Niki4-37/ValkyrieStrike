@@ -6,6 +6,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/WeaponComponent.h"
 #include "Components/VehicleIndicatorsComponent.h"
+#include "Components/WorkshopComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
@@ -60,18 +61,21 @@ ADefaultWeeledVehicle::ADefaultWeeledVehicle()
 
     WeaponComponent = CreateDefaultSubobject<UWeaponComponent>("WeaponComponent");
     VehicleIndicatorsComp = CreateDefaultSubobject<UVehicleIndicatorsComponent>("VehicleIndicatorsComp");
+    WorkshopComponent = CreateDefaultSubobject<UWorkshopComponent>("WorkshopComponent");
 }
 
 bool ADefaultWeeledVehicle::AddAmount(const FInteractionData& Data)
 {
-    // GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::FromInt(Amount));
-
     bool bResult{false};
     switch (Data.Type)
     {
         case EItemPropertyType::Ammo: bResult = WeaponComponent->AddAmmo(Data.Amount); break;
         case EItemPropertyType::Money:
-            VehicleIndicatorsComp->AddCoins(Data.Amount);
+            WorkshopComponent->AddCoins(Data.Amount);
+            bResult = true;
+            break;
+        case EItemPropertyType::Endurance:
+            VehicleIndicatorsComp->AddHealth(Data.Amount);
             bResult = true;
             break;
         case EItemPropertyType::Fuel: bResult = VehicleIndicatorsComp->AddFuel(Data.Amount); break;
@@ -82,62 +86,19 @@ bool ADefaultWeeledVehicle::AddAmount(const FInteractionData& Data)
 
 bool ADefaultWeeledVehicle::MakeMaintenance(EItemPropertyType Type)
 {
-    const int32 EnabledCoins = VehicleIndicatorsComp->GetCoins();
-    if (!EnabledCoins) return false;
-
-    const auto ItemPrice = WorkshopTasks.FindByPredicate([&](const FInteractionData& Data) { return Data.Type == Type; })->Amount;
-
-    switch (Type)
-    {
-        case EItemPropertyType::Ammo:                         //
-            if (EnabledCoins < ItemPrice) return false;       //
-            WeaponComponent->AddAmmo(1);                      //
-            VehicleIndicatorsComp->AddCoins(-ItemPrice);      //
-            break;                                            //
-        case EItemPropertyType::Endurance:                    //
-            VehicleIndicatorsComp->RepairVehicle(ItemPrice);  //
-            break;                                            //
-        case EItemPropertyType::Armor:                        //
-            VehicleIndicatorsComp->RepairArmor(ItemPrice);    //
-            break;                                            //
-        case EItemPropertyType::Fuel:                         //
-            VehicleIndicatorsComp->Refuel(ItemPrice);         //
-            break;                                            //
-        default: break;
-    }
-
+    WorkshopComponent->MakeMaintenance(Type);
     return true;
 }
 
 bool ADefaultWeeledVehicle::SetWorkshopTasksData(const TArray<FInteractionData>& Tasks)
 {
-    WorkshopTasks = Tasks;
-
-    TArray<FInteractionData> WorkshopCost;
-    for (auto& Task : Tasks)
-    {
-        if (Task.Type == EItemPropertyType::NoType) continue;
-
-        UE_LOG(LogTemp, Display, TEXT("Task: %s"), *UEnum::GetValueAsString(Task.Type));
-
-        if (Task.Type == EItemPropertyType::Ammo)
-        {
-            WorkshopCost.Add(Task);
-        }
-        else
-        {
-            WorkshopCost.Add(FInteractionData(Task.Type, Task.Amount * VehicleIndicatorsComp->GetNeededValue(Task.Type), Task.ItemTumb));
-        }
-    }
-    OnWorkshopTasksUpdated.Broadcast(WorkshopCost);
+    WorkshopComponent->SetWorkshopTasks(Tasks);
     return false;
 }
 
 void ADefaultWeeledVehicle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-    // DOREPLIFETIME(ADefaultWeeledVehicle, Pricies);
 }
 
 void ADefaultWeeledVehicle::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -167,6 +128,13 @@ void ADefaultWeeledVehicle::Tick(float Delta)
     //{
     //     GetVehicleMovementComponent()->SetThrottleInput(0.4f);
     // }
+    const float EngineRotation = GetVehicleMovementComponent()->GetEngineRotationSpeed();
+    const float MaxEngineRotation = GetVehicleMovementComponent()->GetEngineMaxRotationSpeed();
+    const float Percentage = MaxEngineRotation > 0.f ? EngineRotation / MaxEngineRotation : 0.f;
+    
+    GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Red, FString::SanitizeFloat(Percentage));
+    
+    VehicleIndicatorsComp->SetFuelConsumptionModifier_OnServer(Percentage);
 }
 
 void ADefaultWeeledVehicle::BeginPlay()

@@ -19,6 +19,7 @@ class VALKIRIASTRIKE_API UWorkshopTaskWidget : public UUserWidget
 public:
     void SetTaskData(const FInteractionData& Data);
     const FInteractionData& GetTaskData() const { return TaskData; }
+    void UpdateCost(int32 Amount);
 
 protected:
     UPROPERTY(meta = (BindWidget))

@@ -3,8 +3,8 @@
 #include "UI/WorkshopWidget.h"
 #include "Components/UniformGridPanel.h"
 #include "Components/UniformGridSlot.h"
-#include "Player/DefaultWeeledVehicle.h"
 #include "UI/WorkshopTaskWidget.h"
+#include "Components/WorkshopComponent.h"
 
 void UWorkshopWidget::NativeOnInitialized()
 {
@@ -21,10 +21,11 @@ void UWorkshopWidget::OnNewPawn(APawn* NewPawn)
 {
     if (!NewPawn) return;
 
-    const auto Vehicle = Cast<ADefaultWeeledVehicle>(NewPawn);
-    if (Vehicle && !Vehicle->OnWorkshopTasksUpdated.IsBoundToObject(this))
+    const auto WorkshopComponent = NewPawn->FindComponentByClass<UWorkshopComponent>();
+    if (WorkshopComponent)
     {
-        Vehicle->OnWorkshopTasksUpdated.AddUObject(this, &UWorkshopWidget::OnWorkshopTasksUpdated);
+        WorkshopComponent->OnTasksUpdated.AddUObject(this, &UWorkshopWidget::OnWorkshopTasksUpdated);
+        WorkshopComponent->OnUpdateCost.AddUObject(this, &UWorkshopWidget::OnUpdateCost);
     }
 }
 
@@ -34,6 +35,7 @@ void UWorkshopWidget::OnWorkshopTasksUpdated(const TArray<FInteractionData>& Tas
 
     if (!WorkshopTaskSlots) return;
     WorkshopTaskSlots->ClearChildren();
+    TaskMap.Empty();
 
     uint8 SlotIndex{0};
     for (auto& Task : Tasks)
@@ -41,11 +43,20 @@ void UWorkshopWidget::OnWorkshopTasksUpdated(const TArray<FInteractionData>& Tas
         if (Task.Type == EItemPropertyType::Money || Task.Type == EItemPropertyType::NoType) continue;
         const auto NewTask = CreateWidget<UWorkshopTaskWidget>(GetWorld(), WorkshopTaskWidgetClass);
         if (!NewTask) continue;
+        TaskMap.Add(Task.Type, NewTask);
         NewTask->SetTaskData(Task);
         auto GridObject = WorkshopTaskSlots->AddChildToUniformGrid(NewTask, SlotIndex / SlotsInRow, SlotIndex % SlotsInRow);
         if (!GridObject) continue;
         GridObject->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Center);
         GridObject->SetVerticalAlignment(EVerticalAlignment::VAlign_Fill);
         ++SlotIndex;
+    }
+}
+
+void UWorkshopWidget::OnUpdateCost(EItemPropertyType Type, int32 Amount)
+{
+    if (TaskMap.Contains(Type))
+    {
+        TaskMap.FindChecked(Type)->UpdateCost(Amount);
     }
 }

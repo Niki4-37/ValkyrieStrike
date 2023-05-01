@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "GameCoreTypes.h"
 #include "VehicleEnduranceWidget.generated.h"
 
 class UProgressBar;
@@ -20,6 +21,6 @@ protected:
     virtual void NativeOnInitialized() override;
 
 private:
-    void OnHealthChanged(float Health, float MaxHealth);
+    void OnHealthChanged(EItemPropertyType Type, float Health, float MaxHealth);
     void OnNewPawn(APawn* NewPawn);
 };

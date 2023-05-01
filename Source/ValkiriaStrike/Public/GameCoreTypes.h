@@ -100,8 +100,7 @@ struct FVehicleItemData : public FTableRowBase
 };
 
 DECLARE_MULTICAST_DELEGATE(FOnDeathSignature);
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnHealthChangedSignature, float, float);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnFuelValueChangedSignature, float);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnItemValueChangedSignature, EItemPropertyType, float, float);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnItemMountSignature, const FVehicleItemData&);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnChangeAmmoSignature, EVehicleItemType, int32);
@@ -121,7 +120,7 @@ struct FInteractionData
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     UTexture2D* ItemTumb;
 
-    FInteractionData(EItemPropertyType InType, int32 InAmount, UTexture2D* InItemTumb) : Type(InType), Amount(InAmount), ItemTumb(InItemTumb) {}
+    FInteractionData(EItemPropertyType InType, int32 InAmount, UTexture2D* InItemTumb = nullptr) : Type(InType), Amount(InAmount), ItemTumb(InItemTumb) {}
     FInteractionData()
     {
         Type = EItemPropertyType::NoType;
@@ -131,22 +130,5 @@ struct FInteractionData
 };
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnWorkshopTasksUpdatedSignature, const TArray<FInteractionData>&);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnUpdateCostSignature, EItemPropertyType, int32);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnCoinsChangedSignature, int32);
-
-USTRUCT(BlueprintType)
-struct FWorkshopPriceData
-{
-    GENERATED_USTRUCT_BODY()
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    int32 EndurancePerUnit;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    int32 ArmorPerUnit;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    int32 AmmoPerUnit;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    int32 FuelPerUnit;
-};

@@ -8,14 +8,12 @@
 #include "WorkshopWidget.generated.h"
 
 class UUniformGridPanel;
+class UWorkshopTaskWidget;
 
 UCLASS()
 class VALKIRIASTRIKE_API UWorkshopWidget : public UUserWidget
 {
     GENERATED_BODY()
-
-public:
-    void UpdateCost(EItemPropertyType Type, int32 Cost);
 
 protected:
     UPROPERTY(meta = (BindWidget))
@@ -30,7 +28,11 @@ protected:
     virtual void NativeOnInitialized() override;
 
 private:
+    UPROPERTY()
+    TMap<EItemPropertyType, UWorkshopTaskWidget*> TaskMap;
+
     void OnNewPawn(APawn* NewPawn);
 
     void OnWorkshopTasksUpdated(const TArray<FInteractionData>& Tasks);
+    void OnUpdateCost(EItemPropertyType Type, int32 Amount);
 };

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "GameCoreTypes.h"
 #include "FuelGaugeWidget.generated.h"
 
 class UImage;
@@ -22,14 +23,14 @@ protected:
     FName NeedlePositionParamName{"NeedlePosition"};
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    float MaxValue{-0.17f};
+    float RightBorder{-0.17f};
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    float MinValue{0.17f};
+    float LeftBorder{0.17f};
 
     virtual void NativeOnInitialized() override;
 
 private:
     void OnNewPawn(APawn* NewPawn);
-    void OnFuelValueChanged(float Value);
+    void OnFuelValueChanged(EItemPropertyType Type, float Value, float MaxValue);
 };

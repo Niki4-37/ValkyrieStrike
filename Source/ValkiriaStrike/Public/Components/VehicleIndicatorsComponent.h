@@ -14,20 +14,10 @@ class VALKIRIASTRIKE_API UVehicleIndicatorsComponent : public UHealthComponent
 public:
     UVehicleIndicatorsComponent();
 
-    /* used in widget */
-    FOnFuelValueChangedSignature OnFuelValueChanged;
-    FOnCoinsChangedSignature OnCoinsChanged;
-
-    void AddCoins(int32 Value);
-    int32 GetCoins() const { return Coins; }
-
     bool AddFuel(int32 Value);
 
-    void RepairVehicle(int32 Price);
-    void RepairArmor(int32 Price);
-    void Refuel(int32 Price);
-
-    int32 GetNeededValue(EItemPropertyType Type);
+    UFUNCTION(Server, unreliable)
+    void SetFuelConsumptionModifier_OnServer(float Percentage);
 
 protected:
     virtual void BeginPlay() override;
@@ -35,15 +25,15 @@ protected:
 
 private:
     UPROPERTY(Replicated)
-    float FuelValue;
+    float FuelValue{0.f};
     float MaxFuelValue{100.f};
     UPROPERTY(Replicated)
     float FuelConsumptionModifier{1.f};
 
-    UPROPERTY(Replicated)
-    int32 Coins;
-
     FTimerHandle FuelChangeTimer;
 
     void SpendFuel();
+
+    UFUNCTION(NetMulticast, reliable)
+    void OnFuelValueChanged_Multicast(float Value, float MaxValue);
 };

@@ -20,20 +20,21 @@ void UFuelGaugeWidget::OnNewPawn(APawn* NewPawn)
 {
     if (!NewPawn) return;
     const auto VehicleIndicatorsComp = NewPawn->FindComponentByClass<UVehicleIndicatorsComponent>();
-    if (VehicleIndicatorsComp && !VehicleIndicatorsComp->OnFuelValueChanged.IsBoundToObject(this))
+    if (VehicleIndicatorsComp && !VehicleIndicatorsComp->OnItemValueChanged.IsBoundToObject(this))
     {
-        VehicleIndicatorsComp->OnFuelValueChanged.AddUObject(this, &UFuelGaugeWidget::OnFuelValueChanged);
+        VehicleIndicatorsComp->OnItemValueChanged.AddUObject(this, &UFuelGaugeWidget::OnFuelValueChanged);
     }
 }
 
-void UFuelGaugeWidget::OnFuelValueChanged(float Value)
+void UFuelGaugeWidget::OnFuelValueChanged(EItemPropertyType Type, float Value, float MaxValue)
 {
-    if (!FuelGaugeImage) return;
+    if (!FuelGaugeImage || Type != EItemPropertyType::Fuel) return;
 
     const auto FuelGaugeMat = FuelGaugeImage->GetDynamicMaterial();
     if (!FuelGaugeMat) return;
 
-    const auto Position = FMath::Lerp(MinValue, MaxValue, Value);
+    const float ValueToSet = MaxValue > 0.f ? Value / MaxValue : 0.f;
+    const auto Position = FMath::Lerp(LeftBorder, RightBorder, ValueToSet);
 
     FuelGaugeMat->SetScalarParameterValue(NeedlePositionParamName, Position);
 }

@@ -19,7 +19,7 @@ APickupActor::APickupActor()
 
 void APickupActor::NotifyActorBeginOverlap(AActor* OtherActor)
 {
-    GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, "APickupActor::NotifyActorBeginOverlap");
+    //GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, "APickupActor::NotifyActorBeginOverlap");
 
     if (!OtherActor || bHasOwner || SavedActors.Contains(OtherActor) || !OtherActor->ActorHasTag("Player")) return;
     Alpha = 0.f;

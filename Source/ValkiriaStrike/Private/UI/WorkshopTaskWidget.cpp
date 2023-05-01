@@ -18,6 +18,15 @@ void UWorkshopTaskWidget::SetTaskData(const FInteractionData& Data)
     if (TaskTumb)
     {
         TaskTumb->SetBrushFromSoftTexture(TaskData.ItemTumb);
+        TaskTumb->SetBrushSize(FVector2D(200.f));
+    }
+}
+
+void UWorkshopTaskWidget::UpdateCost(int32 Amount)
+{
+    if (CostText)
+    {
+        CostText->SetText(FText::AsNumber(Amount * TaskData.Amount));
     }
 }
 

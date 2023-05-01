@@ -17,7 +17,7 @@ void UHealthComponent::BeginPlay()
 
     if (GetOwnerRole() == ENetRole::ROLE_Authority)  //(GetOwner()->HasAuthority())
     {
-        SetHealth(MaxHealth);
+        AddHealth(MaxHealth);
     }
 
     const auto ComponentOwner = GetOwner();
@@ -42,18 +42,19 @@ void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void UHealthComponent::SetHealth(float NewHealth)
+void UHealthComponent::AddHealth(float Value)
 {
+    const float NewHealth = Health + Value;
     Health = FMath::Clamp(NewHealth, 0.f, MaxHealth);
 
-    OnHealthChanged_OnClient(Health, MaxHealth);
-    UE_LOG(HealthComponent_LOG, Display, TEXT("SetHealth: %f"), Health);
+    OnHealthChanged_Multicast(Health, MaxHealth);
+    // UE_LOG(HealthComponent_LOG, Display, TEXT("AddHealth: %f"), Health);
 }
 
 void UHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
     if (Damage < 0.f || IsDead()) return;
-    SetHealth(Health - Damage);
+    AddHealth(-Damage);
 
     if (IsDead())
     {
@@ -62,7 +63,7 @@ void UHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const
     }
 }
 
-void UHealthComponent::OnHealthChanged_OnClient_Implementation(float Value, float MaxValue)
+void UHealthComponent::OnHealthChanged_Multicast_Implementation(float Value, float MaxValue)
 {
-    OnHealthChanged.Broadcast(Value, MaxValue);
+    OnItemValueChanged.Broadcast(EItemPropertyType::Endurance, Value, MaxValue);
 }
