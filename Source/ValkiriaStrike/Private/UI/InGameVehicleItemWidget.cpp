@@ -30,7 +30,7 @@ void UInGameVehicleItemWidget::SetItemData(const FVehicleItemData& Data)
 
 void UInGameVehicleItemWidget::UpdateAmmoCapacityBar(int32 NewValue)
 {
-    MaxAmmoCapacity > 0 ? AmmoCapacityBar->SetPercent(NewValue / static_cast<float>(MaxAmmoCapacity)) : AmmoCapacityBar->SetPercent(0.f);
+    MaxAmmoCapacity > 0 ? AmmoCapacityBar->SetPercent(NewValue / FMath::CeilToFloat(MaxAmmoCapacity)) : AmmoCapacityBar->SetPercent(0.f);
 }
 
 void UInGameVehicleItemWidget::StartReloading()
@@ -52,6 +52,16 @@ void UInGameVehicleItemWidget::StartReloading()
         });
 
     GetWorld()->GetTimerManager().SetTimer(ProgressTimer, TimerDelegate, ReloadingTime / 100.f, true);
+}
+
+void UInGameVehicleItemWidget::BeginDestroy()
+{
+    Super::BeginDestroy();
+    if (GetWorld())
+    {
+        GetWorld()->GetTimerManager().ClearTimer(ReloadingTimer);
+        GetWorld()->GetTimerManager().ClearTimer(ProgressTimer);
+    }
 }
 
 void UInGameVehicleItemWidget::EndReloading()

@@ -23,24 +23,26 @@ ASecondWeapon::ASecondWeapon()
 bool ASecondWeapon::ChangeAmmoCapacity(int32 Value)
 {
     /** handled on server */
+    bool bCanChanged{AmmoCapacity < MaxAmmoCapacity};
 
-    bool bCanChanged{true};
-    if (AmmoCapacity == WeaponData.MaxAmmoCapacity)
+    if (IsEmpty() && Value > 0)
     {
-        bCanChanged = false;
+        ReloadWeapon();
     }
-    AmmoCapacity = FMath::Clamp(AmmoCapacity + Value, 0, WeaponData.MaxAmmoCapacity);
 
+    AmmoCapacity = FMath::Clamp(AmmoCapacity + Value, 0, MaxAmmoCapacity);
+
+    OnChangeAmmoInWeapon.Broadcast(EVehicleItemType::SecondWeapon, AmmoCapacity);
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::FromInt(AmmoCapacity));
 
     return bCanChanged;
 }
 
-void ASecondWeapon::ReloadWeapon()
+void ASecondWeapon::SetupWeapon(int32 InMaxAmmoCapacity, float InReloadingTime)
 {
-    FTimerDelegate TimerDelegate;
-    TimerDelegate.BindLambda([&]() { bIsReady = true; });
-    GetWorldTimerManager().SetTimer(ReloadingTimer, TimerDelegate, WeaponData.ReloadingTime, false);
+    MaxAmmoCapacity = InMaxAmmoCapacity;
+    ReloadingTime = InReloadingTime;
+    ChangeAmmoCapacity(MaxAmmoCapacity);
 }
 
 bool ASecondWeapon::MakeShot()
@@ -113,4 +115,14 @@ void ASecondWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 
     DOREPLIFETIME(ASecondWeapon, bIsReady);
     DOREPLIFETIME(ASecondWeapon, AmmoCapacity);
+    DOREPLIFETIME(ASecondWeapon, MaxAmmoCapacity);
+}
+
+void ASecondWeapon::ReloadWeapon()
+{
+    FTimerDelegate TimerDelegate;
+    TimerDelegate.BindLambda([&]() { bIsReady = true; });
+    GetWorldTimerManager().SetTimer(ReloadingTimer, TimerDelegate, ReloadingTime, false);
+
+    OnStartWeaponReloading.Broadcast(EVehicleItemType::SecondWeapon);
 }

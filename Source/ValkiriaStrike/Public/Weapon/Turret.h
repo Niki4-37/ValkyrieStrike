@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "GameCoreTypes.h"
 #include "Turret.generated.h"
 
 class UStaticMeshComponent;
@@ -18,10 +19,16 @@ class VALKIRIASTRIKE_API ATurret : public APawn
 public:
     ATurret();
 
-    UFUNCTION(Server, unreliable)
-    void Fire_OnServer(bool bIsPressed);
+    FOnChangeAmmoSignature OnChangeAmmoInWeapon;
+    FOnOnStartReloadingSignature OnStartWeaponReloading;
 
-    void RotateToTarget(AActor* AimActor, float TimerRate);
+    UFUNCTION(Server, unreliable)
+    void Fire_OnServer(bool bCanFire);
+
+    UFUNCTION(Server, unreliable)
+    void RotateToTarget_OnServer(AActor* AimActor, float TimerRate);
+
+    void SetupWeapon(int32 InMaxAmmoCapacity, float InReloadingTime);
 
 protected:
     UPROPERTY(VisibleDefaultsOnly)
@@ -39,6 +46,9 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     float FireRate{0.5f};
 
+    UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite)
+    int32 AmmoCapacity{100};
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     TSubclassOf<ADefaultProjectile> DefaultProjectileClass;
 
@@ -47,15 +57,20 @@ protected:
 
 private:
     FTimerHandle FireTimer;
+    FTimerHandle ReloadingTimer;
 
     FTimerHandle SmoothRotationTimer;
 
     float Alpha{0.f};
 
-    void MakeShot();
+    bool bIsReady{true};
 
-    UFUNCTION(Server, unreliable)
-    void RotateTurret_OnServer(const FQuat& Value);
+    int32 MaxAmmoCapacity;
+    float ReloadingTime;
+
+    void MakeShot();
+    void ReloadWeapon();
+    bool IsEmpty() const { return AmmoCapacity == 0; };
 
     UFUNCTION(NetMulticast, unreliable)
     void RotateTurret_Multicast(const FQuat& Value);

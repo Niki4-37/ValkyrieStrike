@@ -78,7 +78,7 @@ struct FVehicleItemData : public FTableRowBase
     GENERATED_USTRUCT_BODY()
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    FName ItemName = NAME_None;
+    FName ItemName{NAME_None};
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     UTexture2D* ItemTumb;
@@ -95,7 +95,7 @@ struct FVehicleItemData : public FTableRowBase
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     int32 MaxAmmoCapacity{10};
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     float ReloadingTime{2.f};
 };
 

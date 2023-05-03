@@ -53,6 +53,9 @@ private:
     UPROPERTY(Replicated)
     ASecondWeapon* SecondWeapon{nullptr};
 
+    void OnChangeAmmoInWeapon(EVehicleItemType Type, int32 AmmoAmount);
+    void OnStartWeaponReloading(EVehicleItemType Type);
+
     UFUNCTION(Server, reliable)
     void InitWeapons_OnServer();
 

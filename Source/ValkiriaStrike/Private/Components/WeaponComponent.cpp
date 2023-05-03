@@ -20,36 +20,13 @@ UWeaponComponent::UWeaponComponent()
 void UWeaponComponent::ShootFromSecondWeapon_OnServer_Implementation()
 {
     if (!SecondWeapon) return;
-    if (SecondWeapon->MakeShot())
-    {
-        OnChangeAmmo_Client(EVehicleItemType::SecondWeapon, SecondWeapon->GetAmmoCapacity());
-        if (!SecondWeapon->IsEmpty())
-        {
-            OnStartReloading_Client(EVehicleItemType::SecondWeapon);
-        }
-    }
+    SecondWeapon->MakeShot();
 }
 
 bool UWeaponComponent::AddAmmo(int32 Amount)
 {
     /** handled on server. Pickup->DefaultWeeledVehicle */
-    bool bCanAdd{false};
-    if (SecondWeapon)
-    {
-        if (SecondWeapon->IsEmpty() && SecondWeapon->ChangeAmmoCapacity(Amount))
-        {
-            SecondWeapon->ReloadWeapon();
-            OnStartReloading_Client(EVehicleItemType::SecondWeapon);
-            bCanAdd = true;
-        }
-        else
-        {
-            bCanAdd = SecondWeapon->ChangeAmmoCapacity(Amount);
-        }
-        OnChangeAmmo_Client(EVehicleItemType::SecondWeapon, SecondWeapon->GetAmmoCapacity());
-    }
-
-    return bCanAdd;
+    return SecondWeapon ? SecondWeapon->ChangeAmmoCapacity(Amount) : false;
 }
 
 void UWeaponComponent::BeginPlay()
@@ -72,36 +49,65 @@ void UWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
+void UWeaponComponent::OnChangeAmmoInWeapon(EVehicleItemType Type, int32 AmmoAmount)
+{
+    OnChangeAmmo_Client(Type, AmmoAmount);
+}
+
+void UWeaponComponent::OnStartWeaponReloading(EVehicleItemType Type)
+{
+    OnStartReloading_Client(Type);
+}
+
 void UWeaponComponent::InitWeapons_OnServer_Implementation()
 {
-    // if (!GetOwner() || !GetOwner()->GetInstigatorController()) return;
-    // const auto PlayerState = GetOwner()->GetInstigatorController()->GetPlayerState<AValkiriaPlayerState>();
-    // if (!PlayerState) return;
+    if (!GetOwner() || !GetOwner()->GetInstigatorController()) return;
+    const auto PlayerState = GetOwner()->GetInstigatorController()->GetPlayerState<AValkiriaPlayerState>();
+    if (!PlayerState || PlayerState->GetVehicleItems().Num() == 0) return;
 
-    // for (auto& VehicleItem : PlayerState->GetVehicleItems())
-    //{
-    //     if (VehicleItem.ItemType == EVehicleItemType::Turret && VehicleItem.ItemClass)
-    //     {
-    //         VehicleTurret = MountWeapon<ATurret>(VehicleItem.ItemClass, TurretSocketName);
-    //     }
-    //     if (VehicleItem.ItemType == EVehicleItemType::SecondWeapon && VehicleItem.ItemClass)
-    //     {
-    //         SecondWeapon = MountWeapon<ASecondWeapon>(VehicleItem.ItemClass, SecondWeaponSocketName);
-    //         SecondWeapon->SetWeaponData(VehicleItem);
-    //         SecondWeapon->ChangeAmmoCapacity(VehicleItem.MaxAmmoCapacity);
-    //     }
-    //     OnItemMount_Client(VehicleItem);
-    // }
+    for (auto& VehicleItem : PlayerState->GetVehicleItems())
+    {
+        if (!VehicleItem.ItemClass) continue;
+
+        FString EnumNameString{UEnum::GetValueAsName(VehicleItem.ItemType).ToString()};
+        int32 ScopeIndex = EnumNameString.Find(TEXT("::"), ESearchCase::CaseSensitive);
+        FName SocketName{NAME_None};
+        if (ScopeIndex != INDEX_NONE)
+        {
+            SocketName = FName(*(EnumNameString.Mid(ScopeIndex + 2) + "Socket"));
+        }
+
+        if (VehicleItem.ItemType == EVehicleItemType::Turret)
+        {
+            VehicleTurret = MountWeapon<ATurret>(VehicleItem.ItemClass, SocketName /*TurretSocketName*/);
+            if (!VehicleTurret) continue;
+
+            VehicleTurret->SetupWeapon(VehicleItem.MaxAmmoCapacity, VehicleItem.ReloadingTime);
+            VehicleTurret->OnChangeAmmoInWeapon.AddUObject(this, &UWeaponComponent::OnChangeAmmoInWeapon);
+            VehicleTurret->OnStartWeaponReloading.AddUObject(this, &UWeaponComponent::OnStartWeaponReloading);
+        }
+        if (VehicleItem.ItemType == EVehicleItemType::SecondWeapon)
+        {
+            SecondWeapon = MountWeapon<ASecondWeapon>(VehicleItem.ItemClass, SocketName /*SecondWeaponSocketName*/);
+            if (!SecondWeapon) continue;
+
+            SecondWeapon->SetupWeapon(VehicleItem.MaxAmmoCapacity, VehicleItem.ReloadingTime);
+
+            SecondWeapon->OnChangeAmmoInWeapon.AddUObject(this, &UWeaponComponent::OnChangeAmmoInWeapon);
+            SecondWeapon->OnStartWeaponReloading.AddUObject(this, &UWeaponComponent::OnStartWeaponReloading);
+        }
+        OnItemMount_Client(VehicleItem);
+    }
 
     /* used in game level for debug */
-    if (TurretClass)
-    {
-        VehicleTurret = MountWeapon<ATurret>(TurretClass, TurretSocketName);
-    }
-    if (SecondWeaponClass)
-    {
-        SecondWeapon = MountWeapon<ASecondWeapon>(SecondWeaponClass, SecondWeaponSocketName);
-    }
+    // if (TurretClass)
+    //{
+    //     VehicleTurret = MountWeapon<ATurret>(TurretClass, TurretSocketName);
+    // }
+    // if (SecondWeaponClass)
+    //{
+    //     SecondWeapon = MountWeapon<ASecondWeapon>(SecondWeaponClass, SecondWeaponSocketName);
+    // }
     /* end debug */
 
     if (VehicleTurret && !VehicleTurret->Controller)

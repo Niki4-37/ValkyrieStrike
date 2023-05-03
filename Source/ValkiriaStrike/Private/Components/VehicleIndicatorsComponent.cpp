@@ -10,11 +10,7 @@ UVehicleIndicatorsComponent::UVehicleIndicatorsComponent()
 
 bool UVehicleIndicatorsComponent::AddFuel(int32 Value)
 {
-    bool bCanChanged{true};
-    if (FuelValue == MaxFuelValue)
-    {
-        bCanChanged = false;
-    }
+    bool bCanChanged{FuelValue < MaxFuelValue};
 
     FuelValue = FMath::Clamp(FuelValue + FMath::CeilToFloat(Value), 0.f, MaxFuelValue);
     OnFuelValueChanged_Multicast(FuelValue, MaxFuelValue);

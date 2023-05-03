@@ -20,6 +20,8 @@ public:
     void UpdateAmmoCapacityBar(int32 NewValue);
     void StartReloading();
 
+    virtual void BeginDestroy() override;
+
 protected:
     UPROPERTY(meta = (BindWidget))
     UImage* ItemImage;

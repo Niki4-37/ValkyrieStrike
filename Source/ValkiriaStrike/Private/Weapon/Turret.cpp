@@ -28,7 +28,22 @@ ATurret::ATurret()
     // AIControllerClass = AAITurretController::StaticClass();
 }
 
-void ATurret::RotateToTarget(AActor* AimActor, float TimerRate)
+void ATurret::SetupWeapon(int32 InMaxAmmoCapacity, float InReloadingTime)
+{
+    MaxAmmoCapacity = InMaxAmmoCapacity;
+    ReloadingTime = InReloadingTime;
+    AmmoCapacity = MaxAmmoCapacity;
+}
+
+void ATurret::Fire_OnServer_Implementation(bool bCanFire)
+{
+    (bCanFire && bIsReady && !IsEmpty()) ?                                                    //
+        GetWorldTimerManager().SetTimer(FireTimer, this, &ATurret::MakeShot, FireRate, true)  //
+        :                                                                                     //
+        GetWorldTimerManager().ClearTimer(FireTimer);
+}
+
+void ATurret::RotateToTarget_OnServer_Implementation(AActor* AimActor, float TimerRate)
 {
     Alpha = 0.f;
     GetWorldTimerManager().ClearTimer(SmoothRotationTimer);
@@ -51,23 +66,12 @@ void ATurret::RotateToTarget(AActor* AimActor, float TimerRate)
             const FRotator Direction = FRotationMatrix::MakeFromX(AimLocation - TurretLocatiom).Rotator();
             FQuat DeltaQuat = FQuat::Slerp(FQuat(FromRotation), FQuat(Direction), Alpha);
 
-            float YawValue = DeltaQuat.Rotator().Yaw;
-            TurretTower->SetWorldRotation(FRotator(0.f, YawValue, 0.f));
-            TurretMuzzle->SetWorldRotation(DeltaQuat);
-            RotateTurret_OnServer(DeltaQuat);
+            RotateTurret_Multicast(DeltaQuat);
 
             Alpha += 0.1f;
         });
 
     GetWorldTimerManager().SetTimer(SmoothRotationTimer, TimerDelegate, TimerRate / 10.f, true);
-}
-
-void ATurret::Fire_OnServer_Implementation(bool bIsPressed)
-{
-    bIsPressed ?                                                                              //
-        GetWorldTimerManager().SetTimer(FireTimer, this, &ATurret::MakeShot, FireRate, true)  //
-        :                                                                                     //
-        GetWorldTimerManager().ClearTimer(FireTimer);
 }
 
 void ATurret::BeginPlay()
@@ -78,12 +82,13 @@ void ATurret::BeginPlay()
 void ATurret::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME(ATurret, AmmoCapacity);
 }
 
 void ATurret::MakeShot()
 {
     /* handled on server */
-
     auto Rotation = TurretMuzzle->GetSocketRotation(MuzzleSocketName);
 
     auto MuzzleLocation = TurretMuzzle->GetSocketLocation(MuzzleSocketName);
@@ -93,20 +98,32 @@ void ATurret::MakeShot()
     if (Bullet)
     {
         Bullet->SetLifeSpan(1.f);
+        --AmmoCapacity;
+        OnChangeAmmoInWeapon.Broadcast(EVehicleItemType::Turret, AmmoCapacity);
+    }
+    if (IsEmpty())
+    {
+        bIsReady = false;
+        ReloadWeapon();
     }
 }
 
-void ATurret::RotateTurret_OnServer_Implementation(const FQuat& Value)
+void ATurret::ReloadWeapon()
 {
-    RotateTurret_Multicast(Value);
+    FTimerDelegate TimerDelegate;
+    TimerDelegate.BindLambda(
+        [&]()
+        {
+            bIsReady = true;
+            AmmoCapacity = MaxAmmoCapacity;
+        });
+    GetWorldTimerManager().SetTimer(ReloadingTimer, TimerDelegate, ReloadingTime, false);
+    OnStartWeaponReloading.Broadcast(EVehicleItemType::Turret);
 }
 
 void ATurret::RotateTurret_Multicast_Implementation(const FQuat& Value)
 {
-    if (Controller && !Controller->IsLocalPlayerController())
-    {
-        float YawValue = Value.Rotator().Yaw;
-        TurretTower->SetWorldRotation(FRotator(0.f, YawValue, 0.f));
-        TurretMuzzle->SetWorldRotation(Value);
-    }
+    float YawValue = Value.Rotator().Yaw;
+    TurretTower->SetWorldRotation(FRotator(0.f, YawValue, 0.f));
+    TurretMuzzle->SetWorldRotation(Value);
 }
