@@ -74,34 +74,34 @@ void UWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 void UWeaponComponent::InitWeapons_OnServer_Implementation()
 {
-    if (!GetOwner() || !GetOwner()->GetInstigatorController()) return;
-    const auto PlayerState = GetOwner()->GetInstigatorController()->GetPlayerState<AValkiriaPlayerState>();
-    if (!PlayerState) return;
+    // if (!GetOwner() || !GetOwner()->GetInstigatorController()) return;
+    // const auto PlayerState = GetOwner()->GetInstigatorController()->GetPlayerState<AValkiriaPlayerState>();
+    // if (!PlayerState) return;
 
-    for (auto& VehicleItem : PlayerState->GetVehicleItems())
-    {
-        if (VehicleItem.ItemType == EVehicleItemType::Turret && VehicleItem.ItemClass)
-        {
-            VehicleTurret = MountWeapon<ATurret>(VehicleItem.ItemClass, TurretSocketName);
-        }
-        if (VehicleItem.ItemType == EVehicleItemType::SecondWeapon && VehicleItem.ItemClass)
-        {
-            SecondWeapon = MountWeapon<ASecondWeapon>(VehicleItem.ItemClass, SecondWeaponSocketName);
-            SecondWeapon->SetWeaponData(VehicleItem);
-            SecondWeapon->ChangeAmmoCapacity(VehicleItem.MaxAmmoCapacity);
-        }
-        OnItemMount_Client(VehicleItem);
-    }
+    // for (auto& VehicleItem : PlayerState->GetVehicleItems())
+    //{
+    //     if (VehicleItem.ItemType == EVehicleItemType::Turret && VehicleItem.ItemClass)
+    //     {
+    //         VehicleTurret = MountWeapon<ATurret>(VehicleItem.ItemClass, TurretSocketName);
+    //     }
+    //     if (VehicleItem.ItemType == EVehicleItemType::SecondWeapon && VehicleItem.ItemClass)
+    //     {
+    //         SecondWeapon = MountWeapon<ASecondWeapon>(VehicleItem.ItemClass, SecondWeaponSocketName);
+    //         SecondWeapon->SetWeaponData(VehicleItem);
+    //         SecondWeapon->ChangeAmmoCapacity(VehicleItem.MaxAmmoCapacity);
+    //     }
+    //     OnItemMount_Client(VehicleItem);
+    // }
 
     /* used in game level for debug */
-    // if (TurretClass)
-    //{
-    //     VehicleTurret = MountWeapon<ATurret>(TurretClass, TurretSocketName);
-    // }
-    // if (SecondWeaponClass)
-    //{
-    //    SecondWeapon = MountWeapon<ASecondWeapon>(SecondWeaponClass, SecondWeaponSocketName);
-    //}
+    if (TurretClass)
+    {
+        VehicleTurret = MountWeapon<ATurret>(TurretClass, TurretSocketName);
+    }
+    if (SecondWeaponClass)
+    {
+        SecondWeapon = MountWeapon<ASecondWeapon>(SecondWeaponClass, SecondWeaponSocketName);
+    }
     /* end debug */
 
     if (VehicleTurret && !VehicleTurret->Controller)

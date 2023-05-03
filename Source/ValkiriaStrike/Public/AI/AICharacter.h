@@ -10,6 +10,7 @@ class UHealthComponent;
 class UAnimMontage;
 class ADefaultWeapon;
 class UBehaviorTree;
+class UDropComponent;
 
 UCLASS()
 class VALKIRIASTRIKE_API AAICharacter : public ACharacter
@@ -30,6 +31,9 @@ public:
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     UHealthComponent* HealthComponent;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    UDropComponent* DropComponent;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     UAnimMontage* DeathMontage;

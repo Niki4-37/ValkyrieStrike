@@ -17,6 +17,9 @@ class VALKIRIASTRIKE_API APickupActor : public AInteractionActor
 public:
     APickupActor();
 
+    void SetupPickup(UStaticMesh* Mesh, UMaterialInterface* Material, const FInteractionData& InData);
+    void ThrowUp(const FVector& StartPosition);
+
 protected:
     UPROPERTY(VisibleAnywhere)
     USphereComponent* CollisionComponent;
@@ -26,6 +29,12 @@ protected:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     float MoveRate{1.f};
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    float Gravity{2.f};
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    float Impulse{50.f};
 
     virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
     virtual void NotifyActorEndOverlap(AActor* OtherActor) override;
@@ -38,5 +47,14 @@ private:
 
     FTimerHandle MoveTimer;
 
+    FTimerHandle TrowTimer;
+
+    float Height{0.f};
+
     bool IsAppliedToActor(AActor* OtherActor);
+
+    UFUNCTION(NetMulticast, reliable)
+    void SetMaterial_Multicast(UMaterialInterface* Material);
+    UFUNCTION(NetMulticast, unreliable)
+    void SetActorLocation_Multicast(const FVector& NewLocation);
 };

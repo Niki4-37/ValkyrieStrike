@@ -16,11 +16,15 @@ ADefaultProjectile::ADefaultProjectile()
     SetRootComponent(CollisionComponent);
     CollisionComponent->bReturnMaterialOnMove = true;      // hit Event returns PhysMaterial
     CollisionComponent->SetCanEverAffectNavigation(true);  // collision not affect navigation
+    // CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    // CollisionComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 
     DefaultProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
     DefaultProjectileMesh->SetupAttachment(CollisionComponent);
     DefaultProjectileMesh->SetCanEverAffectNavigation(false);
     DefaultProjectileMesh->SetMobility(EComponentMobility::Movable);
+    DefaultProjectileMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    DefaultProjectileMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 
     ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>("UDefaultProjectileMovementComponent");
     ProjectileMovementComponent->UpdatedComponent = RootComponent;  //???

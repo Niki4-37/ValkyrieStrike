@@ -4,6 +4,7 @@
 #include "AI/AIEnemyController.h"
 #include "Components/HealthComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/DropComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "BrainComponent.h"
 
@@ -12,6 +13,7 @@ AAICharacter::AAICharacter()
     PrimaryActorTick.bCanEverTick = true;
 
     HealthComponent = CreateDefaultSubobject<UHealthComponent>("HealthComponent");
+    DropComponent = CreateDefaultSubobject<UDropComponent>("DropComponent");
 
     AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
     AIControllerClass = AAIEnemyController::StaticClass();
@@ -41,6 +43,7 @@ void AAICharacter::BeginPlay()
 {
     Super::BeginPlay();
     check(HealthComponent);
+    check(DropComponent);
     HealthComponent->OnDeath.AddUObject(this, &AAICharacter::OnDeath);
     Tags.Add("Enemy");
 }
@@ -57,6 +60,7 @@ void AAICharacter::OnDeath()
     {
         STUController->BrainComponent->Cleanup();
     }
+    DropComponent->DropItem();  // Server
 
     Tags.Empty();
 }

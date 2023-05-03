@@ -9,9 +9,6 @@ AWorkshopActor::AWorkshopActor()
     CollisionComponent = CreateDefaultSubobject<UBoxComponent>("CollisionComponent");
     CollisionComponent->SetBoxExtent(FVector(300.f));
     CollisionComponent->SetupAttachment(ActorRootComponent);
-
-    WorkshopMesh = CreateDefaultSubobject<UStaticMeshComponent>("WorkshopMesh");
-    WorkshopMesh->SetupAttachment(ActorRootComponent);
 }
 
 void AWorkshopActor::NotifyActorBeginOverlap(AActor* OtherActor)

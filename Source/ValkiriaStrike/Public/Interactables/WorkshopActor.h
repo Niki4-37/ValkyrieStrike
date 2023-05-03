@@ -22,9 +22,6 @@ protected:
     UPROPERTY(VisibleAnywhere)
     UBoxComponent* CollisionComponent;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    UStaticMeshComponent* WorkshopMesh;
-
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TArray<FInteractionData> WorkshopTasks;
 

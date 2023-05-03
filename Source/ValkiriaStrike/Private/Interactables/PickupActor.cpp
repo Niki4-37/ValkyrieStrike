@@ -17,10 +17,48 @@ APickupActor::APickupActor()
     CollisionComponent->SetupAttachment(RootComponent);
 }
 
+void APickupActor::SetupPickup(UStaticMesh* Mesh, UMaterialInterface* Material, const FInteractionData& InData)
+{
+    /** handled on server */
+    if (Mesh)
+    {
+        MeshComponent->SetStaticMesh(Mesh);
+        MeshComponent->SetRelativeScale3D(FVector(1.f));
+        SetMaterial_Multicast(Material);
+    }
+    Data = InData;
+}
+
+void APickupActor::ThrowUp(const FVector& StartPosition)
+{
+    const float LocationX = StartPosition.X;
+    const float LocationY = StartPosition.Y;
+    const float LocationZ = StartPosition.Z;
+
+    Height = LocationZ;
+
+    FTimerDelegate TimerDelegate;
+    TimerDelegate.BindLambda(
+        [&, LocationX, LocationY, LocationZ]
+        {
+            Impulse -= Gravity;
+            Height += Impulse;
+
+            if (Height < LocationZ)
+            {
+                GetWorldTimerManager().ClearTimer(TrowTimer);
+                return;
+            }
+            SetActorLocation_Multicast(FVector(LocationX, LocationY, Height));
+
+            GEngine->AddOnScreenDebugMessage(-1, 0.01f, FColor::Yellow, FVector(LocationX, LocationY, Height).ToString());
+        });
+
+    GetWorldTimerManager().SetTimer(TrowTimer, TimerDelegate, 0.01f, true);
+}
+
 void APickupActor::NotifyActorBeginOverlap(AActor* OtherActor)
 {
-    //GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, "APickupActor::NotifyActorBeginOverlap");
-
     if (!OtherActor || bHasOwner || SavedActors.Contains(OtherActor) || !OtherActor->ActorHasTag("Player")) return;
     Alpha = 0.f;
     bHasOwner = true;
@@ -62,4 +100,14 @@ bool APickupActor::IsAppliedToActor(AActor* OtherActor)
     bHasOwner = false;
     GetWorldTimerManager().ClearTimer(MoveTimer);
     return true;
+}
+
+void APickupActor::SetMaterial_Multicast_Implementation(UMaterialInterface* Material)
+{
+    MeshComponent->SetMaterial(0, Material);
+}
+
+void APickupActor::SetActorLocation_Multicast_Implementation(const FVector& NewLocation)
+{
+    SetActorLocation(NewLocation);
 }

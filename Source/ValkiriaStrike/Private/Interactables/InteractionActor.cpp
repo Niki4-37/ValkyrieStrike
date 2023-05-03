@@ -14,6 +14,8 @@ AInteractionActor::AInteractionActor()
     MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("MeshComponent");
     MeshComponent->SetupAttachment(RootComponent);
     MeshComponent->SetIsReplicated(true);
+    MeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    MeshComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 }
 
 void AInteractionActor::BeginPlay()
