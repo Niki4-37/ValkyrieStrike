@@ -44,7 +44,8 @@ void ADefaultProjectile::BeginPlay()
 
     check(CollisionComponent);
 
-    CollisionComponent->OnComponentHit.AddDynamic(this, &ADefaultProjectile::ProjectileCollisionComponentHit);
+    // CollisionComponent->OnComponentHit.AddDynamic(this, &ADefaultProjectile::ProjectileCollisionComponentHit);
+    CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &ADefaultProjectile::ComponentBeginOverlap);
 }
 
 void ADefaultProjectile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -57,21 +58,37 @@ void ADefaultProjectile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 
 void ADefaultProjectile::ProjectileCollisionComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-    UGameplayStatics::ApplyPointDamage(Hit.GetActor(),                  //
-                                       DamageAmount,                    //
-                                       Hit.TraceStart,                  //
-                                       Hit, GetInstigatorController(),  //
-                                       GetOwner(),                      //
-                                       nullptr);
+     UGameplayStatics::ApplyPointDamage(Hit.GetActor(),             //
+                                        DamageAmount,               //
+                                        Hit.TraceStart,             //
+                                        Hit,                        //
+                                        GetInstigatorController(),  //
+                                        GetOwner(),                 //
+                                        nullptr);
 
-    if (Hit.bBlockingHit && Hit.GetActor())
+     if (Hit.bBlockingHit && Hit.GetActor())
     {
-        // UE_LOG(LogTemp, Display, TEXT("%s"), *Hit.GetActor()->GetName());
-        Destroy();
-    }
+         // UE_LOG(LogTemp, Display, TEXT("%s"), *Hit.GetActor()->GetName());
+         Destroy();
+     }
 }
 
 void ADefaultProjectile::SetShootDirection(const FVector& Direction)
 {
     ProjectileMovementComponent->Velocity = Direction * ProjectileMovementComponent->InitialSpeed;
+}
+
+void ADefaultProjectile::ComponentBeginOverlap(
+    UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+    if (!OtherActor) return;
+    UGameplayStatics::ApplyPointDamage(OtherActor,                 //
+                                       DamageAmount,               //
+                                       SweepResult.TraceStart,     //
+                                       SweepResult,                //
+                                       GetInstigatorController(),  //
+                                       GetOwner(),                 //
+                                       nullptr);
+
+    Destroy();
 }

@@ -34,7 +34,10 @@ protected:
     UStaticMeshComponent* WeaponMesh;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    float BeemRadius = 50.f;
+    float BeemRadius = 100.f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    float WeaponDamage = 100.f;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     FName MuzzleSocketName{"MuzzleSocket"};

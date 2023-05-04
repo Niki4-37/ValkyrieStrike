@@ -3,6 +3,7 @@
 #include "Weapon/SecondWeapon.h"
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
 #include "DrawDebugHelpers.h"
@@ -88,10 +89,17 @@ bool ASecondWeapon::MakeShot()
                                            Hits,                                                                 //
                                            true);
     /* debug */
+    TArray<AActor*> HitActors;
     for (auto& Hit : Hits)
     {
         if (!Hit.GetActor()) continue;
-        GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, Hit.GetActor()->GetName());
+        HitActors.AddUnique(Hit.GetActor());
+    }
+
+    for (auto HitActor : HitActors)
+    {
+        UGameplayStatics::ApplyDamage(HitActor, WeaponDamage, GetInstigatorController(), GetOwner(), UDamageType::StaticClass());
+        GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, HitActor->GetName());
     }
 
     ChangeAmmoCapacity(-1);
