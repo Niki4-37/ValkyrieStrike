@@ -3,14 +3,17 @@
 #include "UI/GameHUD.h"
 #include "UI/PlayerHUDWidget.h"
 
-void AGameHUD::PostInitializeComponents()
-{
-    Super::PostInitializeComponents();
-}
-
 void AGameHUD::CreateGameHUDWidgets()
 {
-    const auto PlayerHUDWidget = CreateWidget<UUserWidget>(GetWorld(), PlayerHUDWidgetClass);
+    if (!GetOwningPlayerController() || !PlayerHUDWidgetClass) return;
+
+    if (PlayerHUDWidget)
+    {
+        PlayerHUDWidget->RemoveFromParent();
+        PlayerHUDWidget = nullptr;
+    }
+
+    PlayerHUDWidget = CreateWidget<UUserWidget>(GetOwningPlayerController(), PlayerHUDWidgetClass);
     if (PlayerHUDWidget)
     {
         PlayerHUDWidget->AddToViewport();
@@ -20,8 +23,6 @@ void AGameHUD::CreateGameHUDWidgets()
 void AGameHUD::BeginPlay()
 {
     Super::BeginPlay();
-
-    checkf(PlayerHUDWidgetClass, TEXT("PlayerHUDWidgetClass not define!"));
 
     CreateGameHUDWidgets();
 }

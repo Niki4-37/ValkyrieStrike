@@ -23,12 +23,14 @@ protected:
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+    void Killed();
+
 public:
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
     void AddHealth(float Value);
 
-    float GetHealth() const { return Health; };
     bool IsDead() const { return Health <= 0.f; };
+    virtual void UpdateWidgetsInfo();
 
 private:
     UPROPERTY(Replicated)

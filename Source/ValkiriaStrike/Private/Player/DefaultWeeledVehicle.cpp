@@ -131,10 +131,13 @@ void ADefaultWeeledVehicle::Tick(float Delta)
     const float EngineRotation = GetVehicleMovementComponent()->GetEngineRotationSpeed();
     const float MaxEngineRotation = GetVehicleMovementComponent()->GetEngineMaxRotationSpeed();
     const float Percentage = MaxEngineRotation > 0.f ? EngineRotation / MaxEngineRotation : 0.f;
-    
+
     GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Red, FString::SanitizeFloat(Percentage));
-    
-    VehicleIndicatorsComp->SetFuelConsumptionModifier_OnServer(Percentage);
+
+    if (HasAuthority())
+    {
+        VehicleIndicatorsComp->SetFuelConsumptionModifier_OnServer(Percentage);
+    }
 }
 
 void ADefaultWeeledVehicle::BeginPlay()
@@ -145,6 +148,12 @@ void ADefaultWeeledVehicle::BeginPlay()
     check(VehicleIndicatorsComp);
 
     Tags.Add("Player");
+}
+
+void ADefaultWeeledVehicle::UnPossessed()
+{
+    Super::UnPossessed();
+    Tags.Empty();
 }
 
 void ADefaultWeeledVehicle::MoveForward(float Val)

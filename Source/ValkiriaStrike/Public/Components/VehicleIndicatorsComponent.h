@@ -19,6 +19,8 @@ public:
     UFUNCTION(Server, unreliable)
     void SetFuelConsumptionModifier_OnServer(float Percentage);
 
+    virtual void UpdateWidgetsInfo() override;
+
 protected:
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

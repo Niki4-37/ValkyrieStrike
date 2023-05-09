@@ -28,6 +28,8 @@ public:
 
     void MakeMaintenance(EItemPropertyType Type);
 
+    void UpdateWidgetsInfo();
+
 protected:
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

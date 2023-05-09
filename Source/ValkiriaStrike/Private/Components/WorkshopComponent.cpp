@@ -78,6 +78,11 @@ void UWorkshopComponent::MakeMaintenance(EItemPropertyType Type)
     }
 }
 
+void UWorkshopComponent::UpdateWidgetsInfo()
+{
+    OnRep_Coins();
+}
+
 void UWorkshopComponent::BeginPlay()
 {
     Super::BeginPlay();

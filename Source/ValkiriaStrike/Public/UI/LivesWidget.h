@@ -4,25 +4,24 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "GameCoreTypes.h"
-#include "VehicleEnduranceWidget.generated.h"
+#include "LivesWidget.generated.h"
 
-class UProgressBar;
+class UTextBlock;
 
 UCLASS()
-class VALKIRIASTRIKE_API UVehicleEnduranceWidget : public UUserWidget
+class VALKIRIASTRIKE_API ULivesWidget : public UUserWidget
 {
     GENERATED_BODY()
 
 protected:
     UPROPERTY(meta = (BindWidget))
-    UProgressBar* HealthBar;
+    UTextBlock* Lives_Text;
 
     virtual void NativeOnInitialized() override;
 
 private:
-    FTimerHandle FoundPawnTimer;
+    FTimerHandle FoundPlayerStateTimer;
 
-    void OnHealthChanged(EItemPropertyType Type, float Health, float MaxHealth);
-    void OnNewPawn(APawn* NewPawn);
+    void BindDelegate();
+    void OnLivesChanged(int32 Value);
 };

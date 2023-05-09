@@ -8,6 +8,8 @@
 #include "EngineUtils.h"
 #include "GameFramework/PlayerStart.h"
 
+#include "Decorations/DecorationActor.h"
+
 AFirstLevelGameModeBase::AFirstLevelGameModeBase()
 {
 
@@ -44,6 +46,63 @@ AActor* AFirstLevelGameModeBase::ChoosePlayerStart_Implementation(AController* P
     }
 
     return Super::ChoosePlayerStart_Implementation(Player);
+}
+
+void AFirstLevelGameModeBase::RestartPlayer(AController* NewPlayer)
+{
+    if (NewPlayer == nullptr || NewPlayer->IsPendingKillPending())
+    {
+        return;
+    }
+
+    const auto ValkiriaPlayerState = NewPlayer->GetPlayerState<AValkiriaPlayerState>();
+
+    if (ValkiriaPlayerState && !ValkiriaPlayerState->IsFirstDead() /*&& PS->IsReconnecting()*/)
+    {
+        FTransform NewTransforn = ValkiriaPlayerState->GetRespawnTransform();
+        FVector NewLocation = NewTransforn.GetLocation() + FVector(300.f, 300.f, 100.f);
+        NewTransforn.SetLocation(NewLocation);
+        RestartPlayerAtTransform(NewPlayer, NewTransforn);
+    }
+    else
+    {
+        AActor* StartSpot = FindPlayerStart(NewPlayer);
+
+        if (StartSpot == nullptr)
+        {
+            if (NewPlayer->StartSpot != nullptr)
+            {
+                StartSpot = NewPlayer->StartSpot.Get();
+                UE_LOG(LogGameMode, Warning, TEXT("RestartPlayer: Player start not found, using last start spot"));
+            }
+        }
+
+        RestartPlayerAtPlayerStart(NewPlayer, StartSpot);
+    }
+}
+
+void AFirstLevelGameModeBase::Killed(AController* VictimController, const FTransform& VictimTransform)
+{
+    if (VictimController && VictimController->IsA<APlayerController>())
+    {
+        auto BrokenVehicle = GetWorld()->SpawnActorDeferred<ADecorationActor>(ADecorationActor::StaticClass(), VictimTransform);
+        if (BrokenVehicle)
+        {
+            BrokenVehicle->SetupDecoration(BrokenVehicleMesh);
+            BrokenVehicle->FinishSpawning(VictimTransform);
+        }
+
+        if (const auto ValkiriaPlayerState = VictimController->GetPlayerState<AValkiriaPlayerState>())
+        {
+            ValkiriaPlayerState->SetRespawnTransform(VictimTransform);
+            ValkiriaPlayerState->ChangeLives(-1);
+            VictimController->GetPawn()->Reset();
+            if (ValkiriaPlayerState->CanRespawn())
+            {
+                RestartPlayer(VictimController);
+            }
+        }
+    }
 }
 
 void AFirstLevelGameModeBase::FillPlayerStartMap()

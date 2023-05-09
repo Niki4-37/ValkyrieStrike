@@ -27,6 +27,9 @@ protected:
     UBorder* CoinsValuePosition;
 
     UPROPERTY(meta = (BindWidget))
+    UBorder* LivesPosition;
+
+    UPROPERTY(meta = (BindWidget))
     UBorder* WorkshopPosition;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -40,6 +43,9 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     TSubclassOf<UUserWidget> CoinsValueWidgetClass;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    TSubclassOf<UUserWidget> LivesWidgetClass;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     TSubclassOf<UUserWidget> WorkshopWidgetClass;

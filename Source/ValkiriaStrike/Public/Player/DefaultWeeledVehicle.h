@@ -55,6 +55,7 @@ public:
     virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
     virtual void Tick(float Delta) override;
     virtual void BeginPlay() override;
+    virtual void UnPossessed() override;
 
 private:
     /* Are we on a 'slippery' surface */

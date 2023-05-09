@@ -22,6 +22,12 @@ void UVehicleIndicatorsComponent::SetFuelConsumptionModifier_OnServer_Implementa
     FuelConsumptionModifier = FMath::Lerp(0.f, 2.f, Percentage);
 }
 
+void UVehicleIndicatorsComponent::UpdateWidgetsInfo()
+{
+    Super::UpdateWidgetsInfo();
+    OnFuelValueChanged_Multicast(FuelValue, MaxFuelValue);
+}
+
 void UVehicleIndicatorsComponent::BeginPlay()
 {
     Super::BeginPlay();

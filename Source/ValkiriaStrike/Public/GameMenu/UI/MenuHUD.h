@@ -26,6 +26,7 @@ protected:
     virtual void BeginPlay() override;
 
 private:
+    UPROPERTY()
     TMap<EMenuState, UUserWidget*> MenuWidgetsMap;
 
     UPROPERTY()

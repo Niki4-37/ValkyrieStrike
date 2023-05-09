@@ -89,12 +89,15 @@ void APickupActor::NotifyActorEndOverlap(AActor* OtherActor)
 
 bool APickupActor::IsAppliedToActor(AActor* OtherActor)
 {
-    if (Alpha < 0.7f) return false;
-
-    auto Interface = Cast<IGameInterface>(OtherActor);
-    if (Interface && Interface->AddAmount(Data))
+    if (OtherActor)
     {
-        Destroy();
+        if (Alpha < 0.7f) return false;
+
+        auto Interface = Cast<IGameInterface>(OtherActor);
+        if (Interface && Interface->AddAmount(Data))
+        {
+            Destroy();
+        }
     }
 
     bHasOwner = false;
@@ -104,6 +107,7 @@ bool APickupActor::IsAppliedToActor(AActor* OtherActor)
 
 void APickupActor::SetMaterial_Multicast_Implementation(UMaterialInterface* Material)
 {
+    if (!Material) return;
     MeshComponent->SetMaterial(0, Material);
 }
 

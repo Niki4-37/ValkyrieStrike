@@ -21,6 +21,14 @@ public:
 
     virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
+    virtual void RestartPlayer(AController* NewPlayer) override;
+
+    void Killed(AController* VictimController, const FTransform& VictimTransform);
+
+protected:
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    UStaticMesh* BrokenVehicleMesh;
+
 private:
     UPROPERTY()
     TMap<AActor*, bool> PlayerStartMap;

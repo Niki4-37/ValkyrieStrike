@@ -4,6 +4,8 @@
 #include "Components/TextBlock.h"
 #include "Components/WorkshopComponent.h"
 
+#include "Engine.h"
+
 void UCoinsValueWidget::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
@@ -12,11 +14,6 @@ void UCoinsValueWidget::NativeOnInitialized()
     {
         GetOwningPlayer()->GetOnNewPawnNotifier().AddUObject(this, &UCoinsValueWidget::OnNewPawn);
         OnNewPawn(GetOwningPlayerPawn());
-    }
-
-    if (CoinsValue_Text)
-    {
-        CoinsValue_Text->SetText(FText::AsNumber(0));
     }
 }
 
@@ -27,10 +24,13 @@ void UCoinsValueWidget::OnNewPawn(APawn* NewPawn)
     if (WorkshopComponent && !WorkshopComponent->OnCoinsChanged.IsBoundToObject(this))
     {
         WorkshopComponent->OnCoinsChanged.AddUObject(this, &UCoinsValueWidget::OnCoinsChanged);
+        WorkshopComponent->UpdateWidgetsInfo();
     }
 }
 
 void UCoinsValueWidget::OnCoinsChanged(int32 Value)
 {
     CoinsValue_Text->SetText(FText::AsNumber(Value));
+
+    GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Green, "OnCoinsChanged");
 }

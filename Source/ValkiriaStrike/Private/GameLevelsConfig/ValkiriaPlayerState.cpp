@@ -11,6 +11,12 @@ void AValkiriaPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 
     DOREPLIFETIME(AValkiriaPlayerState, Lives);
     DOREPLIFETIME(AValkiriaPlayerState, VehicleItems);
+    DOREPLIFETIME(AValkiriaPlayerState, bNoLives);
+}
+
+void AValkiriaPlayerState::UpdateWidgetsInfo()
+{
+    OnLivesChanged_OnClient(Lives);
 }
 
 void AValkiriaPlayerState::SaveMountedItem(const FVehicleItemData& VehicleItemData)
@@ -37,4 +43,12 @@ void AValkiriaPlayerState::OverrideWith(APlayerState* PlayerState)
     {
         SetVehicleItems(ValkiriaPlayerState->GetVehicleItems());
     }
+}
+
+void AValkiriaPlayerState::OnLivesChanged_OnClient_Implementation(int32 Amount)
+{
+    // if (GetLocalRole() == ENetRole::ROLE_Authority)
+    //{
+    OnLivesChanged.Broadcast(Amount);
+    //}
 }

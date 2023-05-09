@@ -31,6 +31,8 @@ private:
     UPROPERTY()
     TMap<EItemPropertyType, UWorkshopTaskWidget*> TaskMap;
 
+    FTimerHandle FoundPawnTimer;
+
     void OnNewPawn(APawn* NewPawn);
 
     void OnWorkshopTasksUpdated(const TArray<FInteractionData>& Tasks);

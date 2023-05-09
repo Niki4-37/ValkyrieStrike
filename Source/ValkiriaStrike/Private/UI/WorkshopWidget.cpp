@@ -19,14 +19,21 @@ void UWorkshopWidget::NativeOnInitialized()
 
 void UWorkshopWidget::OnNewPawn(APawn* NewPawn)
 {
-    if (!NewPawn) return;
+    FTimerDelegate TimerDelegate;
+    TimerDelegate.BindLambda(
+        [&]()
+        {
+            if (!GetOwningPlayerPawn()) return;
 
-    const auto WorkshopComponent = NewPawn->FindComponentByClass<UWorkshopComponent>();
-    if (WorkshopComponent)
-    {
-        WorkshopComponent->OnTasksUpdated.AddUObject(this, &UWorkshopWidget::OnWorkshopTasksUpdated);
-        WorkshopComponent->OnUpdateCost.AddUObject(this, &UWorkshopWidget::OnUpdateCost);
-    }
+            const auto WorkshopComponent = GetOwningPlayerPawn()->FindComponentByClass<UWorkshopComponent>();
+            if (!WorkshopComponent) return;
+
+            WorkshopComponent->OnTasksUpdated.AddUObject(this, &UWorkshopWidget::OnWorkshopTasksUpdated);
+            WorkshopComponent->OnUpdateCost.AddUObject(this, &UWorkshopWidget::OnUpdateCost);
+
+            GetWorld()->GetTimerManager().ClearTimer(FoundPawnTimer);
+        });
+    GetWorld()->GetTimerManager().SetTimer(FoundPawnTimer, TimerDelegate, 0.1f, true);
 }
 
 void UWorkshopWidget::OnWorkshopTasksUpdated(const TArray<FInteractionData>& Tasks)

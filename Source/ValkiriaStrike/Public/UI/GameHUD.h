@@ -12,8 +12,6 @@ class VALKIRIASTRIKE_API AGameHUD : public AHUD
     GENERATED_BODY()
 
 public:
-    virtual void PostInitializeComponents() override;
-
     void CreateGameHUDWidgets();
 
 protected:
@@ -21,4 +19,8 @@ protected:
     TSubclassOf<UUserWidget> PlayerHUDWidgetClass;
 
     virtual void BeginPlay() override;
+
+private:
+    UPROPERTY()
+    UUserWidget* PlayerHUDWidget;
 };
