@@ -14,7 +14,7 @@ class VALKYRIESTRIKE_API AMenuHUD : public AHUD
 
 public:
     virtual void PostInitializeComponents() override;
-    virtual void Destroyed();
+    virtual void Destroyed() override;
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)

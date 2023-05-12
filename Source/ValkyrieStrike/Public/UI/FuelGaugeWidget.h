@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "UI/BaseWidget.h"
 #include "GameCoreTypes.h"
 #include "FuelGaugeWidget.generated.h"
 
@@ -11,7 +11,7 @@ class UImage;
 class UMaterialInstance;
 
 UCLASS()
-class VALKYRIESTRIKE_API UFuelGaugeWidget : public UUserWidget
+class VALKYRIESTRIKE_API UFuelGaugeWidget : public UBaseWidget
 {
     GENERATED_BODY()
 
@@ -28,9 +28,7 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     float LeftBorder{0.17f};
 
-    virtual void NativeOnInitialized() override;
-
 private:
-    void OnNewPawn(APawn* NewPawn);
+    virtual void OnNewPawn(APawn* NewPawn) override;
     void OnFuelValueChanged(EItemPropertyType Type, float Value, float MaxValue);
 };

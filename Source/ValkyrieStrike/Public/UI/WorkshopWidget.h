@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "UI/BaseWidget.h"
 #include "GameCoreTypes.h"
 #include "WorkshopWidget.generated.h"
 
@@ -11,7 +11,7 @@ class UUniformGridPanel;
 class UWorkshopTaskWidget;
 
 UCLASS()
-class VALKYRIESTRIKE_API UWorkshopWidget : public UUserWidget
+class VALKYRIESTRIKE_API UWorkshopWidget : public UBaseWidget
 {
     GENERATED_BODY()
 
@@ -25,15 +25,11 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (Clampmin = "1", Clampmax = "5"))
     uint8 SlotsInRow{2};
 
-    virtual void NativeOnInitialized() override;
-
 private:
     UPROPERTY()
     TMap<EItemPropertyType, UWorkshopTaskWidget*> TaskMap;
 
-    FTimerHandle FoundPawnTimer;
-
-    void OnNewPawn(APawn* NewPawn);
+    virtual void OnNewPawn(APawn* NewPawn) override;
 
     void OnWorkshopTasksUpdated(const TArray<FInteractionData>& Tasks);
     void OnUpdateCost(EItemPropertyType Type, int32 Amount);

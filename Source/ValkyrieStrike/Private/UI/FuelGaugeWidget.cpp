@@ -5,25 +5,13 @@
 #include "Components/Image.h"
 #include "Components/VehicleIndicatorsComponent.h"
 
-void UFuelGaugeWidget::NativeOnInitialized()
-{
-    Super::NativeOnInitialized();
-
-    if (GetOwningPlayer())
-    {
-        GetOwningPlayer()->GetOnNewPawnNotifier().AddUObject(this, &UFuelGaugeWidget::OnNewPawn);
-        OnNewPawn(GetOwningPlayerPawn());
-    }
-}
-
 void UFuelGaugeWidget::OnNewPawn(APawn* NewPawn)
 {
     if (!NewPawn) return;
     const auto VehicleIndicatorsComp = NewPawn->FindComponentByClass<UVehicleIndicatorsComponent>();
-    if (VehicleIndicatorsComp && !VehicleIndicatorsComp->OnItemValueChanged.IsBoundToObject(this))
-    {
-        VehicleIndicatorsComp->OnItemValueChanged.AddUObject(this, &UFuelGaugeWidget::OnFuelValueChanged);
-    }
+    if (!VehicleIndicatorsComp || VehicleIndicatorsComp->OnItemValueChanged.IsBoundToObject(this)) return;
+
+    VehicleIndicatorsComp->OnItemValueChanged.AddUObject(this, &UFuelGaugeWidget::OnFuelValueChanged);
 }
 
 void UFuelGaugeWidget::OnFuelValueChanged(EItemPropertyType Type, float Value, float MaxValue)

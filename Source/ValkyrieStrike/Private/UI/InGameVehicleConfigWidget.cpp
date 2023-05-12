@@ -12,56 +12,30 @@ void UInGameVehicleConfigWidget::NativeOnInitialized()
     Super::NativeOnInitialized();
 
     checkf(InGameVehicleItemWidgetClass, TEXT("InGameVehicleItemWidgetClass not define!"));
-
-    if (GetOwningPlayer())
-    {
-        GetOwningPlayer()->GetOnNewPawnNotifier().AddUObject(this, &UInGameVehicleConfigWidget::OnNewPawn);
-        OnNewPawn(GetOwningPlayerPawn());
-    }
-
-    GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "InGameVehicleConfigWidget: NativeOnInitialized");
 }
 
 void UInGameVehicleConfigWidget::OnNewPawn(APawn* NewPawn)
 {
-    FTimerDelegate TimerDelegate;
-    TimerDelegate.BindLambda(
-        [&]()
-        {
-            FString Test = GetOwningPlayerPawn() ? GetOwningPlayerPawn()->GetName() : "No Pawn!";
-            GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Yellow, Test);
+    if (!NewPawn) return;
+    const auto WeaponComponent = NewPawn->FindComponentByClass<UWeaponComponent>();
+    if (!WeaponComponent) return;
 
-            if (!GetOwningPlayerPawn()) return;
+    if (!WeaponComponent->OnItemMount.IsBoundToObject(this))
+    {
+        WeaponComponent->OnItemMount.AddUObject(this, &UInGameVehicleConfigWidget::OnItemMount);
+    }
 
-            const auto WeaponComponent = GetOwningPlayerPawn()->FindComponentByClass<UWeaponComponent>();
-            if (!WeaponComponent)
-            {
-                GetWorld()->GetTimerManager().ClearTimer(FoundPawnTimer);
-                return;
-            }
+    if (!WeaponComponent->OnChangeAmmo.IsBoundToObject(this))
+    {
+        WeaponComponent->OnChangeAmmo.AddUObject(this, &UInGameVehicleConfigWidget::OnChangeAmmo);
+    }
 
-            if (!WeaponComponent->OnItemMount.IsBoundToObject(this))
-            {
-                GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Yellow, "IsBoundToObject");
-                WeaponComponent->OnItemMount.AddUObject(this, &UInGameVehicleConfigWidget::OnItemMount);
-            }
+    if (!WeaponComponent->OnStartReloading.IsBoundToObject(this))
+    {
+        WeaponComponent->OnStartReloading.AddUObject(this, &UInGameVehicleConfigWidget::OnStartReloading);
+    }
 
-            if (!WeaponComponent->OnChangeAmmo.IsBoundToObject(this))
-            {
-                WeaponComponent->OnChangeAmmo.AddUObject(this, &UInGameVehicleConfigWidget::OnChangeAmmo);
-            }
-
-            if (!WeaponComponent->OnStartReloading.IsBoundToObject(this))
-            {
-                WeaponComponent->OnStartReloading.AddUObject(this, &UInGameVehicleConfigWidget::OnStartReloading);
-            }
-
-            WeaponComponent->UpdateWidgets();
-
-            GetWorld()->GetTimerManager().ClearTimer(FoundPawnTimer);
-        });
-
-    GetWorld()->GetTimerManager().SetTimer(FoundPawnTimer, TimerDelegate, 0.1f, true);
+    WeaponComponent->UpdateWidgets();
 }
 
 void UInGameVehicleConfigWidget::OnItemMount(const FVehicleItemData& Data)

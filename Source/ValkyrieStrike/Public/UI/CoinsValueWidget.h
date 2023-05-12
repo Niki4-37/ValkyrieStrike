@@ -3,13 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "UI/BaseWidget.h"
 #include "CoinsValueWidget.generated.h"
 
 class UTextBlock;
 
 UCLASS()
-class VALKYRIESTRIKE_API UCoinsValueWidget : public UUserWidget
+class VALKYRIESTRIKE_API UCoinsValueWidget : public UBaseWidget
 {
     GENERATED_BODY()
 
@@ -17,9 +17,7 @@ protected:
     UPROPERTY(meta = (BindWidget))
     UTextBlock* CoinsValue_Text;
 
-    virtual void NativeOnInitialized() override;
-
 private:
-    void OnNewPawn(APawn* NewPawn);
+    virtual void OnNewPawn(APawn* NewPawn) override;
     void OnCoinsChanged(int32 Value);
 };

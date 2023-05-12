@@ -26,3 +26,13 @@ void AGameHUD::BeginPlay()
 
     CreateGameHUDWidgets();
 }
+
+void AGameHUD::Destroyed()
+{
+    Super::Destroyed();
+
+    if (PlayerHUDWidget)
+    {
+        PlayerHUDWidget->RemoveFromParent();
+    }
+}

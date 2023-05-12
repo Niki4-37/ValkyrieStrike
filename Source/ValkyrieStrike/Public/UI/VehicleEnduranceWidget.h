@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "UI/BaseWidget.h"
 #include "GameCoreTypes.h"
 #include "VehicleEnduranceWidget.generated.h"
 
 class UProgressBar;
 
 UCLASS()
-class VALKYRIESTRIKE_API UVehicleEnduranceWidget : public UUserWidget
+class VALKYRIESTRIKE_API UVehicleEnduranceWidget : public UBaseWidget
 {
     GENERATED_BODY()
 
@@ -18,11 +18,7 @@ protected:
     UPROPERTY(meta = (BindWidget))
     UProgressBar* HealthBar;
 
-    virtual void NativeOnInitialized() override;
-
 private:
-    FTimerHandle FoundPawnTimer;
-
     void OnHealthChanged(EItemPropertyType Type, float Health, float MaxHealth);
-    void OnNewPawn(APawn* NewPawn);
+    virtual void OnNewPawn(APawn* NewPawn) override;
 };

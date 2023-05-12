@@ -6,38 +6,19 @@
 #include "UI/WorkshopTaskWidget.h"
 #include "Components/WorkshopComponent.h"
 
-void UWorkshopWidget::NativeOnInitialized()
-{
-    Super::NativeOnInitialized();
-
-    if (GetOwningPlayer())
-    {
-        GetOwningPlayer()->GetOnNewPawnNotifier().AddUObject(this, &UWorkshopWidget::OnNewPawn);
-        OnNewPawn(GetOwningPlayerPawn());
-    }
-}
-
 void UWorkshopWidget::OnNewPawn(APawn* NewPawn)
 {
-    FTimerDelegate TimerDelegate;
-    TimerDelegate.BindLambda(
-        [&]()
-        {
-            if (!GetOwningPlayerPawn()) return;
-
-            const auto WorkshopComponent = GetOwningPlayerPawn()->FindComponentByClass<UWorkshopComponent>();
-            if (!WorkshopComponent)
-            {
-                GetWorld()->GetTimerManager().ClearTimer(FoundPawnTimer);
-                return;
-            }
-
-            WorkshopComponent->OnTasksUpdated.AddUObject(this, &UWorkshopWidget::OnWorkshopTasksUpdated);
-            WorkshopComponent->OnUpdateCost.AddUObject(this, &UWorkshopWidget::OnUpdateCost);
-
-            GetWorld()->GetTimerManager().ClearTimer(FoundPawnTimer);
-        });
-    GetWorld()->GetTimerManager().SetTimer(FoundPawnTimer, TimerDelegate, 0.1f, true);
+    if (!NewPawn) return;
+    const auto WorkshopComponent = NewPawn->FindComponentByClass<UWorkshopComponent>();
+    if (!WorkshopComponent) return;
+    if (!WorkshopComponent->OnTasksUpdated.IsBoundToObject(this))
+    {
+        WorkshopComponent->OnTasksUpdated.AddUObject(this, &UWorkshopWidget::OnWorkshopTasksUpdated);
+    }
+    if (!WorkshopComponent->OnUpdateCost.IsBoundToObject(this))
+    {
+        WorkshopComponent->OnUpdateCost.AddUObject(this, &UWorkshopWidget::OnUpdateCost);
+    }
 }
 
 void UWorkshopWidget::OnWorkshopTasksUpdated(const TArray<FInteractionData>& Tasks)

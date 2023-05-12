@@ -2,6 +2,9 @@
 
 #include "UI/PlayerHUDWidget.h"
 #include "Components/Border.h"
+#include "UI/BaseWidget.h"
+
+#include "Engine.h"
 
 void UPlayerHUDWidget::NativeOnInitialized()
 {
@@ -14,55 +17,105 @@ void UPlayerHUDWidget::NativeOnInitialized()
 
     if (VehicleEndurancePosition)
     {
-        const auto EnduranceWidget = CreateWidget(GetWorld(), VehicleEndurenceWidgetClass);
+        const auto EnduranceWidget = CreateWidget<UBaseWidget>(GetWorld(), VehicleEndurenceWidgetClass);
         if (EnduranceWidget)
         {
+            InGameWidgets.Add(EnduranceWidget);
             VehicleEndurancePosition->AddChild(EnduranceWidget);
         }
     }
 
     if (VehicleFuelPosition)
     {
-        const auto FuelGaugeWidget = CreateWidget(GetWorld(), FuelGaugeWidgetClass);
+        const auto FuelGaugeWidget = CreateWidget<UBaseWidget>(GetWorld(), FuelGaugeWidgetClass);
         if (FuelGaugeWidget)
         {
+            InGameWidgets.Add(FuelGaugeWidget);
             VehicleFuelPosition->AddChild(FuelGaugeWidget);
         }
     }
 
     if (VehicleConfigPosition)
     {
-        const auto ConfigWidget = CreateWidget(GetWorld(), InGameVehicleConfigWidgetClass);
+        const auto ConfigWidget = CreateWidget<UBaseWidget>(GetWorld(), InGameVehicleConfigWidgetClass);
         if (ConfigWidget)
         {
+            InGameWidgets.Add(ConfigWidget);
             VehicleConfigPosition->AddChild(ConfigWidget);
         }
     }
 
     if (CoinsValuePosition)
     {
-        const auto CoinsWidget = CreateWidget(GetWorld(), CoinsValueWidgetClass);
+        const auto CoinsWidget = CreateWidget<UBaseWidget>(GetWorld(), CoinsValueWidgetClass);
         if (CoinsWidget)
         {
+            InGameWidgets.Add(CoinsWidget);
             CoinsValuePosition->AddChild(CoinsWidget);
         }
     }
 
     if (LivesPosition)
     {
-        const auto LivesWidget = CreateWidget(GetWorld(), LivesWidgetClass);
+        const auto LivesWidget = CreateWidget<UBaseWidget>(GetWorld(), LivesWidgetClass);
         if (LivesWidget)
         {
+            InGameWidgets.Add(LivesWidget);
             LivesPosition->AddChild(LivesWidget);
         }
     }
 
     if (WorkshopPosition)
     {
-        const auto WorkshopWidget = CreateWidget(GetWorld(), WorkshopWidgetClass);
+        const auto WorkshopWidget = CreateWidget<UBaseWidget>(GetWorld(), WorkshopWidgetClass);
         if (WorkshopWidget)
         {
+            InGameWidgets.Add(WorkshopWidget);
             WorkshopPosition->AddChild(WorkshopWidget);
         }
     }
+
+    if (GetOwningPlayer())
+    {
+        GetOwningPlayer()->GetOnNewPawnNotifier().AddUObject(this, &UPlayerHUDWidget::OnNewPawn);
+        OnNewPawn(GetOwningPlayerPawn());
+    }
+}
+
+void UPlayerHUDWidget::RemoveFromParent()
+{
+    if (GetWorld() && GetWorld()->GetTimerManager().TimerExists(FindingPawnTimer))
+    {
+        GetWorld()->GetTimerManager().ClearTimer(FindingPawnTimer);
+    }
+    Super::RemoveFromParent();
+}
+
+void UPlayerHUDWidget::OnNewPawn(APawn* NewPawn)
+{
+    FTimerDelegate TimerDelegate;
+    TimerDelegate.BindLambda(
+        [&]()
+        {
+            FString Test = GetOwningPlayerPawn() ? GetOwningPlayerPawn()->GetName() : "No Pawn!";
+            GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Yellow, Test);
+
+            if (GetOwningPlayer()->GetSpectatorPawn())
+            {
+                GetWorld()->GetTimerManager().ClearTimer(FindingPawnTimer);
+                return;
+            }
+
+            if (!GetOwningPlayerPawn()) return;
+
+            for (auto& InGameWidget : InGameWidgets)
+            {
+                if (!InGameWidget) continue;
+                InGameWidget->OnNewPawn(GetOwningPlayerPawn());
+            }
+
+            GetWorld()->GetTimerManager().ClearTimer(FindingPawnTimer);
+        });
+
+    GetWorld()->GetTimerManager().SetTimer(FindingPawnTimer, TimerDelegate, 0.1f, true);
 }

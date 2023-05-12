@@ -7,6 +7,7 @@
 #include "PlayerHUDWidget.generated.h"
 
 class UBorder;
+class UBaseWidget;
 
 UCLASS()
 class VALKYRIESTRIKE_API UPlayerHUDWidget : public UUserWidget
@@ -51,4 +52,11 @@ protected:
     TSubclassOf<UUserWidget> WorkshopWidgetClass;
 
     virtual void NativeOnInitialized() override;
+    virtual void RemoveFromParent() override;
+
+private:
+    FTimerHandle FindingPawnTimer;
+    TArray<UBaseWidget*> InGameWidgets;
+
+    void OnNewPawn(APawn* NewPawn);
 };

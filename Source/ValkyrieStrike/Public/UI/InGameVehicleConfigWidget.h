@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "UI/BaseWidget.h"
 #include "GameCoreTypes.h"
 #include "InGameVehicleConfigWidget.generated.h"
 
@@ -11,7 +11,7 @@ class UVerticalBox;
 class UInGameVehicleItemWidget;
 
 UCLASS()
-class VALKYRIESTRIKE_API UInGameVehicleConfigWidget : public UUserWidget
+class VALKYRIESTRIKE_API UInGameVehicleConfigWidget : public UBaseWidget
 {
     GENERATED_BODY()
 
@@ -25,9 +25,7 @@ protected:
     virtual void NativeOnInitialized() override;
 
 private:
-    FTimerHandle FoundPawnTimer;
-
-    void OnNewPawn(APawn* NewPawn);
+    virtual void OnNewPawn(APawn* NewPawn) override;
     void OnItemMount(const FVehicleItemData& Data);
     void OnChangeAmmo(EVehicleItemType Type, int32 NewValue);
     void OnStartReloading(EVehicleItemType Type);

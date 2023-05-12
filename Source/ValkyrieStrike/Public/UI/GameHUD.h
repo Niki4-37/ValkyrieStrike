@@ -19,6 +19,7 @@ protected:
     TSubclassOf<UUserWidget> PlayerHUDWidgetClass;
 
     virtual void BeginPlay() override;
+    virtual void Destroyed() override;
 
 private:
     UPROPERTY()
