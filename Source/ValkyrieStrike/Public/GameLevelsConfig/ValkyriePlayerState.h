@@ -25,6 +25,9 @@ public:
         OnLivesChanged_OnClient(Lives);
     }
 
+    void SaveCoins(int32 Value) { Coins = Value; }
+    int32 GetCoins() const { return Coins; }
+
     void UpdateWidgetsInfo();
 
     void SaveMountedItem(const FVehicleItemData& VehicleItemData);
@@ -54,6 +57,9 @@ private:
     bool bIsNotDiedYet{true};
     UPROPERTY(Replicated)
     bool bNoLives{false};
+
+    UPROPERTY(Replicated)
+    int32 Coins{0};
 
     FTransform RespawnTransform;
 

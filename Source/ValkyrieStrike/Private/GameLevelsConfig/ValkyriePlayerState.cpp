@@ -12,6 +12,7 @@ void AValkyriePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
     DOREPLIFETIME(AValkyriePlayerState, Lives);
     DOREPLIFETIME(AValkyriePlayerState, VehicleItems);
     DOREPLIFETIME(AValkyriePlayerState, bNoLives);
+    DOREPLIFETIME(AValkyriePlayerState, Coins);
 }
 
 void AValkyriePlayerState::UpdateWidgetsInfo()

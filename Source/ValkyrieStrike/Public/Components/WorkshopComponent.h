@@ -20,6 +20,7 @@ public:
     FOnCoinsChangedSignature OnCoinsChanged;
 
     void AddCoins(int32 Value);
+    int32 GetCoins() const { return Coins; }
 
     void SetWorkshopTasks(const TArray<FInteractionData>& Tasks);
 

@@ -17,6 +17,7 @@
 #include "Materials/Material.h"
 #include "GameFramework/Controller.h"
 #include "Net/UnrealNetwork.h"
+#include "GameLevelsConfig/ValkyriePlayerState.h"
 
 #include "Engine.h"
 
@@ -152,6 +153,11 @@ void ADefaultWeeledVehicle::BeginPlay()
 
 void ADefaultWeeledVehicle::UnPossessed()
 {
+    if (const auto ValkyriePS = GetPlayerState<AValkyriePlayerState>())
+    {
+        ValkyriePS->SaveCoins(WorkshopComponent->GetCoins());
+    }
+
     Super::UnPossessed();
     Tags.Empty();
 }
@@ -161,6 +167,11 @@ void ADefaultWeeledVehicle::Restart()
     Super::Restart();
 
     WeaponComponent->InitWeapons_OnServer();
+
+    if (const auto ValkyriePS = GetPlayerState<AValkyriePlayerState>())
+    {
+        WorkshopComponent->AddCoins(ValkyriePS->GetCoins());
+    }
 }
 
 void ADefaultWeeledVehicle::MoveForward(float Val)
