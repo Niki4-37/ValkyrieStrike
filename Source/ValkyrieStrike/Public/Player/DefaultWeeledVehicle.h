@@ -56,6 +56,7 @@ public:
     virtual void Tick(float Delta) override;
     virtual void BeginPlay() override;
     virtual void UnPossessed() override;
+    virtual void Restart() override;
 
 private:
     /* Are we on a 'slippery' surface */

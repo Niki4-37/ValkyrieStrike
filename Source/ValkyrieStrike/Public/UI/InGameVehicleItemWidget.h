@@ -19,6 +19,7 @@ public:
     void SetItemData(const FVehicleItemData& Data);
     void UpdateAmmoCapacityBar(int32 NewValue);
     void StartReloading();
+    EVehicleItemType GetItemType() const {return ItemType;}
 
     virtual void BeginDestroy() override;
 
@@ -35,6 +36,7 @@ protected:
 private:
     int32 MaxAmmoCapacity;
     float ReloadingTime;
+    EVehicleItemType ItemType;
     FTimerHandle ReloadingTimer;
     FTimerHandle ProgressTimer;
 

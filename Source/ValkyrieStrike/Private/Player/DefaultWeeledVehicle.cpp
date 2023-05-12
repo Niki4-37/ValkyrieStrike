@@ -156,6 +156,13 @@ void ADefaultWeeledVehicle::UnPossessed()
     Tags.Empty();
 }
 
+void ADefaultWeeledVehicle::Restart()
+{
+    Super::Restart();
+
+    WeaponComponent->InitWeapons_OnServer();
+}
+
 void ADefaultWeeledVehicle::MoveForward(float Val)
 {
     bIsAutoMoveForward = FMath::IsNearlyZero(Val) ? true : false;

@@ -13,7 +13,7 @@ DEFINE_LOG_CATEGORY_STATIC(WeaponComponent_LOG, All, All)
 
 UWeaponComponent::UWeaponComponent()
 {
-    PrimaryComponentTick.bCanEverTick = true;
+    PrimaryComponentTick.bCanEverTick = false;
     SetIsReplicatedByDefault(true);
 }
 
@@ -29,40 +29,11 @@ bool UWeaponComponent::AddAmmo(int32 Amount)
     return SecondWeapon ? SecondWeapon->ChangeAmmoCapacity(Amount) : false;
 }
 
-void UWeaponComponent::BeginPlay()
-{
-    Super::BeginPlay();
-
-    InitWeapons_OnServer();
-}
-
-void UWeaponComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-    DOREPLIFETIME(UWeaponComponent, VehicleTurret);
-    DOREPLIFETIME(UWeaponComponent, SecondWeapon);
-}
-
-void UWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-    Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-}
-
-void UWeaponComponent::OnChangeAmmoInWeapon(EVehicleItemType Type, int32 AmmoAmount)
-{
-    OnChangeAmmo_Client(Type, AmmoAmount);
-}
-
-void UWeaponComponent::OnStartWeaponReloading(EVehicleItemType Type)
-{
-    OnStartReloading_Client(Type);
-}
-
 void UWeaponComponent::InitWeapons_OnServer_Implementation()
 {
     if (!GetOwner() || !GetOwner()->GetInstigatorController()) return;
     const auto PlayerState = GetOwner()->GetInstigatorController()->GetPlayerState<AValkyriePlayerState>();
+
     if (!PlayerState || PlayerState->GetVehicleItems().Num() == 0) return;
 
     for (auto& VehicleItem : PlayerState->GetVehicleItems())
@@ -83,8 +54,8 @@ void UWeaponComponent::InitWeapons_OnServer_Implementation()
             if (!VehicleTurret) continue;
 
             VehicleTurret->SetupWeapon(VehicleItem.MaxAmmoCapacity, VehicleItem.ReloadingTime);
-            VehicleTurret->OnChangeAmmoInWeapon.AddUObject(this, &UWeaponComponent::OnChangeAmmoInWeapon);
-            VehicleTurret->OnStartWeaponReloading.AddUObject(this, &UWeaponComponent::OnStartWeaponReloading);
+            VehicleTurret->OnChangeAmmoInWeapon.AddUObject(this, &UWeaponComponent::OnChangeAmmo_Client);
+            VehicleTurret->OnStartWeaponReloading.AddUObject(this, &UWeaponComponent::OnStartReloading_Client);
         }
         if (VehicleItem.ItemType == EVehicleItemType::SecondWeapon)
         {
@@ -92,21 +63,33 @@ void UWeaponComponent::InitWeapons_OnServer_Implementation()
             if (!SecondWeapon) continue;
 
             SecondWeapon->SetupWeapon(VehicleItem.MaxAmmoCapacity, VehicleItem.ReloadingTime);
-
-            SecondWeapon->OnChangeAmmoInWeapon.AddUObject(this, &UWeaponComponent::OnChangeAmmoInWeapon);
-            SecondWeapon->OnStartWeaponReloading.AddUObject(this, &UWeaponComponent::OnStartWeaponReloading);
+            SecondWeapon->OnChangeAmmoInWeapon.AddUObject(this, &UWeaponComponent::OnChangeAmmo_Client);
+            SecondWeapon->OnStartWeaponReloading.AddUObject(this, &UWeaponComponent::OnStartReloading_Client);
         }
-        OnItemMount_Client(VehicleItem);
     }
 
     /* used in game level for debug */
-    // if (TurretClass)
+    // if (TurretData.ItemClass)
     //{
-    //     VehicleTurret = MountWeapon<ATurret>(TurretClass, TurretSocketName);
+    //     VehicleTurret = MountWeapon<ATurret>(TurretData.ItemClass, TurretSocketName);
+    //     if (VehicleTurret)
+    //     {
+    //         VehicleTurret->SetupWeapon(TurretData.MaxAmmoCapacity, TurretData.ReloadingTime);
+    //         VehicleTurret->OnChangeAmmoInWeapon.AddUObject(this, &UWeaponComponent::OnChangeAmmo_Client);
+    //         VehicleTurret->OnStartWeaponReloading.AddUObject(this, &UWeaponComponent::OnStartReloading_Client);
+    //         OnItemMount_Client(TurretData);
+    //     }
     // }
-    // if (SecondWeaponClass)
+    // if (SecondWeaponData.ItemClass)
     //{
-    //     SecondWeapon = MountWeapon<ASecondWeapon>(SecondWeaponClass, SecondWeaponSocketName);
+    //     SecondWeapon = MountWeapon<ASecondWeapon>(SecondWeaponData.ItemClass, SecondWeaponSocketName);
+    //     if (SecondWeapon)
+    //     {
+    //         SecondWeapon->SetupWeapon(SecondWeaponData.MaxAmmoCapacity, SecondWeaponData.ReloadingTime);
+    //         SecondWeapon->OnChangeAmmoInWeapon.AddUObject(this, &UWeaponComponent::OnChangeAmmo_Client);
+    //         SecondWeapon->OnStartWeaponReloading.AddUObject(this, &UWeaponComponent::OnStartReloading_Client);
+    //         OnItemMount_Client(SecondWeaponData);
+    //     }
     // }
     /* end debug */
 
@@ -116,11 +99,42 @@ void UWeaponComponent::InitWeapons_OnServer_Implementation()
     }
 }
 
+void UWeaponComponent::UpdateWidgets()
+{
+    if (!GetOwner() || !GetOwner()->GetInstigatorController()) return;
+    const auto PlayerState = GetOwner()->GetInstigatorController()->GetPlayerState<AValkyriePlayerState>();
+
+    if (!PlayerState || PlayerState->GetVehicleItems().Num() == 0) return;
+
+    for (auto& VehicleItem : PlayerState->GetVehicleItems())
+    {
+        OnItemMount_Client(VehicleItem);
+    }
+}
+
+void UWeaponComponent::BeginPlay()
+{
+    Super::BeginPlay();
+}
+
+void UWeaponComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    /* debug */
+    DOREPLIFETIME(UWeaponComponent, TurretData);
+    DOREPLIFETIME(UWeaponComponent, SecondWeaponData);
+
+    DOREPLIFETIME(UWeaponComponent, VehicleTurret);
+    DOREPLIFETIME(UWeaponComponent, SecondWeapon);
+}
+
 void UWeaponComponent::OnItemMount_Client_Implementation(const FVehicleItemData& Data)
 {
-    OnItemMount.Broadcast(Data);
+    FString Test = "UWeaponComponent : OnItemMount " + Data.ItemName.ToString();
+    GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, Test);
 
-    GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "UWeaponComponent: OnItemMount");
+    OnItemMount.Broadcast(Data);
 }
 
 void UWeaponComponent::OnChangeAmmo_Client_Implementation(EVehicleItemType Type, int32 Amount)

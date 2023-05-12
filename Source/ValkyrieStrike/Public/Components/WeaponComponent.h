@@ -26,25 +26,26 @@ public:
     void ShootFromSecondWeapon_OnServer();
     bool AddAmmo(int32 Amount);
 
+    UFUNCTION(Server, reliable)
+    void InitWeapons_OnServer();
+    void UpdateWidgets();
+
 protected:
     /* used in game level for debug */
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    TSubclassOf<ATurret> TurretClass;
+    UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly)
+    FVehicleItemData TurretData;
+    /* used in game level for debug */
+    UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly)
+    FVehicleItemData SecondWeaponData;
     /* used in game level for debug */
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    TSubclassOf<ASecondWeapon> SecondWeaponClass;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     FName TurretSocketName{"TurretSocket"};
-
+    /* used in game level for debug */
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     FName SecondWeaponSocketName{"SecondWeaponSocket"};
 
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-public:
-    virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
     UPROPERTY(Replicated)
@@ -52,12 +53,6 @@ private:
 
     UPROPERTY(Replicated)
     ASecondWeapon* SecondWeapon{nullptr};
-
-    void OnChangeAmmoInWeapon(EVehicleItemType Type, int32 AmmoAmount);
-    void OnStartWeaponReloading(EVehicleItemType Type);
-
-    UFUNCTION(Server, reliable)
-    void InitWeapons_OnServer();
 
     UFUNCTION(Client, reliable)
     void OnItemMount_Client(const FVehicleItemData& Data);

@@ -26,7 +26,11 @@ void UWorkshopWidget::OnNewPawn(APawn* NewPawn)
             if (!GetOwningPlayerPawn()) return;
 
             const auto WorkshopComponent = GetOwningPlayerPawn()->FindComponentByClass<UWorkshopComponent>();
-            if (!WorkshopComponent) return;
+            if (!WorkshopComponent)
+            {
+                GetWorld()->GetTimerManager().ClearTimer(FoundPawnTimer);
+                return;
+            }
 
             WorkshopComponent->OnTasksUpdated.AddUObject(this, &UWorkshopWidget::OnWorkshopTasksUpdated);
             WorkshopComponent->OnUpdateCost.AddUObject(this, &UWorkshopWidget::OnUpdateCost);

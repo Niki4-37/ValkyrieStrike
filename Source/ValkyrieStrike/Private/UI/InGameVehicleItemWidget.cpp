@@ -26,6 +26,7 @@ void UInGameVehicleItemWidget::SetItemData(const FVehicleItemData& Data)
     }
     ReloadingTime = Data.ReloadingTime;
     checkf(ReloadingTime, TEXT("ReloadingTime is ZERO!"));
+    ItemType = Data.ItemType;
 }
 
 void UInGameVehicleItemWidget::UpdateAmmoCapacityBar(int32 NewValue)

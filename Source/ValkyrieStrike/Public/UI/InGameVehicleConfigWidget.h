@@ -25,6 +25,8 @@ protected:
     virtual void NativeOnInitialized() override;
 
 private:
+    FTimerHandle FoundPawnTimer;
+
     void OnNewPawn(APawn* NewPawn);
     void OnItemMount(const FVehicleItemData& Data);
     void OnChangeAmmo(EVehicleItemType Type, int32 NewValue);
