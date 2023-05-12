@@ -31,15 +31,13 @@ void APickupActor::SetupPickup(UStaticMesh* Mesh, UMaterialInterface* Material, 
 
 void APickupActor::ThrowUp(const FVector& StartPosition)
 {
-    const float LocationX = StartPosition.X;
-    const float LocationY = StartPosition.Y;
     const float LocationZ = StartPosition.Z;
 
     Height = LocationZ;
 
     FTimerDelegate TimerDelegate;
     TimerDelegate.BindLambda(
-        [&, LocationX, LocationY, LocationZ]
+        [&, LocationZ]
         {
             Impulse -= Gravity;
             Height += Impulse;
@@ -49,9 +47,10 @@ void APickupActor::ThrowUp(const FVector& StartPosition)
                 GetWorldTimerManager().ClearTimer(TrowTimer);
                 return;
             }
-            SetActorLocation_Multicast(FVector(LocationX, LocationY, Height));
+            const float LocationX = GetActorLocation().X;
+            const float LocationY = GetActorLocation().Y;
 
-            GEngine->AddOnScreenDebugMessage(-1, 0.01f, FColor::Yellow, FVector(LocationX, LocationY, Height).ToString());
+            SetActorLocation_Multicast(FVector(LocationX, LocationY, Height));
         });
 
     GetWorldTimerManager().SetTimer(TrowTimer, TimerDelegate, 0.01f, true);
