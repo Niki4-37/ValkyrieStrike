@@ -61,7 +61,9 @@ void AFirstLevelGameModeBase::RestartPlayer(AController* NewPlayer)
     {
         FTransform NewTransforn = ValkyriePlayerState->GetRespawnTransform();
         FVector NewLocation = NewTransforn.GetLocation() + FVector(300.f, 300.f, 100.f);
+        FRotator NewRotation = FRotator(0.f, NewTransforn.Rotator().Yaw, 0.f);
         NewTransforn.SetLocation(NewLocation);
+        NewTransforn.SetRotation(FQuat(NewRotation));
         RestartPlayerAtTransform(NewPlayer, NewTransforn);
     }
     else
