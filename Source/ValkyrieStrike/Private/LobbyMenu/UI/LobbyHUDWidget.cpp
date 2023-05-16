@@ -1,31 +1,30 @@
 // Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 
-#include "GameMenu/UI/GameConfigWidget.h"
+#include "LobbyMenu/UI/LobbyHUDWidget.h"
 #include "Components/Button.h"
 #include "Components/Border.h"
-#include "GameMenu/MenuPlayerController.h"
 #include "ValkyrieGameInstance.h"
 #include "Components/HorizontalBox.h"
-#include "GameMenu/UI/LevelItemWidget.h"
-#include "GameMenu/UI/VehicleConfigWidget.h"
-#include "GameMenu/MenuGameModeBase.h"
+#include "LobbyMenu/UI/LevelTileWidget.h"
+#include "LobbyMenu/UI/VehicleConfigWidget.h"
+#include "LobbyMenu/LobbyGameModeBase.h"
 #include "Kismet/KismetSystemLibrary.h"
 
-void UGameConfigWidget::NativeOnInitialized()
+void ULobbyHUDWidget::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
 
-    checkf(LevelItemWidgetClass, TEXT("LevelItemWidgetClass not define!"));
+    checkf(LevelTileWidgetClass, TEXT("LevelTileWidgetClass not define!"));
     checkf(VehicleConfigWidgetClass, TEXT("VehicleConfigWidgetClass not define!"));
 
     if (BackButton)
     {
-        BackButton->OnClicked.AddDynamic(this, &UGameConfigWidget::OnBackClicked);
+        BackButton->OnClicked.AddDynamic(this, &ULobbyHUDWidget::OnBackClicked);
     }
 
     if (BeginPlayButton)
     {
-        BeginPlayButton->OnClicked.AddDynamic(this, &UGameConfigWidget::OnBeginPlayClicked);
+        BeginPlayButton->OnClicked.AddDynamic(this, &ULobbyHUDWidget::OnBeginPlayClicked);
         UKismetSystemLibrary::IsServer(GetWorld()) ? BeginPlayButton->SetIsEnabled(false) : BeginPlayButton->SetVisibility(ESlateVisibility::Collapsed);
     }
 
@@ -41,26 +40,20 @@ void UGameConfigWidget::NativeOnInitialized()
     InitLevelItems();
 }
 
-void UGameConfigWidget::OnBackClicked()
+void ULobbyHUDWidget::OnBackClicked() {}
+
+void ULobbyHUDWidget::OnBeginPlayClicked()
 {
-    if (const auto PlayerController = Cast<AMenuPlayerController>(GetOwningPlayer()))
-    {
-        PlayerController->SetNewView(EMenuState::MainMenu);
-    }
+    const auto LobbyGameMode = GetWorld()->GetAuthGameMode<ALobbyGameModeBase>();
+    if (!LobbyGameMode) return;
+
+    LobbyGameMode->LaunchGame(GetOwningPlayer());
 }
 
-void UGameConfigWidget::OnBeginPlayClicked()
+void ULobbyHUDWidget::InitLevelItems()
 {
-    const auto MenuGM = GetWorld()->GetAuthGameMode<AMenuGameModeBase>();
-    if (!MenuGM) return;
-
-    MenuGM->LaunchGame(GetOwningPlayer());
-}
-
-void UGameConfigWidget::InitLevelItems()
-{
-    if (!LevelItemsBox) return;
-    LevelItemsBox->ClearChildren();
+    if (!LevelTilesBox) return;
+    LevelTilesBox->ClearChildren();
 
     if (!UKismetSystemLibrary::IsServer(GetWorld())) return;
 
@@ -69,20 +62,20 @@ void UGameConfigWidget::InitLevelItems()
 
     for (const auto& LevelData : ValkyrieGameInstance->GetLevelsData())
     {
-        const auto LevelItemWidget = CreateWidget<ULevelItemWidget>(GetWorld(), LevelItemWidgetClass);
+        const auto LevelTileWidget = CreateWidget<ULevelTileWidget>(GetWorld(), LevelTileWidgetClass);
 
-        if (!LevelItemWidget) continue;
-        LevelItemWidget->SetLevelData(LevelData);
-        LevelItemWidget->SetSelected(false);
-        LevelItemWidget->OnLevelSelected.AddUObject(this, &UGameConfigWidget::OnLevelSelected);
-        LevelItemsBox->AddChild(LevelItemWidget);
-        LevelItemWidgets.Add(LevelItemWidget);
+        if (!LevelTileWidget) continue;
+        LevelTileWidget->SetLevelData(LevelData);
+        LevelTileWidget->SetSelected(false);
+        LevelTileWidget->OnLevelSelected.AddUObject(this, &ULobbyHUDWidget::OnLevelSelected);
+        LevelTilesBox->AddChild(LevelTileWidget);
+        LevelTileWidgets.Add(LevelTileWidget);
     }
 }
 
-void UGameConfigWidget::OnLevelSelected(const FLevelData& Data)
+void ULobbyHUDWidget::OnLevelSelected(const FLevelData& Data)
 {
-    for (auto LevelItemWidget : LevelItemWidgets)
+    for (auto LevelItemWidget : LevelTileWidgets)
     {
         if (!LevelItemWidget) continue;
         const bool bIsSelected = Data.LevelName == LevelItemWidget->GetLevelData().LevelName;

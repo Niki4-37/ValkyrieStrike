@@ -5,10 +5,10 @@
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
 #include "GameCoreTypes.h"
-#include "MenuHUD.generated.h"
+#include "LobbyHUD.generated.h"
 
 UCLASS()
-class VALKYRIESTRIKE_API AMenuHUD : public AHUD
+class VALKYRIESTRIKE_API ALobbyHUD : public AHUD
 {
     GENERATED_BODY()
 
@@ -18,19 +18,10 @@ public:
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    TSubclassOf<UUserWidget> MenuWidgetClass;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    TSubclassOf<UUserWidget> GameSettingsWidgetClass;
+    TSubclassOf<UUserWidget> LobbyHUDWidgetClass;
 
     virtual void BeginPlay() override;
 
 private:
-    UPROPERTY()
-    TMap<EMenuState, UUserWidget*> MenuWidgetsMap;
-
-    UPROPERTY()
-    UUserWidget* ActiveWidget{nullptr};
-
-    void OnMenuStateChanged(EMenuState NewState);
+    UUserWidget* LobbyHUDWidget{nullptr};
 };

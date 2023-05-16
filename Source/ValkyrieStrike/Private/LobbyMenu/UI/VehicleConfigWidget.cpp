@@ -1,8 +1,8 @@
 // Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 
-#include "GameMenu/UI/VehicleConfigWidget.h"
+#include "LobbyMenu/UI/VehicleConfigWidget.h"
 #include "Components/HorizontalBox.h"
-#include "GameMenu/UI/VehicleItemWidget.h"
+#include "LobbyMenu/UI/VehicleItemWidget.h"
 
 void UVehicleConfigWidget::NativeOnInitialized()
 {

@@ -5,15 +5,15 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "GameCoreTypes.h"
-#include "GameConfigWidget.generated.h"
+#include "LobbyHUDWidget.generated.h"
 
 class UButton;
 class UHorizontalBox;
-class ULevelItemWidget;
 class UBorder;
+class ULevelTileWidget;
 
 UCLASS()
-class VALKYRIESTRIKE_API UGameConfigWidget : public UUserWidget
+class VALKYRIESTRIKE_API ULobbyHUDWidget : public UUserWidget
 {
     GENERATED_BODY()
 
@@ -25,10 +25,10 @@ protected:
     UButton* BeginPlayButton;
 
     UPROPERTY(meta = (BindWidget))
-    UHorizontalBox* LevelItemsBox;
+    UHorizontalBox* LevelTilesBox;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    TSubclassOf<UUserWidget> LevelItemWidgetClass;
+    TSubclassOf<UUserWidget> LevelTileWidgetClass;
 
     UPROPERTY(meta = (BindWidget))
     UBorder* VehicleConfigPosition;
@@ -40,7 +40,7 @@ protected:
 
 private:
     UPROPERTY()
-    TArray<ULevelItemWidget*> LevelItemWidgets;
+    TArray<ULevelTileWidget*> LevelTileWidgets;
 
     UFUNCTION()
     void OnBackClicked();

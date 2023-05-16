@@ -5,14 +5,14 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "GameCoreTypes.h"
-#include "LevelItemWidget.generated.h"
+#include "LevelTileWidget.generated.h"
 
 class UButton;
 class UTextBlock;
 class UImage;
 
 UCLASS()
-class VALKYRIESTRIKE_API ULevelItemWidget : public UUserWidget
+class VALKYRIESTRIKE_API ULevelTileWidget : public UUserWidget
 {
     GENERATED_BODY()
 

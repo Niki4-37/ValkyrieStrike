@@ -1,11 +1,11 @@
 // Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 
-#include "GameMenu/UI/LevelItemWidget.h"
+#include "LobbyMenu/UI/LevelTileWidget.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
 
-void ULevelItemWidget::SetLevelData(const FLevelData& Data)
+void ULevelTileWidget::SetLevelData(const FLevelData& Data)
 {
     LevelData = Data;
 
@@ -25,7 +25,7 @@ void ULevelItemWidget::SetLevelData(const FLevelData& Data)
     }
 }
 
-void ULevelItemWidget::SetSelected(bool IsSelected)
+void ULevelTileWidget::SetSelected(bool IsSelected)
 {
     if (FrameImage)
     {
@@ -33,17 +33,17 @@ void ULevelItemWidget::SetSelected(bool IsSelected)
     }
 }
 
-void ULevelItemWidget::NativeOnInitialized()
+void ULevelTileWidget::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
 
     if (LevelSelectButton)
     {
-        LevelSelectButton->OnClicked.AddDynamic(this, &ULevelItemWidget::OnLevelItemClicked);
+        LevelSelectButton->OnClicked.AddDynamic(this, &ULevelTileWidget::OnLevelItemClicked);
     }
 }
 
-void ULevelItemWidget::OnLevelItemClicked()
+void ULevelTileWidget::OnLevelItemClicked()
 {
     OnLevelSelected.Broadcast(LevelData);
 }

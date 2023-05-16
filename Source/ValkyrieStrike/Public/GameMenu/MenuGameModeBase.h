@@ -18,24 +18,4 @@ class VALKYRIESTRIKE_API AMenuGameModeBase : public AGameModeBase
 
 public:
     AMenuGameModeBase();
-
-    virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
-    virtual void StartPlay() override;
-
-    void LaunchGame(APlayerController* PC);
-
-    virtual void PostLogin(APlayerController* NewPlayer);
-
-protected:
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    TSubclassOf<AMenuVehicleActor> MenuVehicleActorClass;
-
-private:
-    UPROPERTY()
-    TMap<APlayerStart*, bool> SpawnPositionsMap;
-
-    UPROPERTY()
-    TArray<AMenuPlayerController*> Controllers;
-
-    void SpawnMenuVehicleActor(AMenuPlayerController* Controller);
 };

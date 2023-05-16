@@ -9,7 +9,7 @@ void AMenuHUD::PostInitializeComponents()
     Super::PostInitializeComponents();
 
     MenuWidgetsMap.Add(EMenuState::MainMenu, CreateWidget<UUserWidget>(GetWorld(), MenuWidgetClass));
-    MenuWidgetsMap.Add(EMenuState::GameConfig, CreateWidget<UUserWidget>(GetWorld(), GameConfigWidgetClass));
+    // MenuWidgetsMap.Add(EMenuState::GameSettings, CreateWidget<UUserWidget>(GetWorld(), GameSettingsWidgetClass));
 
     for (auto MenuWidgetPair : MenuWidgetsMap)
     {
@@ -44,13 +44,11 @@ void AMenuHUD::BeginPlay()
     Super::BeginPlay();
 
     checkf(MenuWidgetClass, TEXT("MenuWidgetClass not define!"));
-    checkf(GameConfigWidgetClass, TEXT("GameConfigWidgetClass not define!"));
+    // checkf(GameSettingsWidgetClass, TEXT("GameConfigWidgetClass not define!"));
 }
 
 void AMenuHUD::OnMenuStateChanged(EMenuState NewState)
 {
-    UE_LOG(LogTemp, Display, TEXT("EMenuState: %s"), *UEnum::GetValueAsString(NewState));
-
     if (ActiveWidget)
     {
         ActiveWidget->SetVisibility(ESlateVisibility::Hidden);

@@ -20,19 +20,10 @@ public:
 
     FOnMenuStateChangedSignature OnMenuStateChanged;
 
-    UFUNCTION(Server, reliable)
-    void VehicleItemHasSelected_OnServer(const FVehicleItemData& VehicleItemData);
-
-    void SetMenuVehicleActor(AMenuVehicleActor* MenuVehicle) { MenuVehicleActor = MenuVehicle; }
-
 protected:
     virtual void BeginPlay() override;
-    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
     UPROPERTY()
     TMap<EMenuState, AMenuCameraActor*> MenuCameraActorsMap;
-
-    UPROPERTY(Replicated)
-    AMenuVehicleActor* MenuVehicleActor{nullptr};
 };

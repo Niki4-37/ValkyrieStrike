@@ -1,10 +1,10 @@
 // Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 
-#include "GameMenu/UI/VehicleItemWidget.h"
+#include "LobbyMenu/UI/VehicleItemWidget.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
-#include "GameMenu/MenuPlayerController.h"
+#include "LobbyMenu/LobbyPlayerController.h"
 
 void UVehicleItemWidget::SetItemData(const FVehicleItemData& Data)
 {
@@ -33,8 +33,8 @@ void UVehicleItemWidget::NativeOnInitialized()
 
 void UVehicleItemWidget::OnItemClicked()
 {
-    const auto MenuPlayerController = Cast<AMenuPlayerController>(GetOwningPlayer());
-    if (!MenuPlayerController) return;
+    const auto LobbyPlayerController = Cast<ALobbyPlayerController>(GetOwningPlayer());
+    if (!LobbyPlayerController) return;
 
-    MenuPlayerController->VehicleItemHasSelected_OnServer(ItemData);
+    LobbyPlayerController->VehicleItemHasSelected_OnServer(ItemData);
 }

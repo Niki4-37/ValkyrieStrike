@@ -31,6 +31,8 @@ public class ValkyrieStrike : ModuleRules
             "ValkyrieStrike/Public/Weapon"
         });
 
+        DynamicallyLoadedModuleNames.Add("OnlineSubsystemNull");
+
         //PublicDefinitions.Add("HMD_MODULE_INCLUDED=1");
     }
 }
