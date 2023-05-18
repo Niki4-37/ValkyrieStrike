@@ -17,7 +17,9 @@ public class ValkyrieStrike : ModuleRules
             "PhysXVehicles",
             "GameplayTasks",
             "Niagara",
-            "NavigationSystem"
+            "NavigationSystem",
+            "OnlineSubsystem",
+            "OnlineSubsystemUtils"
         });
 
         PublicIncludePaths.AddRange(new string[]

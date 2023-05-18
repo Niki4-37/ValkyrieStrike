@@ -132,3 +132,5 @@ struct FInteractionData
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnWorkshopTasksUpdatedSignature, const TArray<FInteractionData>&);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnUpdateCostSignature, EItemPropertyType, int32);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnCoinsChangedSignature, int32);
+
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnFoundSessionDataSignature, const FString&, int32, int32);

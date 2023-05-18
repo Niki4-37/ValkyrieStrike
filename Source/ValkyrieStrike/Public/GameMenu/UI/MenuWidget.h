@@ -8,6 +8,7 @@
 #include "MenuWidget.generated.h"
 
 class UButton;
+class UVerticalBox;
 
 UCLASS()
 class VALKYRIESTRIKE_API UMenuWidget : public UUserWidget
@@ -16,11 +17,25 @@ class VALKYRIESTRIKE_API UMenuWidget : public UUserWidget
 
 protected:
     UPROPERTY(meta = (BindWidget))
-    UButton* StartGameButton;
+    UButton* CreateSessionButton;
+
+    UPROPERTY(meta = (BindWidget))
+    UButton* FindSessionButton;
+
+    UPROPERTY(meta = (BindWidget))
+    UVerticalBox* FoundSessionsBox;
+
+    UPROPERTY(EditDefaultsOnly)
+    TSubclassOf<UUserWidget> JionSessionWidgetClass;
 
     virtual void NativeOnInitialized() override;
 
 private:
     UFUNCTION()
-    void OnStartGame();
+    void OnFindGame();
+
+    void OnFoundSessionData(const FString& SessionID, int32 ConnectionNum, int32 MaxPlayers);
+
+    UFUNCTION()
+    void OnCreateGame();
 };

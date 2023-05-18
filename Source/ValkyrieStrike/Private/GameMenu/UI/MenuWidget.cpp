@@ -3,20 +3,55 @@
 #include "GameMenu/UI/MenuWidget.h"
 #include "Components/Button.h"
 #include "GameMenu/MenuPlayerController.h"
+#include "ValkyrieGameInstance.h"
+#include "GameMenu/UI/JoinSessionWidget.h"
+#include "Components/VerticalBox.h"
 
 void UMenuWidget::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
-    if (StartGameButton)
+    if (FindSessionButton)
     {
-        StartGameButton->OnClicked.AddDynamic(this, &UMenuWidget::OnStartGame);
+        FindSessionButton->OnClicked.AddDynamic(this, &UMenuWidget::OnFindGame);
+    }
+
+    if (CreateSessionButton)
+    {
+        CreateSessionButton->OnClicked.AddDynamic(this, &UMenuWidget::OnCreateGame);
+    }
+
+    if (const auto ValkyrieGameInstance = GetGameInstance<UValkyrieGameInstance>())
+    {
+        ValkyrieGameInstance->OnFoundSessionData.AddUObject(this, &UMenuWidget::OnFoundSessionData);
     }
 }
 
-void UMenuWidget::OnStartGame()
+void UMenuWidget::OnFindGame()
 {
-    if (const auto PlayerController = Cast<AMenuPlayerController>(GetOwningPlayer()))
+    if (const auto ValkyrieGameInstance = GetGameInstance<UValkyrieGameInstance>())
     {
-        PlayerController->SetNewView(EMenuState::GameConfig);
+        ValkyrieGameInstance->FindGame();
+    }
+
+    if (FoundSessionsBox)
+    {
+        FoundSessionsBox->ClearChildren();
+    }
+}
+
+void UMenuWidget::OnFoundSessionData(const FString& SessionID, int32 ConnectionNum, int32 MaxPlayers)
+{
+    if (!JionSessionWidgetClass || !FoundSessionsBox) return;
+    const auto SessionWidget = CreateWidget<UJoinSessionWidget>(GetOwningPlayer(), JionSessionWidgetClass);
+    if (!SessionWidget) return;
+    SessionWidget->InitWidget(SessionID, ConnectionNum, MaxPlayers);
+    FoundSessionsBox->AddChild(SessionWidget);
+}
+
+void UMenuWidget::OnCreateGame()
+{
+    if (const auto ValkyrieGameInstance = GetGameInstance<UValkyrieGameInstance>())
+    {
+        ValkyrieGameInstance->CreateGame();
     }
 }

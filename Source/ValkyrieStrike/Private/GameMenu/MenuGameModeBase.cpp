@@ -10,6 +10,4 @@ AMenuGameModeBase::AMenuGameModeBase()
     HUDClass = AMenuHUD::StaticClass();
     PlayerControllerClass = AMenuPlayerController::StaticClass();
     PlayerStateClass = AValkyriePlayerState::StaticClass();
-
-    bUseSeamlessTravel = true;
 }

@@ -16,9 +16,8 @@ class VALKYRIESTRIKE_API AMenuPlayerController : public APlayerController
     GENERATED_BODY()
 
 public:
-    void SetNewView(EMenuState MenuState);
-
     FOnMenuStateChangedSignature OnMenuStateChanged;
+    void SetNewView(EMenuState MenuState);
 
 protected:
     virtual void BeginPlay() override;
