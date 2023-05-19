@@ -2,10 +2,10 @@
 
 #include "GameMenu/UI/MenuWidget.h"
 #include "Components/Button.h"
-#include "GameMenu/MenuPlayerController.h"
 #include "ValkyrieGameInstance.h"
 #include "GameMenu/UI/JoinSessionWidget.h"
 #include "Components/VerticalBox.h"
+#include "Subsystems/SessionSubsystem.h"
 
 void UMenuWidget::NativeOnInitialized()
 {
@@ -20,9 +20,9 @@ void UMenuWidget::NativeOnInitialized()
         CreateSessionButton->OnClicked.AddDynamic(this, &UMenuWidget::OnCreateGame);
     }
 
-    if (const auto ValkyrieGameInstance = GetGameInstance<UValkyrieGameInstance>())
+    if (GetGameInstance()->GetSubsystem<USessionSubsystem>())
     {
-        ValkyrieGameInstance->OnFoundSessionData.AddUObject(this, &UMenuWidget::OnFoundSessionData);
+        GetGameInstance()->GetSubsystem<USessionSubsystem>()->OnFoundSessionData.AddUObject(this, &UMenuWidget::OnFoundSessionData);
     }
 }
 
