@@ -23,6 +23,12 @@ protected:
     UButton* FindSessionButton;
 
     UPROPERTY(meta = (BindWidget))
+    UButton* SettingsButton;
+
+    UPROPERTY(meta = (BindWidget))
+    UButton* QuitButton;
+
+    UPROPERTY(meta = (BindWidget))
     UVerticalBox* FoundSessionsBox;
 
     UPROPERTY(EditDefaultsOnly)
@@ -38,4 +44,10 @@ private:
 
     UFUNCTION()
     void OnCreateGame();
+
+    UFUNCTION()
+    void OnOpenSettings();
+
+    UFUNCTION()
+    void OnQuit();
 };

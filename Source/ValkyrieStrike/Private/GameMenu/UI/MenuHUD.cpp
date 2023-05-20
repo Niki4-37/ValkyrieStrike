@@ -9,7 +9,7 @@ void AMenuHUD::PostInitializeComponents()
     Super::PostInitializeComponents();
 
     MenuWidgetsMap.Add(EMenuState::MainMenu, CreateWidget<UUserWidget>(GetWorld(), MenuWidgetClass));
-    // MenuWidgetsMap.Add(EMenuState::GameSettings, CreateWidget<UUserWidget>(GetWorld(), GameSettingsWidgetClass));
+    MenuWidgetsMap.Add(EMenuState::GameSettings, CreateWidget<UUserWidget>(GetWorld(), SettingsWidgetClass));
 
     for (auto MenuWidgetPair : MenuWidgetsMap)
     {
@@ -44,7 +44,7 @@ void AMenuHUD::BeginPlay()
     Super::BeginPlay();
 
     checkf(MenuWidgetClass, TEXT("MenuWidgetClass not define!"));
-    // checkf(GameSettingsWidgetClass, TEXT("GameConfigWidgetClass not define!"));
+    checkf(SettingsWidgetClass, TEXT("SettingsWidgetClass not define!"));
 }
 
 void AMenuHUD::OnMenuStateChanged(EMenuState NewState)

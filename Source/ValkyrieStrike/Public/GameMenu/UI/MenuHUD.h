@@ -21,7 +21,7 @@ protected:
     TSubclassOf<UUserWidget> MenuWidgetClass;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    TSubclassOf<UUserWidget> GameSettingsWidgetClass;
+    TSubclassOf<UUserWidget> SettingsWidgetClass;
 
     virtual void BeginPlay() override;
 

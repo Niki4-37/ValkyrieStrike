@@ -6,18 +6,27 @@
 #include "GameMenu/UI/JoinSessionWidget.h"
 #include "Components/VerticalBox.h"
 #include "Subsystems/SessionSubsystem.h"
+#include "GameMenu/MenuPlayerController.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 void UMenuWidget::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
     if (FindSessionButton)
     {
-        FindSessionButton->OnClicked.AddDynamic(this, &UMenuWidget::OnFindGame);
+        FindSessionButton->OnClicked.AddDynamic(this, &ThisClass::OnFindGame);
     }
-
     if (CreateSessionButton)
     {
-        CreateSessionButton->OnClicked.AddDynamic(this, &UMenuWidget::OnCreateGame);
+        CreateSessionButton->OnClicked.AddDynamic(this, &ThisClass::OnCreateGame);
+    }
+    if (SettingsButton)
+    {
+        SettingsButton->OnClicked.AddDynamic(this, &ThisClass::OnOpenSettings);
+    }
+    if (QuitButton)
+    {
+        QuitButton->OnClicked.AddDynamic(this, &ThisClass::OnQuit);
     }
 
     if (GetGameInstance()->GetSubsystem<USessionSubsystem>())
@@ -54,4 +63,17 @@ void UMenuWidget::OnCreateGame()
     {
         ValkyrieGameInstance->CreateGame();
     }
+}
+
+void UMenuWidget::OnOpenSettings()
+{
+    if (const auto PlayerController = Cast<AMenuPlayerController>(GetOwningPlayer()))
+    {
+        PlayerController->SetNewView(EMenuState::GameSettings);
+    }
+}
+
+void UMenuWidget::OnQuit()
+{
+    UKismetSystemLibrary::QuitGame(this, GetOwningPlayer(), EQuitPreference::Quit, true);
 }
