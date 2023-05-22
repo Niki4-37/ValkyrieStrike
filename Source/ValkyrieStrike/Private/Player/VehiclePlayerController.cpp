@@ -11,14 +11,25 @@ void AVehiclePlayerController::MakeMaintenance_OnServer_Implementation(EItemProp
     PawnInterface->MakeMaintenance(Type);
 }
 
+void AVehiclePlayerController::ChangeGameState(EValkyrieGameState State)
+{
+    if (State == EValkyrieGameState::InProgress)
+    {
+        SetInputMode(FInputModeGameOnly());
+        bShowMouseCursor = false;
+    }
+    else
+    {
+        SetInputMode(FInputModeUIOnly());
+        bShowMouseCursor = true;
+    }
+
+    OnGameStateChanged.Broadcast(State);
+}
+
 void AVehiclePlayerController::BeginPlay()
 {
     Super::BeginPlay();
-
-    // SetInputMode(FInputModeGameOnly());
-    // bShowMouseCursor = false;
-    SetInputMode(FInputModeGameAndUI());
-    bShowMouseCursor = true;
 }
 
 void AVehiclePlayerController::OnPossess(APawn* InPawn)
@@ -28,4 +39,22 @@ void AVehiclePlayerController::OnPossess(APawn* InPawn)
     OnNewPawn.Broadcast(InPawn);
 }
 
+void AVehiclePlayerController::SetupInputComponent()
+{
+    Super::SetupInputComponent();
+
+    if (!InputComponent) return;
+    InputComponent->BindAction("PauseGame", IE_Pressed, this, &AVehiclePlayerController::OnPauseGame);
+}
+
+void AVehiclePlayerController::BeginPlayingState()
+{
+    Super::BeginPlayingState();
+}
+
 void AVehiclePlayerController::FailedToSpawnPawn() {}
+
+void AVehiclePlayerController::OnPauseGame()
+{
+    ChangeGameState(EValkyrieGameState::Pause);
+}

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "GameCoreTypes.h"
 #include "GameHUD.generated.h"
 
 UCLASS()
@@ -11,17 +12,25 @@ class VALKYRIESTRIKE_API AGameHUD : public AHUD
 {
     GENERATED_BODY()
 
-public:
-    void CreateGameHUDWidgets();
-
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     TSubclassOf<UUserWidget> PlayerHUDWidgetClass;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    TSubclassOf<UUserWidget> PauseMenuWidgetClass;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    TSubclassOf<UUserWidget> SettingsWidgetClass;
 
     virtual void BeginPlay() override;
     virtual void Destroyed() override;
 
 private:
     UPROPERTY()
-    UUserWidget* PlayerHUDWidget;
+    UUserWidget* CurrentWidget;
+
+    UPROPERTY()
+    TMap<EValkyrieGameState, UUserWidget*> GameStateWidgetsMap;
+
+    void OnGameStateChanged(EValkyrieGameState State);
 };

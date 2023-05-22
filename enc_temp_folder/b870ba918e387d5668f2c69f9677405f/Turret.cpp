@@ -86,13 +86,6 @@ void ATurret::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
     DOREPLIFETIME(ATurret, AmmoCapacity);
 }
 
-void ATurret::Destroyed() 
-{
-    GetWorldTimerManager().ClearTimer(FireTimer);
-    GetWorldTimerManager().ClearTimer(ReloadingTimer);
-    GetWorldTimerManager().ClearTimer(SmoothRotationTimer);
-}
-
 void ATurret::MakeShot()
 {
     /* handled on server */
