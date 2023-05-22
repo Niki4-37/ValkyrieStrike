@@ -4,22 +4,35 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "SettingsWidget.generated.h"
+#include "GameCoreTypes.h"
+#include "PauseMenuWidget.generated.h"
 
 class UButton;
 
 UCLASS()
-class VALKYRIESTRIKE_API USettingsWidget : public UUserWidget
+class VALKYRIESTRIKE_API UPauseMenuWidget : public UUserWidget
 {
     GENERATED_BODY()
 
 protected:
     UPROPERTY(meta = (BindWidget))
+    UButton* SettingsButton;
+
+    UPROPERTY(meta = (BindWidget))
     UButton* GoBackButton;
 
-    virtual void NativeOnInitialized() override;
+    UPROPERTY(meta = (BindWidget))
+    UButton* QuitButton;
+
+    void NativeOnInitialized();
 
 private:
     UFUNCTION()
+    void OnSettingClicked();
+
+    UFUNCTION()
     void OnGoBackClicked();
+
+    UFUNCTION()
+    void OnQuitClicked();
 };

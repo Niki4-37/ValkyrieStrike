@@ -2,37 +2,55 @@
 
 #include "UI/GameHUD.h"
 #include "UI/PlayerHUDWidget.h"
-
-void AGameHUD::CreateGameHUDWidgets()
-{
-    if (!GetOwningPlayerController() || !PlayerHUDWidgetClass) return;
-
-    if (PlayerHUDWidget)
-    {
-        PlayerHUDWidget->RemoveFromParent();
-        PlayerHUDWidget = nullptr;
-    }
-
-    PlayerHUDWidget = CreateWidget<UUserWidget>(GetOwningPlayerController(), PlayerHUDWidgetClass);
-    if (PlayerHUDWidget)
-    {
-        PlayerHUDWidget->AddToViewport();
-    }
-}
+#include "Player/VehiclePlayerController.h"
 
 void AGameHUD::BeginPlay()
 {
     Super::BeginPlay();
 
-    CreateGameHUDWidgets();
+    GameStateWidgetsMap.Add(EValkyrieGameState::InProgress, CreateWidget<UUserWidget>(GetWorld(), PlayerHUDWidgetClass));
+    GameStateWidgetsMap.Add(EValkyrieGameState::Pause, CreateWidget<UUserWidget>(GetWorld(), PauseMenuWidgetClass));
+    GameStateWidgetsMap.Add(EValkyrieGameState::GameSettings, CreateWidget<UUserWidget>(GetWorld(), SettingsWidgetClass));
+
+    for (TPair<EValkyrieGameState, UUserWidget*> Pair : GameStateWidgetsMap)
+    {
+        if (!Pair.Value) continue;
+        Pair.Value->AddToViewport();
+        Pair.Value->SetVisibility(ESlateVisibility::Hidden);
+    }
+
+    if (const auto PlayerController = Cast<AVehiclePlayerController>(GetOwningPlayerController()))
+    {
+        PlayerController->OnGameStateChanged.AddUObject(this, &AGameHUD::OnGameStateChanged);
+        PlayerController->ChangeGameState(EValkyrieGameState::InProgress);
+    }
 }
 
 void AGameHUD::Destroyed()
 {
     Super::Destroyed();
 
-    if (PlayerHUDWidget)
+    for (TPair<EValkyrieGameState, UUserWidget*> Pair : GameStateWidgetsMap)
     {
-        PlayerHUDWidget->RemoveFromParent();
+        if (!Pair.Value) continue;
+        Pair.Value->RemoveFromParent();
+    }
+}
+
+void AGameHUD::OnGameStateChanged(EValkyrieGameState State)
+{
+    if (CurrentWidget)
+    {
+        CurrentWidget->SetVisibility(ESlateVisibility::Hidden);
+    }
+
+    if (GameStateWidgetsMap.Contains(State))
+    {
+        CurrentWidget = GameStateWidgetsMap[State];
+    }
+
+    if (CurrentWidget)
+    {
+        CurrentWidget->SetVisibility(ESlateVisibility::Visible);
     }
 }

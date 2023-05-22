@@ -36,6 +36,16 @@ enum class EItemPropertyType : uint8
     Begin = Ammo    UMETA(Hidden),
     End = NoType    UMETA(Hidden)
 };
+
+UENUM()
+enum class EValkyrieGameState : uint8
+{
+    WaitingToStart = 0,
+    InProgress,
+    Pause,
+    GameSettings,
+    GameOver
+};
 // clang-format on
 
 static EItemPropertyType& operator++(EItemPropertyType& EType)
@@ -134,3 +144,5 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FOnUpdateCostSignature, EItemPropertyType, 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnCoinsChangedSignature, int32);
 
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnFoundSessionDataSignature, const FString&, int32, int32);
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameStateChangedSignature, EValkyrieGameState);
