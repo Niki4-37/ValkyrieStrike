@@ -17,6 +17,7 @@ class VALKYRIESTRIKE_API ALobbyPlayerController : public APlayerController
 
 public:
     void SetNewView(EMenuState MenuState);
+    void GoToMainMenu();
 
     FOnMenuStateChangedSignature OnMenuStateChanged;
 
@@ -28,6 +29,7 @@ public:
 protected:
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+    virtual void Destroyed() override;
 
 private:
     UPROPERTY()

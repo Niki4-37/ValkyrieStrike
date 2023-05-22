@@ -26,7 +26,7 @@ void ALobbyGameModeBase::InitGame(const FString& MapName, const FString& Options
 
     for (const auto& FoundActor : TActorRange<APlayerStart>(GetWorld()))
     {
-        SpawnPositionsMap.Add(FoundActor, false);
+        SpawningMap.Add(FoundActor, nullptr);
     }
 }
 
@@ -42,36 +42,43 @@ void ALobbyGameModeBase::PostLogin(APlayerController* NewPlayer)
 {
     Super::PostLogin(NewPlayer);
 
-    const auto MenuPlayerController = Cast<ALobbyPlayerController>(NewPlayer);
-    if (MenuPlayerController)
+    if (const auto FoundEmptyPosition = *SpawningMap.FindKey(nullptr))
     {
-        Controllers.Add(MenuPlayerController);
-        SpawnLobbyVehicle(MenuPlayerController);
+        SpawningMap.Add(FoundEmptyPosition, NewPlayer);
+        SpawnLobbyVehicle(FoundEmptyPosition, NewPlayer);
     }
 }
 
-void ALobbyGameModeBase::SpawnLobbyVehicle(ALobbyPlayerController* Controller)
+void ALobbyGameModeBase::Logout(AController* Exiting)
 {
-    if (!Controller) return;
+    Super::Logout(Exiting);
 
-    bool bCanSpawnVehicleActor{false};
-    for (TPair<APlayerStart*, bool>& Pair : SpawnPositionsMap)
+    if (const auto PlayerController = Cast<APlayerController>(Exiting))
     {
-        if (const bool bIsOccupied = Pair.Value == true) continue;
-        auto FoundEmptyPosition = Pair.Key;
-        if (!FoundEmptyPosition) continue;
-        FTransform SpawnTransform = FoundEmptyPosition->GetActorTransform();
-        auto VehicleActor = GetWorld()->SpawnActorDeferred<ADummyVehicle>(DummyVehicleClass, SpawnTransform);
-        if (!VehicleActor) continue;
-        VehicleActor->SetupDecoration(DummyVehicleMesh);
-        VehicleActor->FinishSpawning(SpawnTransform);
-        Controller->SetLobbyVehicle(VehicleActor);
-        bCanSpawnVehicleActor = true;
-        Pair.Value = true;
-        break;
+        if (const auto FoundPosition = *SpawningMap.FindKey(PlayerController))
+        {
+            SpawningMap.Add(FoundPosition, nullptr);
+        }
     }
-    if (!bCanSpawnVehicleActor)
+}
+
+void ALobbyGameModeBase::SpawnLobbyVehicle(APlayerStart* Position, APlayerController* Controller)
+{
+    if (!Position || !Controller) return;
+
+    FTransform SpawnTransform = Position->GetActorTransform();
+    auto VehicleActor = GetWorld()->SpawnActorDeferred<ADummyVehicle>(DummyVehicleClass, SpawnTransform);
+    if (!VehicleActor)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, "Can't find Empty Position");
+        GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Orange, "Can't find Empty Position");
+        return;
+    }
+    VehicleActor->SetupDecoration(DummyVehicleMesh);
+    VehicleActor->FinishSpawning(SpawnTransform);
+
+    const auto LobbyPlayerController = Cast<ALobbyPlayerController>(Controller);
+    if (LobbyPlayerController)
+    {
+        LobbyPlayerController->SetLobbyVehicle(VehicleActor);
     }
 }

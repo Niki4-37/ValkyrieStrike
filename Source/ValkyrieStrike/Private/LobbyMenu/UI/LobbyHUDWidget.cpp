@@ -8,6 +8,7 @@
 #include "LobbyMenu/UI/LevelTileWidget.h"
 #include "LobbyMenu/UI/VehicleConfigWidget.h"
 #include "LobbyMenu/LobbyGameModeBase.h"
+#include "LobbyMenu/LobbyPlayerController.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 void ULobbyHUDWidget::NativeOnInitialized()
@@ -40,7 +41,15 @@ void ULobbyHUDWidget::NativeOnInitialized()
     InitLevelItems();
 }
 
-void ULobbyHUDWidget::OnBackClicked() {}
+void ULobbyHUDWidget::OnBackClicked()
+{
+    if (const auto LobbyPlayerController = Cast<ALobbyPlayerController>(GetOwningPlayer()))
+    {
+        LobbyPlayerController->SetNewView(EMenuState::MainMenu);
+
+        LobbyPlayerController->GoToMainMenu();
+    }
+}
 
 void ULobbyHUDWidget::OnBeginPlayClicked()
 {

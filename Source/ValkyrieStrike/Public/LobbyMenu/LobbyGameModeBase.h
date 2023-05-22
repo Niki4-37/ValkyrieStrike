@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "GameCoreTypes.h"
 #include "LobbyGameModeBase.generated.h"
 
 class APlayerStart;
@@ -23,6 +24,7 @@ public:
     void LaunchGame(APlayerController* PC);
 
     virtual void PostLogin(APlayerController* NewPlayer);
+    virtual void Logout(AController* Exiting);
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -33,10 +35,10 @@ protected:
 
 private:
     UPROPERTY()
-    TMap<APlayerStart*, bool> SpawnPositionsMap;
+    TMap<APlayerStart*, APlayerController*> SpawningMap;
 
     UPROPERTY()
     TArray<ALobbyPlayerController*> Controllers;
 
-    void SpawnLobbyVehicle(ALobbyPlayerController* Controller);
+    void SpawnLobbyVehicle(APlayerStart* Position, APlayerController* Controller);
 };

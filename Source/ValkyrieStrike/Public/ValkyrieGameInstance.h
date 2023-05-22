@@ -24,6 +24,7 @@ public:
     void JoinGame();
 
     FName GetLobbyMapName() const { return LobbyMapName; }
+    FName GetMenuMapName() const { return MenuMapName; }
 
 protected:
     UPROPERTY(EditDefaultsOnly, Category = "Game", meta = (ToolTip = "Level names must be unique!"))
@@ -35,7 +36,7 @@ protected:
     UPROPERTY(EditDefaultsOnly)
     FName LobbyMapName;
 
-    UPROPERTY(EditDefaultsOnly)
+    UPROPERTY(VisibleAnywhere)
     int32 MaxNumPlayers{4};
 
 private:

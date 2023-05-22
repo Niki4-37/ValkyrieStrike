@@ -6,6 +6,9 @@
 #include "Decorations/DummyVehicle.h"
 #include "Net/UnrealNetwork.h"
 #include "GameLevelsConfig/ValkyriePlayerState.h"
+#include "Subsystems/SessionSubsystem.h"
+
+#include "Engine.h"
 
 void ALobbyPlayerController::SetNewView(EMenuState MenuState)
 {
@@ -20,6 +23,17 @@ void ALobbyPlayerController::SetNewView(EMenuState MenuState)
     }
 
     OnMenuStateChanged.Broadcast(MenuState);
+}
+
+void ALobbyPlayerController::GoToMainMenu()
+{
+    // GetNetMode() != NM_Client ? GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Purple, TEXT("SERVER")) : GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Orange, TEXT("CLIENT"));
+
+    if (const auto SessionSubsystem = GetGameInstance()->GetSubsystem<USessionSubsystem>())
+    {
+        // GetNetMode() != NM_Client ? SessionSubsystem->DestroySession() : SessionSubsystem->EndSession();
+        SessionSubsystem->DestroySession();
+    }
 }
 
 void ALobbyPlayerController::VehicleItemHasSelected_OnServer_Implementation(const FVehicleItemData& VehicleItemData)
@@ -62,4 +76,14 @@ void ALobbyPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME(ALobbyPlayerController, DummyVehicle);
+}
+
+void ALobbyPlayerController::Destroyed()
+{
+    if (DummyVehicle)
+    {
+        DummyVehicle->Destroy();
+    }
+
+    Super::Destroyed();
 }

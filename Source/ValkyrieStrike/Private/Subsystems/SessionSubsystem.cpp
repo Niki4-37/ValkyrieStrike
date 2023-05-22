@@ -200,6 +200,12 @@ void USessionSubsystem::OnEndSessionCompleted(FName SessionName, bool Successful
     {
         SessionInterface->ClearOnEndSessionCompleteDelegate_Handle(OnEndSessionCompleteDelegateHandle);
     }
+
+    FName MenuMapName = Cast<UValkyrieGameInstance>(GetGameInstance())->GetMenuMapName();
+    if (Successful)
+    {
+        UGameplayStatics::OpenLevel(GetWorld(), MenuMapName, true, "listen");
+    }
 }
 
 void USessionSubsystem::OnDestroySessionCompleted(FName SessionName, bool Successful)
@@ -208,6 +214,12 @@ void USessionSubsystem::OnDestroySessionCompleted(FName SessionName, bool Succes
     if (sessionInterface)
     {
         sessionInterface->ClearOnDestroySessionCompleteDelegate_Handle(OnDestroySessionCompleteDelegateHandle);
+    }
+
+    FName MenuMapName = Cast<UValkyrieGameInstance>(GetGameInstance())->GetMenuMapName();
+    if (Successful)
+    {
+        UGameplayStatics::OpenLevel(GetWorld(), MenuMapName, true, "listen");
     }
 }
 
