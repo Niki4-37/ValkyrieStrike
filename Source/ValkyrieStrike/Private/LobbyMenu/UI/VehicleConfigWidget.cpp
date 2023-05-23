@@ -24,7 +24,6 @@ void UVehicleConfigWidget::InitVehicleItems()
     {
         if (!VehicleItemPtr) continue;
         const auto VehicleItem = *VehicleItemPtr;
-
         const auto VehicleItemWidget = CreateWidget<UVehicleItemWidget>(GetWorld(), VehicleItemWidgetClass);
         if (!VehicleItemWidget) continue;
         VehicleItemWidget->SetItemData(VehicleItem);

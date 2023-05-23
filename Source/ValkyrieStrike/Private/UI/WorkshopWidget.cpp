@@ -14,6 +14,7 @@ void UWorkshopWidget::OnNewPawn(APawn* NewPawn)
     if (!WorkshopComponent->OnTasksUpdated.IsBoundToObject(this))
     {
         WorkshopComponent->OnTasksUpdated.AddUObject(this, &UWorkshopWidget::OnWorkshopTasksUpdated);
+        OnWorkshopTasksUpdated(TArray<FInteractionData>{});
     }
     if (!WorkshopComponent->OnUpdateCost.IsBoundToObject(this))
     {
@@ -25,7 +26,13 @@ void UWorkshopWidget::OnWorkshopTasksUpdated(const TArray<FInteractionData>& Tas
 {
     checkf(WorkshopTaskWidgetClass, TEXT("WorkshopTaskWidgetClass not define!"));
 
-    if (!WorkshopTaskSlots) return;
+    if (!WorkshopTaskSlots || !Tasks.Num())
+    {
+        SetVisibility(ESlateVisibility::Collapsed);
+        return;
+    }
+    SetVisibility(ESlateVisibility::Visible);
+
     WorkshopTaskSlots->ClearChildren();
     TaskMap.Empty();
 

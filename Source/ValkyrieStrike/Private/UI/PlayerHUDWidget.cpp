@@ -93,6 +93,7 @@ void UPlayerHUDWidget::RemoveFromParent()
 
 void UPlayerHUDWidget::OnNewPawn(APawn* NewPawn)
 {
+    // add fails counter
     FTimerDelegate TimerDelegate;
     TimerDelegate.BindLambda(
         [&]()

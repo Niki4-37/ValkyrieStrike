@@ -241,7 +241,7 @@ void USessionSubsystem::OnFindSessionsCompleted(bool Successful)
     {
         // use widget to show results
         int32 NumberOfConnected = SearchResult.Session.SessionSettings.NumPublicConnections - SearchResult.Session.NumOpenPublicConnections;
-        OnFoundSessionData.Broadcast(SearchResult.Session.OwningUserName, NumberOfConnected, SearchResult.Session.NumOpenPublicConnections);
+        OnFoundSessionData.Broadcast(SearchResult.Session.OwningUserName, NumberOfConnected, SearchResult.Session.SessionSettings.NumPublicConnections);
     }
 }
 

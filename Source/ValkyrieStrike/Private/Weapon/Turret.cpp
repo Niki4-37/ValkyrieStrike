@@ -35,20 +35,40 @@ void ATurret::SetupWeapon(int32 InMaxAmmoCapacity, float InReloadingTime)
     AmmoCapacity = MaxAmmoCapacity;
 }
 
-void ATurret::Fire_OnServer_Implementation(bool bCanFire)
+void ATurret::Fire(bool bWantToFire)
 {
-    (bCanFire && bIsReady && !IsEmpty()) ?                                                    //
-        GetWorldTimerManager().SetTimer(FireTimer, this, &ATurret::MakeShot, FireRate, true)  //
-        :                                                                                     //
-        GetWorldTimerManager().ClearTimer(FireTimer);
+    if (!bWantToFire || bIsReloading || !bIsPreparedToFire || IsEmpty()) return;
+
+    bIsPreparedToFire = false;
+    auto Rotation = TurretMuzzle->GetSocketRotation(MuzzleSocketName);
+
+    auto MuzzleLocation = TurretMuzzle->GetSocketLocation(MuzzleSocketName);
+    FTransform SpawningTransform(Rotation, MuzzleLocation);
+
+    auto Bullet = GetWorld()->SpawnActor<ADefaultProjectile>(DefaultProjectileClass, SpawningTransform);
+    if (Bullet)
+    {
+        Bullet->SetLifeSpan(1.f);
+        --AmmoCapacity;
+        OnChangeAmmoInWeapon.Broadcast(EVehicleItemType::Turret, AmmoCapacity);
+    }
+    if (IsEmpty())
+    {
+        bIsReloading = true;
+        ReloadWeapon();
+    }
+
+    GetWorldTimerManager().SetTimer(
+        FireTimer, [&]() { bIsPreparedToFire = true; }, FireRate, false);
 }
 
-void ATurret::RotateToTarget_OnServer_Implementation(AActor* AimActor, float TimerRate)
+void ATurret::RotateToTarget(AActor* AimActor, float TimerRate)
 {
+    /* handled on server by AIController */
     Alpha = 0.f;
     GetWorldTimerManager().ClearTimer(SmoothRotationTimer);
 
-    AimActor ? Fire_OnServer(true) : Fire_OnServer(false);
+    AimActor ? Fire(true) : Fire(false);
 
     FTimerDelegate TimerDelegate;
     TimerDelegate.BindLambda(
@@ -84,10 +104,14 @@ void ATurret::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME(ATurret, AmmoCapacity);
+    DOREPLIFETIME(ATurret, bIsReloading);
+    DOREPLIFETIME(ATurret, bIsPreparedToFire);
 }
 
-void ATurret::Destroyed() 
+void ATurret::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+    Super::EndPlay(EndPlayReason);
+
     GetWorldTimerManager().ClearTimer(FireTimer);
     GetWorldTimerManager().ClearTimer(ReloadingTimer);
     GetWorldTimerManager().ClearTimer(SmoothRotationTimer);
@@ -110,18 +134,18 @@ void ATurret::MakeShot()
     }
     if (IsEmpty())
     {
-        bIsReady = false;
         ReloadWeapon();
     }
 }
 
 void ATurret::ReloadWeapon()
 {
+    bIsReloading = true;
     FTimerDelegate TimerDelegate;
     TimerDelegate.BindLambda(
         [&]()
         {
-            bIsReady = true;
+            bIsReloading = false;
             AmmoCapacity = MaxAmmoCapacity;
         });
     GetWorldTimerManager().SetTimer(ReloadingTimer, TimerDelegate, ReloadingTime, false);

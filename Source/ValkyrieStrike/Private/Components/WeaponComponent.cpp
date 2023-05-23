@@ -1,6 +1,7 @@
 // Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 
 #include "Components/WeaponComponent.h"
+#include "Components/HealthComponent.h"
 #include "Weapon/Turret.h"
 #include "Weapon/SecondWeapon.h"
 #include "WheeledVehicle.h"
@@ -115,6 +116,11 @@ void UWeaponComponent::UpdateWidgets()
 void UWeaponComponent::BeginPlay()
 {
     Super::BeginPlay();
+
+    if (const auto HealthComponent = GetOwner()->FindComponentByClass<UHealthComponent>())
+    {
+        HealthComponent->OnDeath.AddUObject(this, &UWeaponComponent::OnDeath);
+    }
 }
 
 void UWeaponComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -127,6 +133,14 @@ void UWeaponComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
     DOREPLIFETIME(UWeaponComponent, VehicleTurret);
     DOREPLIFETIME(UWeaponComponent, SecondWeapon);
+}
+
+void UWeaponComponent::OnDeath()
+{
+    if (VehicleTurret && VehicleTurret->Controller)
+    {
+        VehicleTurret->Controller->Destroy();
+    }
 }
 
 void UWeaponComponent::OnItemMount_Client_Implementation(const FVehicleItemData& Data)

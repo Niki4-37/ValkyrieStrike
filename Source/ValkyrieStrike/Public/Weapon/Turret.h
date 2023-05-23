@@ -22,11 +22,9 @@ public:
     FOnChangeAmmoSignature OnChangeAmmoInWeapon;
     FOnOnStartReloadingSignature OnStartWeaponReloading;
 
-    UFUNCTION(Server, unreliable)
-    void Fire_OnServer(bool bCanFire);
+    void Fire(bool bCanFire);
 
-    UFUNCTION(Server, unreliable)
-    void RotateToTarget_OnServer(AActor* AimActor, float TimerRate);
+    void RotateToTarget(AActor* AimActor, float TimerRate);
 
     void SetupWeapon(int32 InMaxAmmoCapacity, float InReloadingTime);
 
@@ -54,7 +52,7 @@ protected:
 
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-    virtual void Destroyed() override;
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 private:
     FTimerHandle FireTimer;
@@ -64,7 +62,11 @@ private:
 
     float Alpha{0.f};
 
-    bool bIsReady{true};
+    UPROPERTY(Replicated)
+    bool bIsReloading{false};
+
+    UPROPERTY(Replicated)
+    bool bIsPreparedToFire{true};
 
     int32 MaxAmmoCapacity;
     float ReloadingTime;

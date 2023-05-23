@@ -9,7 +9,7 @@ void UJoinSessionWidget::InitWidget(const FString& SessionID, int32 ConnectionNu
 {
     if (SessionInfo)
     {
-        const FString SessionInfoStr = SessionID.Mid(0, 15) + FString::FromInt(ConnectionNum) + "/" + FString::FromInt(MaxPlayers);
+        const FString SessionInfoStr = SessionID.Mid(0, 15) + " ==> " + FString::FromInt(ConnectionNum) + "/" + FString::FromInt(MaxPlayers);
         SessionInfo->SetText(FText::FromString(SessionInfoStr));
     }
 }

@@ -54,6 +54,8 @@ private:
     UPROPERTY(Replicated)
     ASecondWeapon* SecondWeapon{nullptr};
 
+    void OnDeath();
+
     UFUNCTION(Client, reliable)
     void OnItemMount_Client(const FVehicleItemData& Data);
 
