@@ -39,6 +39,8 @@ protected:
     UPROPERTY(VisibleAnywhere)
     int32 MaxNumPlayers{4};
 
+    virtual void OnStart() override;
+
 private:
     FLevelData StartupLevel;
 };

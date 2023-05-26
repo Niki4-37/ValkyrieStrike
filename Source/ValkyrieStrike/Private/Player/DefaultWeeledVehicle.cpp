@@ -7,9 +7,10 @@
 #include "Components/WeaponComponent.h"
 #include "Components/VehicleIndicatorsComponent.h"
 #include "Components/WorkshopComponent.h"
+#include "Components/InputComponent.h"
+#include "Components/BoxComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
-#include "Components/InputComponent.h"
 #include "WheeledVehicleMovementComponent4W.h"
 #include "Engine/SkeletalMesh.h"
 #include "Engine/Engine.h"
@@ -18,6 +19,7 @@
 #include "GameFramework/Controller.h"
 #include "Net/UnrealNetwork.h"
 #include "GameLevelsConfig/ValkyriePlayerState.h"
+// #include "Kismet/GameplayStatics.h"
 
 #include "Engine.h"
 
@@ -57,6 +59,10 @@ ADefaultWeeledVehicle::ADefaultWeeledVehicle()
     CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
     CameraComp->bUsePawnControlRotation = false;
     CameraComp->FieldOfView = 90.f;
+
+    HitBox = CreateDefaultSubobject<UBoxComponent>("HitBox");
+    HitBox->SetBoxExtent(FVector(200.f));
+    HitBox->SetupAttachment(RootComponent);
 
     bInReverseGear = false;
 
@@ -100,6 +106,16 @@ bool ADefaultWeeledVehicle::SetWorkshopTasksData(const TArray<FInteractionData>&
 void ADefaultWeeledVehicle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME(ADefaultWeeledVehicle, bCanCauseDamage);
+}
+
+void ADefaultWeeledVehicle::PostInitializeComponents()
+{
+    Super::PostInitializeComponents();
+
+    check(HitBox);
+    HitBox->OnComponentBeginOverlap.AddDynamic(this, &ADefaultWeeledVehicle::HitBoxBeginOverlap);
 }
 
 void ADefaultWeeledVehicle::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -133,10 +149,12 @@ void ADefaultWeeledVehicle::Tick(float Delta)
     const float MaxEngineRotation = GetVehicleMovementComponent()->GetEngineMaxRotationSpeed();
     const float Percentage = MaxEngineRotation > 0.f ? EngineRotation / MaxEngineRotation : 0.f;
 
-    GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Red, FString::SanitizeFloat(Percentage));
+    // GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Red, FString::SanitizeFloat(Percentage));
+    GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Red, FString::SanitizeFloat(GetVelocity().Size()));
 
     if (HasAuthority())
     {
+        bCanCauseDamage = GetVelocity().Size() >= TraumaticSpeed;
         VehicleIndicatorsComp->SetFuelConsumptionModifier_OnServer(Percentage);
     }
 }
@@ -194,3 +212,19 @@ void ADefaultWeeledVehicle::OnHandbrakePressed(bool bIsUsed)
 }
 
 void ADefaultWeeledVehicle::OnFireEvent(bool bIsEnabled) {}
+
+void ADefaultWeeledVehicle::HitBoxBeginOverlap(
+    UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+    if (!OtherActor) return;
+
+    if (!bCanCauseDamage)
+    {
+        GetVehicleMovement()->StopMovementImmediately();
+        return;
+    }
+
+    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Purple, "Apply Damage");
+
+    OtherActor->TakeDamage(1000.f, FDamageEvent(), GetController(), this);
+}

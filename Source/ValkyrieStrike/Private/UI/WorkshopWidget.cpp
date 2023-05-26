@@ -28,10 +28,15 @@ void UWorkshopWidget::OnWorkshopTasksUpdated(const TArray<FInteractionData>& Tas
 
     if (!WorkshopTaskSlots || !Tasks.Num())
     {
+        GetOwningPlayer()->bShowMouseCursor = false;
+
         SetVisibility(ESlateVisibility::Collapsed);
         return;
     }
+
+    GetOwningPlayer()->bShowMouseCursor = true;
     SetVisibility(ESlateVisibility::Visible);
+    
 
     WorkshopTaskSlots->ClearChildren();
     TaskMap.Empty();

@@ -2,6 +2,7 @@
 
 #include "ValkyrieGameInstance.h"
 #include "Subsystems/SessionSubsystem.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 void UValkyrieGameInstance::CreateGame()
 {
@@ -16,4 +17,10 @@ void UValkyrieGameInstance::FindGame()
 void UValkyrieGameInstance::JoinGame()
 {
     GetSubsystem<USessionSubsystem>()->JoinSession();
+}
+
+void UValkyrieGameInstance::OnStart()
+{
+    FString FPSLock = "t.maxfps 60";
+    UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), FPSLock);
 }

@@ -13,6 +13,7 @@ class USpringArmComponent;
 class UWeaponComponent;
 class UVehicleIndicatorsComponent;
 class UWorkshopComponent;
+class UBoxComponent;
 
 UCLASS()
 class VALKYRIESTRIKE_API ADefaultWeeledVehicle : public AWheeledVehicle, public IGameInterface
@@ -38,6 +39,9 @@ protected:
     UCameraComponent* CameraComp;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    UBoxComponent* HitBox;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     UWeaponComponent* WeaponComponent;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -46,10 +50,14 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     UWorkshopComponent* WorkshopComponent;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    float TraumaticSpeed{400.f};
+
     UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly)
     bool bInReverseGear;
 
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+    virtual void PostInitializeComponents() override;
 
 public:
     virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
@@ -64,6 +72,9 @@ private:
 
     bool bIsAutoMoveForward{true};
 
+    UPROPERTY(Replicated)
+    bool bCanCauseDamage{false};
+
     /** Handle pressing forwards */
     void MoveForward(float Val);
     /** Handle pressing right */
@@ -73,4 +84,7 @@ private:
     void OnHandbrakePressed(bool bIsUsed);
 
     void OnFireEvent(bool bIsEnabled);
+
+    UFUNCTION()
+    void HitBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };
