@@ -13,14 +13,6 @@ Saved
 *.xcodeproj
 *.xcworkspace
 Build
-Content/Polar
-Content/Maps
-Content/Sounds
-Content/Environment
-Content/Map/GameLevel.umap
-Content/MilitaryWeapDark
-Content/Modular_Sci_Fi
-Content/StorageHouse
 Config/SteamVRBindings
 Config/steamvr_ue_editor_app.json
 .gitignore.bak
