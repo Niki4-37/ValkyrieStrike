@@ -9,6 +9,7 @@
 
 class UButton;
 class UVerticalBox;
+class UCircularThrobber;
 
 UCLASS()
 class VALKYRIESTRIKE_API UMenuWidget : public UUserWidget
@@ -30,6 +31,9 @@ protected:
 
     UPROPERTY(meta = (BindWidget))
     UVerticalBox* FoundSessionsBox;
+
+    UPROPERTY(meta = (BindWidget))
+    UCircularThrobber* FindingSessionProcess;
 
     UPROPERTY(EditDefaultsOnly)
     TSubclassOf<UUserWidget> JionSessionWidgetClass;

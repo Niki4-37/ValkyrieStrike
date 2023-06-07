@@ -5,6 +5,7 @@
 #include "ValkyrieGameInstance.h"
 #include "GameMenu/UI/JoinSessionWidget.h"
 #include "Components/VerticalBox.h"
+#include "Components/CircularThrobber.h"
 #include "Subsystems/SessionSubsystem.h"
 #include "GameMenu/MenuPlayerController.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -28,6 +29,10 @@ void UMenuWidget::NativeOnInitialized()
     {
         QuitButton->OnClicked.AddDynamic(this, &ThisClass::OnQuit);
     }
+    if (FindingSessionProcess)
+    {
+        FindingSessionProcess->SetVisibility(ESlateVisibility::Collapsed);
+    }
 
     if (GetGameInstance()->GetSubsystem<USessionSubsystem>())
     {
@@ -46,11 +51,22 @@ void UMenuWidget::OnFindGame()
     {
         FoundSessionsBox->ClearChildren();
     }
+
+    if (FindingSessionProcess)
+    {
+        FindingSessionProcess->SetVisibility(ESlateVisibility::Visible);
+    }
 }
 
 void UMenuWidget::OnFoundSessionData(const FString& SessionID, int32 ConnectionNum, int32 MaxPlayers)
 {
     if (!JionSessionWidgetClass || !FoundSessionsBox) return;
+
+    if (FindingSessionProcess)
+    {
+        FindingSessionProcess->SetVisibility(ESlateVisibility::Collapsed);
+    }
+
     const auto SessionWidget = CreateWidget<UJoinSessionWidget>(GetOwningPlayer(), JionSessionWidgetClass);
     if (!SessionWidget) return;
     SessionWidget->InitWidget(SessionID, ConnectionNum, MaxPlayers);
