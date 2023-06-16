@@ -146,3 +146,57 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnCoinsChangedSignature, int32);
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnFoundSessionDataSignature, const FString&, int32, int32);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameStateChangedSignature, EValkyrieGameState);
+
+USTRUCT(BlueprintType)
+struct FWheelData
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    USceneComponent* WheelRoot;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    float LastContactDistance;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    FVector WheelVelocity;
+
+    FWheelData() : WheelRoot(nullptr), LastContactDistance(0.f), WheelVelocity(FVector::ZeroVector) {}
+    FWheelData(USceneComponent* InWheelRoot, float InLastContactDistance, const FVector& InWheelVelocity)  //
+        : WheelRoot(InWheelRoot),                                                                          //
+          LastContactDistance(InLastContactDistance),                                                      //
+          WheelVelocity(InWheelVelocity)
+    {
+    }
+};
+
+USTRUCT(BlueprintType)
+struct FWheelsGroup
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    TArray<FWheelData> WheelsArray;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    float SuspensionDumping;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    float SuspensionStiffness;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    UPrimitiveComponent* RootSimulatedComponent;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    FName RootSimulatedBoneName;
+
+    FWheelsGroup() : WheelsArray({}), SuspensionDumping(0.f), SuspensionStiffness(0.f), RootSimulatedComponent(nullptr), RootSimulatedBoneName(NAME_None) {}
+    FWheelsGroup(const TArray<FWheelData>& InWheelsArray, float InSuspensionDumping, float InSuspensionStiffness, UPrimitiveComponent* InRootSimulatedComponent, FName BoneName = NAME_None)  //
+        : WheelsArray(InWheelsArray),                                                                                                                                                         //
+          SuspensionDumping(InSuspensionDumping),                                                                                                                                             //
+          SuspensionStiffness(InSuspensionStiffness),                                                                                                                                         //
+          RootSimulatedComponent(InRootSimulatedComponent),                                                                                                                                   //
+          RootSimulatedBoneName(BoneName)
+    {
+    }
+};

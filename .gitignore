@@ -18,3 +18,4 @@ Config/steamvr_ue_editor_app.json
 .gitignore.bak
 *.bat
 *.log
+Content/ModularLowPolyRobots

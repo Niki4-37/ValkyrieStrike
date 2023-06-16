@@ -97,6 +97,8 @@ void ATurret::RotateToTarget(AActor* AimActor, float TimerRate)
 void ATurret::BeginPlay()
 {
     Super::BeginPlay();
+
+    //UE_LOG(LogTemp, Display, TEXT("Turret's owner %s"), *GetOwner()->GetName());
 }
 
 void ATurret::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -154,7 +156,11 @@ void ATurret::ReloadWeapon()
 
 void ATurret::RotateTurret_Multicast_Implementation(const FQuat& Value)
 {
-    float YawValue = Value.Rotator().Yaw;
-    TurretTower->SetWorldRotation(FRotator(0.f, YawValue, 0.f));
+    UE_LOG(LogTemp, Display, TEXT("Turret's owner %s"), *GetOwner()->GetName());    
+
+    const float YawValue = Value.Rotator().Yaw;
+    const float PitchValue = GetOwner()->GetActorRotation().Pitch;
+    const float RollValue = GetOwner()->GetActorRotation().Roll;
+    TurretTower->SetWorldRotation(FRotator(PitchValue, YawValue, RollValue));
     TurretMuzzle->SetWorldRotation(Value);
 }

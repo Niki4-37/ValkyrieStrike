@@ -32,66 +32,66 @@ bool UWeaponComponent::AddAmmo(int32 Amount)
 
 void UWeaponComponent::InitWeapons_OnServer_Implementation()
 {
-    if (!GetOwner() || !GetOwner()->GetInstigatorController()) return;
-    const auto PlayerState = GetOwner()->GetInstigatorController()->GetPlayerState<AValkyriePlayerState>();
+    //if (!GetOwner() || !GetOwner()->GetInstigatorController()) return;
+    //const auto PlayerState = GetOwner()->GetInstigatorController()->GetPlayerState<AValkyriePlayerState>();
 
-    if (!PlayerState || PlayerState->GetVehicleItems().Num() == 0) return;
+    //if (!PlayerState || PlayerState->GetVehicleItems().Num() == 0) return;
 
-    for (auto& VehicleItem : PlayerState->GetVehicleItems())
-    {
-        if (!VehicleItem.ItemClass) continue;
+    //for (auto& VehicleItem : PlayerState->GetVehicleItems())
+    //{
+    //    if (!VehicleItem.ItemClass) continue;
 
-        FString EnumNameString{UEnum::GetValueAsName(VehicleItem.ItemType).ToString()};
-        int32 ScopeIndex = EnumNameString.Find(TEXT("::"), ESearchCase::CaseSensitive);
-        FName SocketName{NAME_None};
-        if (ScopeIndex != INDEX_NONE)
-        {
-            SocketName = FName(*(EnumNameString.Mid(ScopeIndex + 2) + "Socket"));
-        }
+    //    FString EnumNameString{UEnum::GetValueAsName(VehicleItem.ItemType).ToString()};
+    //    int32 ScopeIndex = EnumNameString.Find(TEXT("::"), ESearchCase::CaseSensitive);
+    //    FName SocketName{NAME_None};
+    //    if (ScopeIndex != INDEX_NONE)
+    //    {
+    //        SocketName = FName(*(EnumNameString.Mid(ScopeIndex + 2) + "Socket"));
+    //    }
 
-        if (VehicleItem.ItemType == EVehicleItemType::Turret)
-        {
-            VehicleTurret = MountWeapon<ATurret>(VehicleItem.ItemClass, SocketName /*TurretSocketName*/);
-            if (!VehicleTurret) continue;
+    //    if (VehicleItem.ItemType == EVehicleItemType::Turret)
+    //    {
+    //        VehicleTurret = MountWeapon<ATurret>(VehicleItem.ItemClass, SocketName /*TurretSocketName*/);
+    //        if (!VehicleTurret) continue;
 
-            VehicleTurret->SetupWeapon(VehicleItem.MaxAmmoCapacity, VehicleItem.ReloadingTime);
-            VehicleTurret->OnChangeAmmoInWeapon.AddUObject(this, &UWeaponComponent::OnChangeAmmo_Client);
-            VehicleTurret->OnStartWeaponReloading.AddUObject(this, &UWeaponComponent::OnStartReloading_Client);
-        }
-        if (VehicleItem.ItemType == EVehicleItemType::SecondWeapon)
-        {
-            SecondWeapon = MountWeapon<ASecondWeapon>(VehicleItem.ItemClass, SocketName /*SecondWeaponSocketName*/);
-            if (!SecondWeapon) continue;
+    //        VehicleTurret->SetupWeapon(VehicleItem.MaxAmmoCapacity, VehicleItem.ReloadingTime);
+    //        VehicleTurret->OnChangeAmmoInWeapon.AddUObject(this, &UWeaponComponent::OnChangeAmmo_Client);
+    //        VehicleTurret->OnStartWeaponReloading.AddUObject(this, &UWeaponComponent::OnStartReloading_Client);
+    //    }
+    //    if (VehicleItem.ItemType == EVehicleItemType::SecondWeapon)
+    //    {
+    //        SecondWeapon = MountWeapon<ASecondWeapon>(VehicleItem.ItemClass, SocketName /*SecondWeaponSocketName*/);
+    //        if (!SecondWeapon) continue;
 
-            SecondWeapon->SetupWeapon(VehicleItem.MaxAmmoCapacity, VehicleItem.ReloadingTime);
-            SecondWeapon->OnChangeAmmoInWeapon.AddUObject(this, &UWeaponComponent::OnChangeAmmo_Client);
-            SecondWeapon->OnStartWeaponReloading.AddUObject(this, &UWeaponComponent::OnStartReloading_Client);
-        }
-    }
+    //        SecondWeapon->SetupWeapon(VehicleItem.MaxAmmoCapacity, VehicleItem.ReloadingTime);
+    //        SecondWeapon->OnChangeAmmoInWeapon.AddUObject(this, &UWeaponComponent::OnChangeAmmo_Client);
+    //        SecondWeapon->OnStartWeaponReloading.AddUObject(this, &UWeaponComponent::OnStartReloading_Client);
+    //    }
+    //}
 
     /* used in game level for debug */
-    // if (TurretData.ItemClass)
-    //{
-    //     VehicleTurret = MountWeapon<ATurret>(TurretData.ItemClass, TurretSocketName);
-    //     if (VehicleTurret)
-    //     {
-    //         VehicleTurret->SetupWeapon(TurretData.MaxAmmoCapacity, TurretData.ReloadingTime);
-    //         VehicleTurret->OnChangeAmmoInWeapon.AddUObject(this, &UWeaponComponent::OnChangeAmmo_Client);
-    //         VehicleTurret->OnStartWeaponReloading.AddUObject(this, &UWeaponComponent::OnStartReloading_Client);
-    //         OnItemMount_Client(TurretData);
-    //     }
-    // }
-    // if (SecondWeaponData.ItemClass)
-    //{
-    //     SecondWeapon = MountWeapon<ASecondWeapon>(SecondWeaponData.ItemClass, SecondWeaponSocketName);
-    //     if (SecondWeapon)
-    //     {
-    //         SecondWeapon->SetupWeapon(SecondWeaponData.MaxAmmoCapacity, SecondWeaponData.ReloadingTime);
-    //         SecondWeapon->OnChangeAmmoInWeapon.AddUObject(this, &UWeaponComponent::OnChangeAmmo_Client);
-    //         SecondWeapon->OnStartWeaponReloading.AddUObject(this, &UWeaponComponent::OnStartReloading_Client);
-    //         OnItemMount_Client(SecondWeaponData);
-    //     }
-    // }
+     if (TurretData.ItemClass)
+    {
+         VehicleTurret = MountWeapon<ATurret>(TurretData.ItemClass, TurretSocketName);
+         if (VehicleTurret)
+         {
+             VehicleTurret->SetupWeapon(TurretData.MaxAmmoCapacity, TurretData.ReloadingTime);
+             VehicleTurret->OnChangeAmmoInWeapon.AddUObject(this, &UWeaponComponent::OnChangeAmmo_Client);
+             VehicleTurret->OnStartWeaponReloading.AddUObject(this, &UWeaponComponent::OnStartReloading_Client);
+             OnItemMount_Client(TurretData);
+         }
+     }
+     if (SecondWeaponData.ItemClass)
+    {
+         SecondWeapon = MountWeapon<ASecondWeapon>(SecondWeaponData.ItemClass, SecondWeaponSocketName);
+         if (SecondWeapon)
+         {
+             SecondWeapon->SetupWeapon(SecondWeaponData.MaxAmmoCapacity, SecondWeaponData.ReloadingTime);
+             SecondWeapon->OnChangeAmmoInWeapon.AddUObject(this, &UWeaponComponent::OnChangeAmmo_Client);
+             SecondWeapon->OnStartWeaponReloading.AddUObject(this, &UWeaponComponent::OnStartReloading_Client);
+             OnItemMount_Client(SecondWeaponData);
+         }
+     }
     /* end debug */
 
     if (VehicleTurret && !VehicleTurret->Controller)
@@ -120,6 +120,12 @@ void UWeaponComponent::BeginPlay()
     if (const auto HealthComponent = GetOwner()->FindComponentByClass<UHealthComponent>())
     {
         HealthComponent->OnDeath.AddUObject(this, &UWeaponComponent::OnDeath);
+    }
+
+    /* debug */
+    if (GetOwner()->GetRemoteRole() == ENetRole::ROLE_Authority)
+    {
+        InitWeapons_OnServer();
     }
 }
 
