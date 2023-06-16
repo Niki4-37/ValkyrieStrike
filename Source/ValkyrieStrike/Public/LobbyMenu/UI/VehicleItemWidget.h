@@ -18,6 +18,7 @@ class VALKYRIESTRIKE_API UVehicleItemWidget : public UUserWidget
 
 public:
     void SetItemData(const FVehicleItemData& Data);
+    void SetItemData(const FVehicleConstructPart& Part);
 
 protected:
     UPROPERTY(meta = (BindWidget))
@@ -33,6 +34,8 @@ protected:
 
 private:
     FVehicleItemData ItemData;
+
+    FVehicleConstructPart ConstructPart;
 
     UFUNCTION()
     void OnItemClicked();

@@ -25,8 +25,8 @@ public:
     AModularVehicleBase();
 
 protected:
-    UPROPERTY(VisibleDefaultsOnly)
-    USceneComponent* PawnRootComponent;
+    // UPROPERTY(VisibleDefaultsOnly)
+    // USceneComponent* PawnRootComponent;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     UStaticMeshComponent* VehicleBody;

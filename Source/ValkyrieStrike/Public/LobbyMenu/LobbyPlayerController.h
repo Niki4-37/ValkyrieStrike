@@ -24,6 +24,9 @@ public:
     UFUNCTION(Server, reliable)
     void VehicleItemHasSelected_OnServer(const FVehicleItemData& VehicleItemData);
 
+    UFUNCTION(Server, unreliable)
+    void VehiclePartHasSelected_OnServer(const FVehicleConstructPart& VehicleConstructPart);
+
     void SetLobbyVehicle(ADummyVehicle* Vehicle) { DummyVehicle = Vehicle; }
 
 protected:

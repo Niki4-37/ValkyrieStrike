@@ -19,6 +19,15 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     UDataTable* VehicleItemsTable;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UDataTable* VehicleConstructPartsTable;
+
+    UPROPERTY(meta = (BindWidget))
+    UHorizontalBox* BodyBox;
+
+    UPROPERTY(meta = (BindWidget))
+    UHorizontalBox* ChassisBox;
+
     UPROPERTY(meta = (BindWidget))
     UHorizontalBox* TurretBox;
 
@@ -32,4 +41,5 @@ protected:
 
 private:
     void InitVehicleItems();
+    void InitVehicleConstructParts();
 };

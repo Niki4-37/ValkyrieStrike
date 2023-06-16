@@ -8,13 +8,14 @@ void UVehicleConfigWidget::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
 
+    checkf(VehicleItemWidgetClass, TEXT("VehicleItemWidgetClass not define!"));
+
+    InitVehicleConstructParts();
     InitVehicleItems();
 }
 
 void UVehicleConfigWidget::InitVehicleItems()
 {
-    checkf(VehicleItemWidgetClass, TEXT("VehicleItemWidgetClass not define!"));
-
     TArray<FVehicleItemData*> ItemPtrs;
     VehicleItemsTable->GetAllRows<FVehicleItemData>("", ItemPtrs);
 
@@ -36,6 +37,33 @@ void UVehicleConfigWidget::InitVehicleItems()
         if (VehicleItem.ItemType == EVehicleItemType::SecondWeapon)
         {
             SecondWeaponBox->AddChild(VehicleItemWidget);
+        }
+    }
+}
+
+void UVehicleConfigWidget::InitVehicleConstructParts()
+{
+    TArray<FVehicleConstructPart*> PartsPtrs;
+    VehicleConstructPartsTable->GetAllRows<FVehicleConstructPart>("", PartsPtrs);
+
+    if (!BodyBox || !ChassisBox) return;
+
+    for (auto VehiclePartPtr : PartsPtrs)
+    {
+        if (!VehiclePartPtr) continue;
+        const auto Part = *VehiclePartPtr;
+        const auto VehiclePartWidget = CreateWidget<UVehicleItemWidget>(GetWorld(), VehicleItemWidgetClass);
+        if (!VehiclePartWidget) continue;
+        VehiclePartWidget->SetItemData(Part);
+
+        if (Part.PartType == EVehicleConstructPartType::Body)
+        {
+            BodyBox->AddChild(VehiclePartWidget);
+        }
+
+        if (Part.PartType == EVehicleConstructPartType::Chassis)
+        {
+            ChassisBox->AddChild(VehiclePartWidget);
         }
     }
 }

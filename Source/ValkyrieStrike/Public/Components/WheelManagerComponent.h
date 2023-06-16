@@ -27,28 +27,28 @@ protected:
     TArray<TEnumAsByte<EObjectTypeQuery>> TreceForObjectTypes;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    float WheelMaxSpeed;
+    float WheelMaxSpeed{1000.f};
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    float WheelRadius;
+    float WheelRadius{20.f};
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    float WheelDefaultDistance;
+    float WheelDefaultDistance{60.f};
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    float WheelMaxContactDistance;
+    float WheelMaxContactDistance{65.f};
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    float WheelMinContactDistance;
+    float WheelMinContactDistance{40.f};
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    float WheelFrictionMultipler;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.2", ClampMax = "3.0"))
+    float WheelFrictionMultipler{1.f};
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    float WheelMoveForceMultipler;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.1", ClampMax = "5.0"))
+    float WheelMoveForceMultipler{1.f};
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    float WheelSlideResist;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.5", ClampMax = "6.0"))
+    float WheelSlideResist{1.f};
 
     virtual void BeginPlay() override;
 

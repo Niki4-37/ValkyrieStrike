@@ -21,6 +21,21 @@ void UVehicleItemWidget::SetItemData(const FVehicleItemData& Data)
     }
 }
 
+void UVehicleItemWidget::SetItemData(const FVehicleConstructPart& Part)
+{
+    ConstructPart = Part;
+
+    if (LevelNameTextBlock)
+    {
+        LevelNameTextBlock->SetText(FText::FromString(Part.PartName));
+    }
+    if (ItemImage)
+    {
+        ItemImage->SetBrushFromTexture(Part.PartTumb);
+        ItemImage->SetBrushSize(FVector2D(200.f));
+    }
+}
+
 void UVehicleItemWidget::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
@@ -36,5 +51,12 @@ void UVehicleItemWidget::OnItemClicked()
     const auto LobbyPlayerController = Cast<ALobbyPlayerController>(GetOwningPlayer());
     if (!LobbyPlayerController) return;
 
-    LobbyPlayerController->VehicleItemHasSelected_OnServer(ItemData);
+    if (ItemData.ItemName != NAME_None)
+    {
+        LobbyPlayerController->VehicleItemHasSelected_OnServer(ItemData);
+    }
+    else
+    {
+        LobbyPlayerController->VehiclePartHasSelected_OnServer(ConstructPart);
+    }
 }

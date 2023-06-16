@@ -28,7 +28,10 @@ public:
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    UStaticMesh* DummyVehicleMesh;
+    FVehicleConstructPart DummyVehicleDafaultBody;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    FVehicleConstructPart DummyVehicleDefaultChassis;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     TSubclassOf<ADummyVehicle> DummyVehicleClass;

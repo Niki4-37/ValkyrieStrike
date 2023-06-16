@@ -16,11 +16,12 @@ AModularVehicleBase::AModularVehicleBase()
     PrimaryActorTick.bCanEverTick = true;
     bReplicates = true;
 
-    PawnRootComponent = CreateDefaultSubobject<USceneComponent>("PawnRootComponent");
-    SetRootComponent(PawnRootComponent);
+    // PawnRootComponent = CreateDefaultSubobject<USceneComponent>("PawnRootComponent");
+    // SetRootComponent(PawnRootComponent);
 
     VehicleBody = CreateDefaultSubobject<UStaticMeshComponent>("VehicleBody");
-    VehicleBody->SetupAttachment(RootComponent);
+    // VehicleBody->SetupAttachment(RootComponent);
+    SetRootComponent(VehicleBody);
     VehicleBody->SetCanEverAffectNavigation(false);
     VehicleBody->SetMobility(EComponentMobility::Movable);
     // VehicleBody->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -122,7 +123,7 @@ void AModularVehicleBase::MoveRight(float Value)
     SmoothTurnValue = FMath::FInterpTo(SmoothTurnValue, Value, PawnDeltaTime, 6.f);
 
     const FRotator NewRotationFrontWheels{FRotator(0.f, SmoothTurnValue * 20.f, 0.f)};
-    const FRotator NewRotationRareWheels{FRotator(0.f, SmoothTurnValue * - 20.f, 0.f)};
+    const FRotator NewRotationRareWheels{FRotator(0.f, SmoothTurnValue * -20.f, 0.f)};
     WheelFR->SetRelativeRotation(NewRotationFrontWheels);
     WheelFL->SetRelativeRotation(NewRotationFrontWheels);
     WheelRR->SetRelativeRotation(NewRotationRareWheels);

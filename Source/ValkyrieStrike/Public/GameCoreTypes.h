@@ -16,6 +16,13 @@ enum class EMenuState : uint8
 };
 
 UENUM(BlueprintType)
+enum class EVehicleConstructPartType : uint8
+{
+    Body,
+    Chassis
+};
+
+UENUM(BlueprintType)
 enum class EVehicleItemType : uint8
 {
     Turret,
@@ -81,6 +88,24 @@ struct FLevelData
 };
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnLevelSelectedSignature, const FLevelData&);
+
+USTRUCT(BlueprintType)
+struct FVehicleConstructPart : public FTableRowBase
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    EVehicleConstructPartType PartType;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    FString PartName;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    UTexture2D* PartTumb;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    UStaticMesh* PartMesh;
+};
 
 USTRUCT(BlueprintType)
 struct FVehicleItemData : public FTableRowBase

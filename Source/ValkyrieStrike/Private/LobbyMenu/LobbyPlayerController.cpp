@@ -49,6 +49,14 @@ void ALobbyPlayerController::VehicleItemHasSelected_OnServer_Implementation(cons
     }
 }
 
+void ALobbyPlayerController::VehiclePartHasSelected_OnServer_Implementation(const FVehicleConstructPart& VehicleConstructPart)
+{
+    if (DummyVehicle)
+    {
+        DummyVehicle->MountVehiclePart_OnServer(VehicleConstructPart);
+    }
+}
+
 void ALobbyPlayerController::BeginPlay()
 {
     Super::BeginPlay();

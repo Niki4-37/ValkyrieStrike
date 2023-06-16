@@ -20,9 +20,15 @@ public:
     UFUNCTION(Server, reliable)
     void MountVehicleItem_OnSever(const FVehicleItemData& VehicleItemData);
 
+    UFUNCTION(Server, reliable)
+    void MountVehiclePart_OnServer(const FVehicleConstructPart& VehiclePart);
+
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     UCameraComponent* CameraComponent;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    UStaticMeshComponent* ChassisMesh;
 
 private:
     UPROPERTY()
@@ -30,4 +36,7 @@ private:
 
     UFUNCTION(NetMulticast, reliable)
     void MountVehicleItem_Multicast(const FVehicleItemData& VehicleItemData);
+
+    UFUNCTION(NetMulticast, reliable)
+    void MountVehiclePart_Multicast(const FVehicleConstructPart& VehiclePart);
 };
