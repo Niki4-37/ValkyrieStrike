@@ -2,13 +2,13 @@
 
 #include "LobbyMenu/UI/VehicleConfigWidget.h"
 #include "Components/HorizontalBox.h"
-#include "LobbyMenu/UI/VehicleItemWidget.h"
+#include "LobbyMenu/UI/VehicleUnitWidget.h"
 
 void UVehicleConfigWidget::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
 
-    checkf(VehicleItemWidgetClass, TEXT("VehicleItemWidgetClass not define!"));
+    checkf(VehicleUnitWidgetClass, TEXT("VehicleUnitWidgetClass not define!"));
 
     InitVehicleConstructParts();
     InitVehicleItems();
@@ -25,18 +25,18 @@ void UVehicleConfigWidget::InitVehicleItems()
     {
         if (!VehicleItemPtr) continue;
         const auto VehicleItem = *VehicleItemPtr;
-        const auto VehicleItemWidget = CreateWidget<UVehicleItemWidget>(GetWorld(), VehicleItemWidgetClass);
-        if (!VehicleItemWidget) continue;
-        VehicleItemWidget->SetItemData(VehicleItem);
+        const auto VehicleUnitWidget = CreateWidget<UVehicleUnitWidget>(GetWorld(), VehicleUnitWidgetClass);
+        if (!VehicleUnitWidget) continue;
+        VehicleUnitWidget->SetItemData(VehicleItem);
 
         if (VehicleItem.ItemType == EVehicleItemType::Turret)
         {
-            TurretBox->AddChild(VehicleItemWidget);
+            TurretBox->AddChild(VehicleUnitWidget);
         }
 
         if (VehicleItem.ItemType == EVehicleItemType::SecondWeapon)
         {
-            SecondWeaponBox->AddChild(VehicleItemWidget);
+            SecondWeaponBox->AddChild(VehicleUnitWidget);
         }
     }
 }
@@ -52,7 +52,7 @@ void UVehicleConfigWidget::InitVehicleConstructParts()
     {
         if (!VehiclePartPtr) continue;
         const auto Part = *VehiclePartPtr;
-        const auto VehiclePartWidget = CreateWidget<UVehicleItemWidget>(GetWorld(), VehicleItemWidgetClass);
+        const auto VehiclePartWidget = CreateWidget<UVehicleUnitWidget>(GetWorld(), VehicleUnitWidgetClass);
         if (!VehiclePartWidget) continue;
         VehiclePartWidget->SetItemData(Part);
 

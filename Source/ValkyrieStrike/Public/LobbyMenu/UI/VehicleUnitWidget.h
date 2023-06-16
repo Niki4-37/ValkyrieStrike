@@ -5,14 +5,14 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "GameCoreTypes.h"
-#include "VehicleItemWidget.generated.h"
+#include "VehicleUnitWidget.generated.h"
 
 class UButton;
 class UImage;
 class UTextBlock;
 
 UCLASS()
-class VALKYRIESTRIKE_API UVehicleItemWidget : public UUserWidget
+class VALKYRIESTRIKE_API UVehicleUnitWidget : public UUserWidget
 {
     GENERATED_BODY()
 

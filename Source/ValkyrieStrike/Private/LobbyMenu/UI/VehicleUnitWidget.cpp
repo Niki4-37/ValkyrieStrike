@@ -1,12 +1,12 @@
 // Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 
-#include "LobbyMenu/UI/VehicleItemWidget.h"
+#include "LobbyMenu/UI/VehicleUnitWidget.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
 #include "LobbyMenu/LobbyPlayerController.h"
 
-void UVehicleItemWidget::SetItemData(const FVehicleItemData& Data)
+void UVehicleUnitWidget::SetItemData(const FVehicleItemData& Data)
 {
     ItemData = Data;
 
@@ -21,7 +21,7 @@ void UVehicleItemWidget::SetItemData(const FVehicleItemData& Data)
     }
 }
 
-void UVehicleItemWidget::SetItemData(const FVehicleConstructPart& Part)
+void UVehicleUnitWidget::SetItemData(const FVehicleConstructPart& Part)
 {
     ConstructPart = Part;
 
@@ -36,17 +36,17 @@ void UVehicleItemWidget::SetItemData(const FVehicleConstructPart& Part)
     }
 }
 
-void UVehicleItemWidget::NativeOnInitialized()
+void UVehicleUnitWidget::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
 
     if (ItemSelectButton)
     {
-        ItemSelectButton->OnClicked.AddDynamic(this, &UVehicleItemWidget::OnItemClicked);
+        ItemSelectButton->OnClicked.AddDynamic(this, &UVehicleUnitWidget::OnItemClicked);
     }
 }
 
-void UVehicleItemWidget::OnItemClicked()
+void UVehicleUnitWidget::OnItemClicked()
 {
     const auto LobbyPlayerController = Cast<ALobbyPlayerController>(GetOwningPlayer());
     if (!LobbyPlayerController) return;

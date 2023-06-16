@@ -35,7 +35,7 @@ protected:
     UHorizontalBox* SecondWeaponBox;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    TSubclassOf<UUserWidget> VehicleItemWidgetClass;
+    TSubclassOf<UUserWidget> VehicleUnitWidgetClass;
 
     virtual void NativeOnInitialized() override;
 
