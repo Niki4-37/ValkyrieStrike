@@ -27,7 +27,7 @@ public:
     UFUNCTION(Server, unreliable)
     void VehiclePartHasSelected_OnServer(const FVehicleConstructPart& VehicleConstructPart);
 
-    void SetLobbyVehicle(ADummyVehicle* Vehicle) { DummyVehicle = Vehicle; }
+    void SetLobbyVehicle(ADummyVehicle* Vehicle);
 
 protected:
     virtual void BeginPlay() override;

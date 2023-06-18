@@ -2,13 +2,41 @@
 
 #include "LobbyMenu/UI/VehicleConfigWidget.h"
 #include "Components/HorizontalBox.h"
+#include "Components/Border.h"
 #include "LobbyMenu/UI/VehicleUnitWidget.h"
+#include "LobbyMenu/UI/OneTypeUnitsSelectWidget.h"
+
+void UVehicleConfigWidget::SetStartParts()
+{
+    if (BodyPartsSelectWidget)
+    {
+        BodyPartsSelectWidget->SetStartPart();
+    }
+}
 
 void UVehicleConfigWidget::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
 
     checkf(VehicleUnitWidgetClass, TEXT("VehicleUnitWidgetClass not define!"));
+
+    if (BodyPartsSelectPosition)
+    {
+        BodyPartsSelectWidget = CreateWidget<UOneTypeUnitsSelectWidget>(GetWorld(), OneTypeUnitsSelectWidgetClass);
+        if (BodyPartsSelectWidget)
+        {
+            BodyPartsSelectPosition->AddChild(BodyPartsSelectWidget);
+        }
+    }
+
+    if (ChassisPartsSelectPosition)
+    {
+        ChassisPartsSelectWidget = CreateWidget<UOneTypeUnitsSelectWidget>(GetWorld(), OneTypeUnitsSelectWidgetClass);
+        if (ChassisPartsSelectWidget)
+        {
+            ChassisPartsSelectPosition->AddChild(ChassisPartsSelectWidget);
+        }
+    }
 
     InitVehicleConstructParts();
     InitVehicleItems();
@@ -27,7 +55,7 @@ void UVehicleConfigWidget::InitVehicleItems()
         const auto VehicleItem = *VehicleItemPtr;
         const auto VehicleUnitWidget = CreateWidget<UVehicleUnitWidget>(GetWorld(), VehicleUnitWidgetClass);
         if (!VehicleUnitWidget) continue;
-        VehicleUnitWidget->SetItemData(VehicleItem);
+        VehicleUnitWidget->SetUnitData(VehicleItem);
 
         if (VehicleItem.ItemType == EVehicleItemType::Turret)
         {
@@ -46,24 +74,19 @@ void UVehicleConfigWidget::InitVehicleConstructParts()
     TArray<FVehicleConstructPart*> PartsPtrs;
     VehicleConstructPartsTable->GetAllRows<FVehicleConstructPart>("", PartsPtrs);
 
-    if (!BodyBox || !ChassisBox) return;
-
     for (auto VehiclePartPtr : PartsPtrs)
     {
         if (!VehiclePartPtr) continue;
         const auto Part = *VehiclePartPtr;
-        const auto VehiclePartWidget = CreateWidget<UVehicleUnitWidget>(GetWorld(), VehicleUnitWidgetClass);
-        if (!VehiclePartWidget) continue;
-        VehiclePartWidget->SetItemData(Part);
 
-        if (Part.PartType == EVehicleConstructPartType::Body)
+        if (Part.PartType == EVehicleConstructPartType::Body && BodyPartsSelectWidget)
         {
-            BodyBox->AddChild(VehiclePartWidget);
+            BodyPartsSelectWidget->AddUnit(Part);
         }
 
-        if (Part.PartType == EVehicleConstructPartType::Chassis)
+        if (Part.PartType == EVehicleConstructPartType::Chassis && ChassisPartsSelectWidget)
         {
-            ChassisBox->AddChild(VehiclePartWidget);
+            ChassisPartsSelectWidget->AddUnit(Part);
         }
     }
 }

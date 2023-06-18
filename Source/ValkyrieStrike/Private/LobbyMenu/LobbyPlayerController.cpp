@@ -57,6 +57,13 @@ void ALobbyPlayerController::VehiclePartHasSelected_OnServer_Implementation(cons
     }
 }
 
+void ALobbyPlayerController::SetLobbyVehicle(ADummyVehicle* Vehicle)
+{
+    DummyVehicle = Vehicle;
+
+    GetHUD()->ShowHUD();
+}
+
 void ALobbyPlayerController::BeginPlay()
 {
     Super::BeginPlay();

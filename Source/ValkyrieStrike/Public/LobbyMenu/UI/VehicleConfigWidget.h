@@ -9,11 +9,16 @@
 
 class UButton;
 class UHorizontalBox;
+class UBorder;
+class UOneTypeUnitsSelectWidget;
 
 UCLASS()
 class VALKYRIESTRIKE_API UVehicleConfigWidget : public UUserWidget
 {
     GENERATED_BODY()
+
+public:
+    void SetStartParts();
 
 protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -23,10 +28,10 @@ protected:
     UDataTable* VehicleConstructPartsTable;
 
     UPROPERTY(meta = (BindWidget))
-    UHorizontalBox* BodyBox;
+    UBorder* BodyPartsSelectPosition;
 
     UPROPERTY(meta = (BindWidget))
-    UHorizontalBox* ChassisBox;
+    UBorder* ChassisPartsSelectPosition;
 
     UPROPERTY(meta = (BindWidget))
     UHorizontalBox* TurretBox;
@@ -37,9 +42,18 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     TSubclassOf<UUserWidget> VehicleUnitWidgetClass;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    TSubclassOf<UUserWidget> OneTypeUnitsSelectWidgetClass;
+
     virtual void NativeOnInitialized() override;
 
 private:
+    UPROPERTY()
+    UOneTypeUnitsSelectWidget* BodyPartsSelectWidget{nullptr};
+
+    UPROPERTY()
+    UOneTypeUnitsSelectWidget* ChassisPartsSelectWidget{nullptr};
+
     void InitVehicleItems();
     void InitVehicleConstructParts();
 };

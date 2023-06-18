@@ -8,7 +8,7 @@ void UInGameVehicleItemWidget::SetItemData(const FVehicleItemData& Data)
 {
     if (ItemImage)
     {
-        ItemImage->SetBrushFromSoftTexture(Data.ItemTumb);
+        ItemImage->SetBrushFromSoftTexture(Data.ItemThumb);
         ItemImage->SetBrushSize(FVector2D(100.f));
     }
 

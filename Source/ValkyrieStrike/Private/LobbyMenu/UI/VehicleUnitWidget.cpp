@@ -6,33 +6,40 @@
 #include "Components/Image.h"
 #include "LobbyMenu/LobbyPlayerController.h"
 
-void UVehicleUnitWidget::SetItemData(const FVehicleItemData& Data)
+void UVehicleUnitWidget::SetUnitData(const FVehicleItemData& Data)
 {
     ItemData = Data;
 
-    if (LevelNameTextBlock)
-    {
-        LevelNameTextBlock->SetText(FText::FromName(Data.ItemName));
-    }
-    if (ItemImage)
-    {
-        ItemImage->SetBrushFromTexture(Data.ItemTumb);
-        ItemImage->SetBrushSize(FVector2D(200.f));
-    }
+    InitDescription(FText::FromName(Data.ItemName), Data.ItemThumb);
 }
 
-void UVehicleUnitWidget::SetItemData(const FVehicleConstructPart& Part)
+void UVehicleUnitWidget::SetUnitData(const FVehicleConstructPart& Part)
 {
     ConstructPart = Part;
 
-    if (LevelNameTextBlock)
+    InitDescription(FText::FromString(Part.PartName), Part.PartThumb);
+}
+
+void UVehicleUnitWidget::FocusOnWidget()
+{
+    if (UnitSelectButton)
     {
-        LevelNameTextBlock->SetText(FText::FromString(Part.PartName));
+        UnitSelectButton->SetFocus();
     }
-    if (ItemImage)
+}
+
+void UVehicleUnitWidget::ApplyData()
+{
+    const auto LobbyPlayerController = Cast<ALobbyPlayerController>(GetOwningPlayer());
+    if (!LobbyPlayerController) return;
+
+    if (ItemData.ItemName != NAME_None)
     {
-        ItemImage->SetBrushFromTexture(Part.PartTumb);
-        ItemImage->SetBrushSize(FVector2D(200.f));
+        LobbyPlayerController->VehicleItemHasSelected_OnServer(ItemData);
+    }
+    else
+    {
+        LobbyPlayerController->VehiclePartHasSelected_OnServer(ConstructPart);
     }
 }
 
@@ -40,9 +47,10 @@ void UVehicleUnitWidget::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
 
-    if (ItemSelectButton)
+    if (UnitSelectButton)
     {
-        ItemSelectButton->OnClicked.AddDynamic(this, &UVehicleUnitWidget::OnItemClicked);
+        UnitSelectButton->SetIsEnabled(false);
+        // UnitSelectButton->OnClicked.AddDynamic(this, &UVehicleUnitWidget::OnItemClicked);
     }
 }
 
@@ -58,5 +66,18 @@ void UVehicleUnitWidget::OnItemClicked()
     else
     {
         LobbyPlayerController->VehiclePartHasSelected_OnServer(ConstructPart);
+    }
+}
+
+void UVehicleUnitWidget::InitDescription(FText UnitDescriptionText, UTexture2D* UnitThumb)
+{
+    if (UnitTextBlock)
+    {
+        UnitTextBlock->SetText(UnitDescriptionText);
+    }
+    if (UnitImage)
+    {
+        UnitImage->SetBrushFromTexture(UnitThumb);
+        UnitImage->SetBrushSize(FVector2D(200.f));
     }
 }

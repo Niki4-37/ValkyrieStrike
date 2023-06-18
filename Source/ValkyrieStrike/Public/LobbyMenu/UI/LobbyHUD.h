@@ -7,6 +7,8 @@
 #include "GameCoreTypes.h"
 #include "LobbyHUD.generated.h"
 
+class ULobbyHUDWidget;
+
 UCLASS()
 class VALKYRIESTRIKE_API ALobbyHUD : public AHUD
 {
@@ -21,7 +23,9 @@ protected:
     TSubclassOf<UUserWidget> LobbyHUDWidgetClass;
 
     virtual void BeginPlay() override;
+    virtual void ShowHUD() override;
 
 private:
-    UUserWidget* LobbyHUDWidget{nullptr};
+    UPROPERTY()
+    ULobbyHUDWidget* LobbyHUDWidget{nullptr};
 };

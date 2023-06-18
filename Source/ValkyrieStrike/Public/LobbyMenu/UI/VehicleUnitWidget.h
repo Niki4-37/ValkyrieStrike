@@ -17,18 +17,21 @@ class VALKYRIESTRIKE_API UVehicleUnitWidget : public UUserWidget
     GENERATED_BODY()
 
 public:
-    void SetItemData(const FVehicleItemData& Data);
-    void SetItemData(const FVehicleConstructPart& Part);
+    void SetUnitData(const FVehicleItemData& Data);
+    void SetUnitData(const FVehicleConstructPart& Part);
+
+    void FocusOnWidget();
+    void ApplyData();
 
 protected:
     UPROPERTY(meta = (BindWidget))
-    UButton* ItemSelectButton;
+    UButton* UnitSelectButton;
 
     UPROPERTY(meta = (BindWidget))
-    UTextBlock* LevelNameTextBlock;
+    UTextBlock* UnitTextBlock;
 
     UPROPERTY(meta = (BindWidget))
-    UImage* ItemImage = nullptr;
+    UImage* UnitImage = nullptr;
 
     virtual void NativeOnInitialized() override;
 
@@ -39,4 +42,6 @@ private:
 
     UFUNCTION()
     void OnItemClicked();
+
+    void InitDescription(FText UnitDescriptionText, UTexture2D* UnitThumb);
 };

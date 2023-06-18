@@ -11,6 +11,19 @@
 #include "LobbyMenu/LobbyPlayerController.h"
 #include "Kismet/KismetSystemLibrary.h"
 
+void ULobbyHUDWidget::SetStartParts()
+{
+    if (!VehicleConfigPosition) return;
+
+    for (const auto Child : VehicleConfigPosition->GetAllChildren())
+    {
+        const auto VehicleConfigWidget = Cast<UVehicleConfigWidget>(Child);
+        if (!VehicleConfigWidget) continue;
+        VehicleConfigWidget->SetStartParts();
+        break;
+    }
+}
+
 void ULobbyHUDWidget::NativeOnInitialized()
 {
     Super::NativeOnInitialized();

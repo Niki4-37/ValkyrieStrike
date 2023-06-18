@@ -101,7 +101,7 @@ struct FVehicleConstructPart : public FTableRowBase
     FString PartName;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    UTexture2D* PartTumb;
+    UTexture2D* PartThumb;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     UStaticMesh* PartMesh;
@@ -116,7 +116,7 @@ struct FVehicleItemData : public FTableRowBase
     FName ItemName{NAME_None};
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    UTexture2D* ItemTumb;
+    UTexture2D* ItemThumb;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     TSubclassOf<AActor> ItemClass;

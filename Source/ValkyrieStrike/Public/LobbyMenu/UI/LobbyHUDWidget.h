@@ -17,6 +17,9 @@ class VALKYRIESTRIKE_API ULobbyHUDWidget : public UUserWidget
 {
     GENERATED_BODY()
 
+public:
+    void SetStartParts();
+
 protected:
     UPROPERTY(meta = (BindWidget))
     UButton* BackButton;
