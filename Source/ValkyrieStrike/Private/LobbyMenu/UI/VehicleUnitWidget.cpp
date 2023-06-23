@@ -6,18 +6,11 @@
 #include "Components/Image.h"
 #include "LobbyMenu/LobbyPlayerController.h"
 
-void UVehicleUnitWidget::SetUnitData(const FVehicleItemData& Data)
+void UVehicleUnitWidget::SetUnitData(const FVehicleUnitData& Unit)
 {
-    ItemData = Data;
+    UnitData = Unit;
 
-    InitDescription(FText::FromName(Data.ItemName), Data.ItemThumb);
-}
-
-void UVehicleUnitWidget::SetUnitData(const FVehicleConstructPart& Part)
-{
-    ConstructPart = Part;
-
-    InitDescription(FText::FromString(Part.PartName), Part.PartThumb);
+    InitDescription(FText::FromString(Unit.UnitDescription), Unit.UnitThumb);
 }
 
 void UVehicleUnitWidget::FocusOnWidget()
@@ -33,14 +26,7 @@ void UVehicleUnitWidget::ApplyData()
     const auto LobbyPlayerController = Cast<ALobbyPlayerController>(GetOwningPlayer());
     if (!LobbyPlayerController) return;
 
-    if (ItemData.ItemName != NAME_None)
-    {
-        LobbyPlayerController->VehicleItemHasSelected_OnServer(ItemData);
-    }
-    else
-    {
-        LobbyPlayerController->VehiclePartHasSelected_OnServer(ConstructPart);
-    }
+    LobbyPlayerController->VehicleUnitHasSelected_OnServer(UnitData);
 }
 
 void UVehicleUnitWidget::NativeOnInitialized()
@@ -50,22 +36,6 @@ void UVehicleUnitWidget::NativeOnInitialized()
     if (UnitSelectButton)
     {
         UnitSelectButton->SetIsEnabled(false);
-        // UnitSelectButton->OnClicked.AddDynamic(this, &UVehicleUnitWidget::OnItemClicked);
-    }
-}
-
-void UVehicleUnitWidget::OnItemClicked()
-{
-    const auto LobbyPlayerController = Cast<ALobbyPlayerController>(GetOwningPlayer());
-    if (!LobbyPlayerController) return;
-
-    if (ItemData.ItemName != NAME_None)
-    {
-        LobbyPlayerController->VehicleItemHasSelected_OnServer(ItemData);
-    }
-    else
-    {
-        LobbyPlayerController->VehiclePartHasSelected_OnServer(ConstructPart);
     }
 }
 

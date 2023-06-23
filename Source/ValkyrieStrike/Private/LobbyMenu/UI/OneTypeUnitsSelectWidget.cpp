@@ -5,24 +5,13 @@
 #include "Components/WrapBox.h"
 #include "LobbyMenu/UI/VehicleUnitWidget.h"
 
-void UOneTypeUnitsSelectWidget::AddUnit(const FVehicleItemData& Item)
+void UOneTypeUnitsSelectWidget::AddUnit(const FVehicleUnitData& Unit)
 {
     if (!UnitsWrapBox) return;
 
     const auto VehicleUnitWidget = CreateWidget<UVehicleUnitWidget>(GetWorld(), VehicleUnitWidgetClass);
     if (!VehicleUnitWidget) return;
-    VehicleUnitWidget->SetUnitData(Item);
-    UnitsWrapBox->AddChild(VehicleUnitWidget);
-    TotalUnits = UnitsWrapBox->GetChildrenCount();
-}
-
-void UOneTypeUnitsSelectWidget::AddUnit(const FVehicleConstructPart& Part)
-{
-    if (!UnitsWrapBox) return;
-
-    const auto VehicleUnitWidget = CreateWidget<UVehicleUnitWidget>(GetWorld(), VehicleUnitWidgetClass);
-    if (!VehicleUnitWidget) return;
-    VehicleUnitWidget->SetUnitData(Part);
+    VehicleUnitWidget->SetUnitData(Unit);
     UnitsWrapBox->AddChild(VehicleUnitWidget);
     TotalUnits = UnitsWrapBox->GetChildrenCount();
 }
@@ -65,7 +54,7 @@ void UOneTypeUnitsSelectWidget::ToForwardUnit(bool bIsForward)
 {
     if (TotalUnits <= 0) return;
     CurrentUnitNum = (bIsForward ? ++CurrentUnitNum : --CurrentUnitNum) % TotalUnits;
-    
+
     if (CurrentUnitNum < 0)
     {
         CurrentUnitNum = TotalUnits - 1;

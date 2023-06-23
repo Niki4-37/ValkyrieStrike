@@ -9,19 +9,17 @@
 
 class UCameraComponent;
 
-UCLASS()
-class VALKYRIESTRIKE_API ADummyVehicle : public ADecorationActor
+DECLARE_DELEGATE_OneParam(FOnOperationDelegateSignature, const FVehicleUnitData&)
+
+    UCLASS() class VALKYRIESTRIKE_API ADummyVehicle : public ADecorationActor
 {
     GENERATED_BODY()
 
 public:
     ADummyVehicle();
 
-    UFUNCTION(Server, reliable)
-    void MountVehicleItem_OnSever(const FVehicleItemData& VehicleItemData);
-
-    UFUNCTION(Server, reliable)
-    void MountVehiclePart_OnServer(const FVehicleConstructPart& VehiclePart);
+    /* make RPC */
+    void MountVehicleUnit_OnServer(const FVehicleUnitData& UnitData);
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -30,13 +28,32 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     UStaticMeshComponent* ChassisMesh;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    FVehicleUnitData TestBodyUnit;
+
 private:
     UPROPERTY()
-    TMap<EVehicleItemType, AActor*> AttachedActorsMap;
+    // TMap<EVehicleUnitType, AActor*> AttachedActorsMap;
+    TMap<FName, AActor*> AttachedActorsMap;
 
-    UFUNCTION(NetMulticast, reliable)
-    void MountVehicleItem_Multicast(const FVehicleItemData& VehicleItemData);
+    TArray<FName> SocketNames;
 
-    UFUNCTION(NetMulticast, reliable)
-    void MountVehiclePart_Multicast(const FVehicleConstructPart& VehiclePart);
+    TMap<EVehicleUnitType, FOnOperationDelegateSignature> OperationMap;
+
+    UFUNCTION()
+    void MountArmor(const FVehicleUnitData& UnitData);
+    UFUNCTION()
+    void MountBody(const FVehicleUnitData& UnitData);
+    UFUNCTION()
+    void MountChassis(const FVehicleUnitData& UnitData);
+    UFUNCTION()
+    void MountWeapon(const FVehicleUnitData& UnitData);
+
+    void ConstructVehicle(UStaticMeshComponent* VehicleMeshComponent, const FVehicleUnitData& UnitData);
+
+    // UFUNCTION(NetMulticast, reliable)
+    // void MountVehicleItem_Multicast(const FVehicleItemData& VehicleItemData);
+
+    // UFUNCTION(NetMulticast, reliable)
+    // void MountVehiclePart_Multicast(const FVehicleConstructPart& VehiclePart);
 };

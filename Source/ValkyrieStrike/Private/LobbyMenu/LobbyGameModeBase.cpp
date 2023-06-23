@@ -23,8 +23,6 @@ void ALobbyGameModeBase::InitGame(const FString& MapName, const FString& Options
     Super::InitGame(MapName, Options, ErrorMessage);
 
     checkf(DummyVehicleClass, TEXT("DummyVehicleClass not define!"));
-    checkf(DummyVehicleDafaultBody.PartMesh, TEXT("DummyVehicleBody not define!"));
-    checkf(DummyVehicleDefaultChassis.PartMesh, TEXT("DummyVehicleChassis not define!"));
 
     for (const auto& FoundActor : TActorRange<APlayerStart>(GetWorld()))
     {
@@ -69,16 +67,12 @@ void ALobbyGameModeBase::SpawnLobbyVehicle(APlayerStart* Position, APlayerContro
     if (!Position || !Controller) return;
 
     FTransform SpawnTransform = Position->GetActorTransform();
-    auto VehicleActor = GetWorld()->SpawnActorDeferred<ADummyVehicle>(DummyVehicleClass, SpawnTransform);
+    auto VehicleActor = GetWorld()->SpawnActor<ADummyVehicle>(DummyVehicleClass, SpawnTransform);
     if (!VehicleActor)
     {
         GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Orange, "Can't find Empty Position");
         return;
     }
-    // VehicleActor->SetupDecoration(DummyVehicleMesh);
-    VehicleActor->MountVehiclePart_OnServer(DummyVehicleDafaultBody);
-    VehicleActor->MountVehiclePart_OnServer(DummyVehicleDefaultChassis);
-    VehicleActor->FinishSpawning(SpawnTransform);
 
     const auto LobbyPlayerController = Cast<ALobbyPlayerController>(Controller);
     if (LobbyPlayerController)

@@ -1,24 +1,23 @@
 // Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 
 #include "LobbyMenu/UI/VehicleConfigWidget.h"
-#include "Components/HorizontalBox.h"
 #include "Components/Border.h"
-#include "LobbyMenu/UI/VehicleUnitWidget.h"
 #include "LobbyMenu/UI/OneTypeUnitsSelectWidget.h"
 
 void UVehicleConfigWidget::SetStartParts()
 {
-    if (BodyPartsSelectWidget)
-    {
-        BodyPartsSelectWidget->SetStartPart();
-    }
+    // make checking
+    BodyPartsSelectWidget->SetStartPart();
+    ChassisPartsSelectWidget->SetStartPart();
+    TurretsSelectWidget->SetStartPart();
+    SecondWeaponSelectWidget->SetStartPart();
 }
 
 void UVehicleConfigWidget::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
 
-    checkf(VehicleUnitWidgetClass, TEXT("VehicleUnitWidgetClass not define!"));
+    checkf(OneTypeUnitsSelectWidgetClass, TEXT("OneTypeUnitsSelectWidgetClass not define!"));
 
     if (BodyPartsSelectPosition)
     {
@@ -38,55 +37,54 @@ void UVehicleConfigWidget::NativeOnInitialized()
         }
     }
 
-    InitVehicleConstructParts();
-    InitVehicleItems();
-}
-
-void UVehicleConfigWidget::InitVehicleItems()
-{
-    TArray<FVehicleItemData*> ItemPtrs;
-    VehicleItemsTable->GetAllRows<FVehicleItemData>("", ItemPtrs);
-
-    if (!TurretBox || !SecondWeaponBox) return;
-
-    for (auto VehicleItemPtr : ItemPtrs)
+    if (TurretsSelectPosition)
     {
-        if (!VehicleItemPtr) continue;
-        const auto VehicleItem = *VehicleItemPtr;
-        const auto VehicleUnitWidget = CreateWidget<UVehicleUnitWidget>(GetWorld(), VehicleUnitWidgetClass);
-        if (!VehicleUnitWidget) continue;
-        VehicleUnitWidget->SetUnitData(VehicleItem);
-
-        if (VehicleItem.ItemType == EVehicleItemType::Turret)
+        TurretsSelectWidget = CreateWidget<UOneTypeUnitsSelectWidget>(GetWorld(), OneTypeUnitsSelectWidgetClass);
+        if (TurretsSelectWidget)
         {
-            TurretBox->AddChild(VehicleUnitWidget);
-        }
-
-        if (VehicleItem.ItemType == EVehicleItemType::SecondWeapon)
-        {
-            SecondWeaponBox->AddChild(VehicleUnitWidget);
+            TurretsSelectPosition->AddChild(TurretsSelectWidget);
         }
     }
+
+    if (SecondWeaponSelectPosition)
+    {
+        SecondWeaponSelectWidget = CreateWidget<UOneTypeUnitsSelectWidget>(GetWorld(), OneTypeUnitsSelectWidgetClass);
+        if (SecondWeaponSelectWidget)
+        {
+            SecondWeaponSelectPosition->AddChild(SecondWeaponSelectWidget);
+        }
+    }
+
+    InitVehicleUnits();
 }
 
-void UVehicleConfigWidget::InitVehicleConstructParts()
+void UVehicleConfigWidget::InitVehicleUnits()
 {
-    TArray<FVehicleConstructPart*> PartsPtrs;
-    VehicleConstructPartsTable->GetAllRows<FVehicleConstructPart>("", PartsPtrs);
+    TArray<FVehicleUnitData*> UntsPtrs;
+    VehicleUnitsTable->GetAllRows<FVehicleUnitData>("", UntsPtrs);
 
-    for (auto VehiclePartPtr : PartsPtrs)
+    for (auto VehicleUnitPtr : UntsPtrs)
     {
-        if (!VehiclePartPtr) continue;
-        const auto Part = *VehiclePartPtr;
+        if (!VehicleUnitPtr) continue;
 
-        if (Part.PartType == EVehicleConstructPartType::Body && BodyPartsSelectWidget)
+        if (VehicleUnitPtr->UnitType == EVehicleUnitType::Body && BodyPartsSelectWidget)
         {
-            BodyPartsSelectWidget->AddUnit(Part);
+            BodyPartsSelectWidget->AddUnit(*VehicleUnitPtr);
         }
 
-        if (Part.PartType == EVehicleConstructPartType::Chassis && ChassisPartsSelectWidget)
+        if (VehicleUnitPtr->UnitType == EVehicleUnitType::Chassis && ChassisPartsSelectWidget)
         {
-            ChassisPartsSelectWidget->AddUnit(Part);
+            ChassisPartsSelectWidget->AddUnit(*VehicleUnitPtr);
+        }
+
+        if (VehicleUnitPtr->UnitType == EVehicleUnitType::Turret && TurretsSelectWidget)
+        {
+            TurretsSelectWidget->AddUnit(*VehicleUnitPtr);
+        }
+
+        if (VehicleUnitPtr->UnitType == EVehicleUnitType::SecondWeapon && SecondWeaponSelectWidget)
+        {
+            SecondWeaponSelectWidget->AddUnit(*VehicleUnitPtr);
         }
     }
 }

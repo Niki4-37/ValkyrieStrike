@@ -17,8 +17,7 @@ class VALKYRIESTRIKE_API UVehicleUnitWidget : public UUserWidget
     GENERATED_BODY()
 
 public:
-    void SetUnitData(const FVehicleItemData& Data);
-    void SetUnitData(const FVehicleConstructPart& Part);
+    void SetUnitData(const FVehicleUnitData& Unit);
 
     void FocusOnWidget();
     void ApplyData();
@@ -36,12 +35,7 @@ protected:
     virtual void NativeOnInitialized() override;
 
 private:
-    FVehicleItemData ItemData;
-
-    FVehicleConstructPart ConstructPart;
-
-    UFUNCTION()
-    void OnItemClicked();
+    FVehicleUnitData UnitData;
 
     void InitDescription(FText UnitDescriptionText, UTexture2D* UnitThumb);
 };

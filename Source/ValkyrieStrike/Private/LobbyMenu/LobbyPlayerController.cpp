@@ -36,24 +36,11 @@ void ALobbyPlayerController::GoToMainMenu()
     }
 }
 
-void ALobbyPlayerController::VehicleItemHasSelected_OnServer_Implementation(const FVehicleItemData& VehicleItemData)
+void ALobbyPlayerController::VehicleUnitHasSelected_OnServer_Implementation(const FVehicleUnitData& VehicleUnit)
 {
     if (DummyVehicle)
     {
-        DummyVehicle->MountVehicleItem_OnSever(VehicleItemData);
-    }
-
-    if (const auto ValkyriePlayerState = GetPlayerState<AValkyriePlayerState>())
-    {
-        ValkyriePlayerState->SaveMountedItem(VehicleItemData);
-    }
-}
-
-void ALobbyPlayerController::VehiclePartHasSelected_OnServer_Implementation(const FVehicleConstructPart& VehicleConstructPart)
-{
-    if (DummyVehicle)
-    {
-        DummyVehicle->MountVehiclePart_OnServer(VehicleConstructPart);
+        DummyVehicle->MountVehicleUnit_OnServer(VehicleUnit);
     }
 }
 
@@ -61,7 +48,10 @@ void ALobbyPlayerController::SetLobbyVehicle(ADummyVehicle* Vehicle)
 {
     DummyVehicle = Vehicle;
 
-    GetHUD()->ShowHUD();
+    if (IsLocalController())
+    {
+        GetHUD()->ShowHUD();
+    }
 }
 
 void ALobbyPlayerController::BeginPlay()

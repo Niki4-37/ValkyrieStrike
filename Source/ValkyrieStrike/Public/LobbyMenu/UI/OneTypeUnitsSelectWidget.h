@@ -16,8 +16,7 @@ class VALKYRIESTRIKE_API UOneTypeUnitsSelectWidget : public UUserWidget
     GENERATED_BODY()
 
 public:
-    void AddUnit(const FVehicleItemData& Item);
-    void AddUnit(const FVehicleConstructPart& Part);
+    void AddUnit(const FVehicleUnitData& Unit);
 
     void SetStartPart();
 

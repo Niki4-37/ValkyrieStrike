@@ -7,8 +7,6 @@
 #include "GameCoreTypes.h"
 #include "VehicleConfigWidget.generated.h"
 
-class UButton;
-class UHorizontalBox;
 class UBorder;
 class UOneTypeUnitsSelectWidget;
 
@@ -22,10 +20,7 @@ public:
 
 protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    UDataTable* VehicleItemsTable;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    UDataTable* VehicleConstructPartsTable;
+    UDataTable* VehicleUnitsTable;
 
     UPROPERTY(meta = (BindWidget))
     UBorder* BodyPartsSelectPosition;
@@ -34,13 +29,10 @@ protected:
     UBorder* ChassisPartsSelectPosition;
 
     UPROPERTY(meta = (BindWidget))
-    UHorizontalBox* TurretBox;
+    UBorder* TurretsSelectPosition;
 
     UPROPERTY(meta = (BindWidget))
-    UHorizontalBox* SecondWeaponBox;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    TSubclassOf<UUserWidget> VehicleUnitWidgetClass;
+    UBorder* SecondWeaponSelectPosition;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     TSubclassOf<UUserWidget> OneTypeUnitsSelectWidgetClass;
@@ -48,12 +40,19 @@ protected:
     virtual void NativeOnInitialized() override;
 
 private:
+    TMap<EVehicleUnitType, UOneTypeUnitsSelectWidget*> UnitSelectWidgetsMap;
+
     UPROPERTY()
     UOneTypeUnitsSelectWidget* BodyPartsSelectWidget{nullptr};
 
     UPROPERTY()
     UOneTypeUnitsSelectWidget* ChassisPartsSelectWidget{nullptr};
 
-    void InitVehicleItems();
-    void InitVehicleConstructParts();
+    UPROPERTY()
+    UOneTypeUnitsSelectWidget* TurretsSelectWidget{nullptr};
+
+    UPROPERTY()
+    UOneTypeUnitsSelectWidget* SecondWeaponSelectWidget{nullptr};
+
+    void InitVehicleUnits();
 };

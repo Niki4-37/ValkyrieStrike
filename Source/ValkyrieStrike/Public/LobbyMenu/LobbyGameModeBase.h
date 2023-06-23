@@ -27,12 +27,6 @@ public:
     virtual void Logout(AController* Exiting);
 
 protected:
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    FVehicleConstructPart DummyVehicleDafaultBody;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    FVehicleConstructPart DummyVehicleDefaultChassis;
-
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     TSubclassOf<ADummyVehicle> DummyVehicleClass;
 

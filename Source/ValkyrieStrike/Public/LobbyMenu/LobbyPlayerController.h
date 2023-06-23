@@ -21,11 +21,8 @@ public:
 
     FOnMenuStateChangedSignature OnMenuStateChanged;
 
-    UFUNCTION(Server, reliable)
-    void VehicleItemHasSelected_OnServer(const FVehicleItemData& VehicleItemData);
-
     UFUNCTION(Server, unreliable)
-    void VehiclePartHasSelected_OnServer(const FVehicleConstructPart& VehicleConstructPart);
+    void VehicleUnitHasSelected_OnServer(const FVehicleUnitData& VehicleUnit);
 
     void SetLobbyVehicle(ADummyVehicle* Vehicle);
 

@@ -31,6 +31,28 @@ enum class EVehicleItemType : uint8
 };
 
 UENUM(BlueprintType)
+enum class EVehicleUnitType : uint8
+{
+    Body,
+    Chassis,
+    Turret,
+    SecondWeapon,
+    Armor,
+    NoType,
+
+    Begin = Body    UMETA(Hidden),
+    End = NoType    UMETA(Hidden)
+};
+
+UENUM(BlueprintType)
+enum class EUnitComponentType : uint8
+{
+    Platform,
+    Gun,
+    Other
+};
+
+UENUM(BlueprintType)
 enum class EItemPropertyType : uint8
 {
     Ammo,
@@ -59,6 +81,11 @@ static EItemPropertyType& operator++(EItemPropertyType& EType)
 {
     EType = EItemPropertyType(static_cast<std::underlying_type<EItemPropertyType>::type>(EType) + 1);
     return EType;
+}
+
+static EVehicleUnitType& operator++(EVehicleUnitType& EType)
+{
+    EType = EVehicleUnitType(static_cast<std::underlying_type<EVehicleUnitType>::type>(EType) + 1);
 }
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnMenuStateChangedSignature, EMenuState);
@@ -134,10 +161,58 @@ struct FVehicleItemData : public FTableRowBase
     float ReloadingTime{2.f};
 };
 
+USTRUCT(BlueprintType)
+struct FUnitComponent
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    EUnitComponentType ComponentType;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    UStaticMesh* UnitComponentMesh;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    FName SocketName;
+};
+
+USTRUCT(BlueprintType)
+struct FVehicleUnitData : public FTableRowBase
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    EVehicleUnitType UnitType;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    FString UnitDescription;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    UTexture2D* UnitThumb;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    TSubclassOf<AActor> UnitSpawnClass;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    TArray<FUnitComponent> UnitComponents;
+
+    UPROPERTY(EditDefaultsONly, BlueprintReadWrite)
+    bool bIsLocked{false};
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    int32 UnitMaxValue{10};
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    float ExecutionTime{2.f};
+};
+
 DECLARE_MULTICAST_DELEGATE(FOnDeathSignature);
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnItemValueChangedSignature, EItemPropertyType, float, float);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnItemMountSignature, const FVehicleItemData&);
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnUnitMountSignature, const FVehicleUnitData&);
+
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnChangeAmmoSignature, EVehicleItemType, int32);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnOnStartReloadingSignature, EVehicleItemType);
 
