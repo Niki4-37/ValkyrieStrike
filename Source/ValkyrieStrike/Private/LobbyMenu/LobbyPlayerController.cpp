@@ -40,15 +40,23 @@ void ALobbyPlayerController::VehicleUnitHasSelected_OnServer_Implementation(cons
 {
     if (DummyVehicle)
     {
-        DummyVehicle->MountVehicleUnit_OnServer(VehicleUnit);
+        DummyVehicle->MountVehicleUnit(VehicleUnit);
+    }
+
+    if (const auto ValkyriePlayerState = GetPlayerState<AValkyriePlayerState>())
+    {
+        // ValkyriePlayerState->RememberChoise(VehicleUnit);
     }
 }
 
 void ALobbyPlayerController::SetLobbyVehicle(ADummyVehicle* Vehicle)
 {
     DummyVehicle = Vehicle;
+}
 
-    if (IsLocalController())
+void ALobbyPlayerController::UpdateVehicleConfig_Client_Implementation()
+{
+    if (GetHUD())
     {
         GetHUD()->ShowHUD();
     }

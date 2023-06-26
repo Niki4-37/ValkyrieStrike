@@ -20,7 +20,7 @@ void UOneTypeUnitsSelectWidget::SetStartPart()
 {
     if (!UnitsWrapBox || UnitsWrapBox->GetChildrenCount() <= 0) return;
 
-    const auto FirstUnitWidget = Cast<UVehicleUnitWidget>(UnitsWrapBox->GetChildAt(0));
+    const auto FirstUnitWidget = Cast<UVehicleUnitWidget>(UnitsWrapBox->GetChildAt(CurrentUnitNum));
     if (!FirstUnitWidget) return;
     FirstUnitWidget->FocusOnWidget();
     FirstUnitWidget->ApplyData();

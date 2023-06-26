@@ -27,3 +27,8 @@ void ADecorationActor::BeginPlay()
 {
     Super::BeginPlay();
 }
+
+void ADecorationActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    Super::EndPlay(EndPlayReason);
+}

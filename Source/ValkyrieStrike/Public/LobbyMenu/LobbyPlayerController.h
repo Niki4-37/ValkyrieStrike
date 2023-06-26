@@ -26,6 +26,9 @@ public:
 
     void SetLobbyVehicle(ADummyVehicle* Vehicle);
 
+    UFUNCTION(Client, unreliable)
+    void UpdateVehicleConfig_Client();
+
 protected:
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

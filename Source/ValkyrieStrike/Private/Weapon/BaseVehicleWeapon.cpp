@@ -9,8 +9,12 @@ ABaseVehicleWeapon::ABaseVehicleWeapon()
 
     Platform = CreateDefaultSubobject<UStaticMeshComponent>("Platform");
     SetRootComponent(Platform);
+    Platform->SetMobility(EComponentMobility::Movable);
+    Platform->SetIsReplicated(true);
 
     Gun = CreateDefaultSubobject<UStaticMeshComponent>("Gun");
+    Gun->SetMobility(EComponentMobility::Movable);
+    Gun->SetIsReplicated(true);
 }
 
 void ABaseVehicleWeapon::SetStaticMesh(EUnitComponentType Type, UStaticMesh* NewMesh, FName SocketName)
@@ -30,6 +34,8 @@ void ABaseVehicleWeapon::SetStaticMesh(EUnitComponentType Type, UStaticMesh* New
         {
             auto ExtraSMComponent = NewObject<UStaticMeshComponent>(this, UStaticMeshComponent::StaticClass());
             if (!ExtraSMComponent) return;
+            ExtraSMComponent->SetMobility(EComponentMobility::Movable);
+            ExtraSMComponent->SetIsReplicated(true);
             FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
             ExtraSMComponent->RegisterComponent();
             ExtraSMComponent->AttachToComponent(Gun, AttachmentRules, SocketName);

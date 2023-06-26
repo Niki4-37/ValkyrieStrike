@@ -18,8 +18,7 @@ DECLARE_DELEGATE_OneParam(FOnOperationDelegateSignature, const FVehicleUnitData&
 public:
     ADummyVehicle();
 
-    /* make RPC */
-    void MountVehicleUnit_OnServer(const FVehicleUnitData& UnitData);
+    void MountVehicleUnit(const FVehicleUnitData& UnitData);
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -31,9 +30,10 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     FVehicleUnitData TestBodyUnit;
 
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 private:
     UPROPERTY()
-    // TMap<EVehicleUnitType, AActor*> AttachedActorsMap;
     TMap<FName, AActor*> AttachedActorsMap;
 
     TArray<FName> SocketNames;
@@ -44,16 +44,10 @@ private:
     void MountArmor(const FVehicleUnitData& UnitData);
     UFUNCTION()
     void MountBody(const FVehicleUnitData& UnitData);
-    UFUNCTION()
-    void MountChassis(const FVehicleUnitData& UnitData);
+    UFUNCTION(NetMulticast, unreliable)
+    void MountChassis_Multicast(const FVehicleUnitData& UnitData);
     UFUNCTION()
     void MountWeapon(const FVehicleUnitData& UnitData);
 
     void ConstructVehicle(UStaticMeshComponent* VehicleMeshComponent, const FVehicleUnitData& UnitData);
-
-    // UFUNCTION(NetMulticast, reliable)
-    // void MountVehicleItem_Multicast(const FVehicleItemData& VehicleItemData);
-
-    // UFUNCTION(NetMulticast, reliable)
-    // void MountVehiclePart_Multicast(const FVehicleConstructPart& VehiclePart);
 };

@@ -78,5 +78,6 @@ void ALobbyGameModeBase::SpawnLobbyVehicle(APlayerStart* Position, APlayerContro
     if (LobbyPlayerController)
     {
         LobbyPlayerController->SetLobbyVehicle(VehicleActor);
+        LobbyPlayerController->UpdateVehicleConfig_Client();
     }
 }
