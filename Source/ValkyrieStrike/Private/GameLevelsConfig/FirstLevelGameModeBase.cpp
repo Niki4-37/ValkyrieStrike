@@ -4,7 +4,7 @@
 #include "Player/VehiclePlayerController.h"
 #include "GameLevelsConfig/ValkyriePlayerState.h"
 #include "UI/GameHUD.h"
-#include "Player/DefaultWeeledVehicle.h"
+#include "Player/ModularVehicleBase.h"
 #include "EngineUtils.h"
 #include "GameFramework/PlayerStart.h"
 
@@ -16,7 +16,7 @@ AFirstLevelGameModeBase::AFirstLevelGameModeBase()
     PlayerControllerClass = AVehiclePlayerController::StaticClass();
     PlayerStateClass = AValkyriePlayerState::StaticClass();
     HUDClass = AGameHUD::StaticClass();
-    DefaultPawnClass = ADefaultWeeledVehicle::StaticClass();
+    DefaultPawnClass = AModularVehicleBase::StaticClass();
 }
 
 void AFirstLevelGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
@@ -46,6 +46,20 @@ AActor* AFirstLevelGameModeBase::ChoosePlayerStart_Implementation(AController* P
     }
 
     return Super::ChoosePlayerStart_Implementation(Player);
+}
+
+UClass* AFirstLevelGameModeBase::GetDefaultPawnClassForController_Implementation(AController* InController)
+{
+    if (const auto ValkyriePlayerState = InController->GetPlayerState<AValkyriePlayerState>())
+    {
+        const auto SpawnClassPtr = ValkyriePlayerState->GetVehicleUnits().FindByPredicate([](const FVehicleUnitData& Data) { return Data.UnitType == EVehicleUnitType::Chassis; });
+        if (SpawnClassPtr && SpawnClassPtr->UnitSpawnClass)
+        {
+            return SpawnClassPtr->UnitSpawnClass;
+        }
+    }
+
+    return Super::GetDefaultPawnClassForController_Implementation(InController);
 }
 
 void AFirstLevelGameModeBase::RestartPlayer(AController* NewPlayer)

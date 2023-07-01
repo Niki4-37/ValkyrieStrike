@@ -32,14 +32,14 @@ bool UWeaponComponent::AddAmmo(int32 Amount)
 
 void UWeaponComponent::InitWeapons_OnServer_Implementation()
 {
-    //if (!GetOwner() || !GetOwner()->GetInstigatorController()) return;
-    //const auto PlayerState = GetOwner()->GetInstigatorController()->GetPlayerState<AValkyriePlayerState>();
+    // if (!GetOwner() || !GetOwner()->GetInstigatorController()) return;
+    // const auto PlayerState = GetOwner()->GetInstigatorController()->GetPlayerState<AValkyriePlayerState>();
 
-    //if (!PlayerState || PlayerState->GetVehicleItems().Num() == 0) return;
+    // if (!PlayerState || PlayerState->GetVehicleItems().Num() == 0) return;
 
-    //for (auto& VehicleItem : PlayerState->GetVehicleItems())
+    // for (auto& VehicleItem : PlayerState->GetVehicleItems())
     //{
-    //    if (!VehicleItem.ItemClass) continue;
+    //     if (!VehicleItem.ItemClass) continue;
 
     //    FString EnumNameString{UEnum::GetValueAsName(VehicleItem.ItemType).ToString()};
     //    int32 ScopeIndex = EnumNameString.Find(TEXT("::"), ESearchCase::CaseSensitive);
@@ -70,28 +70,28 @@ void UWeaponComponent::InitWeapons_OnServer_Implementation()
     //}
 
     /* used in game level for debug */
-     if (TurretData.ItemClass)
+    if (TurretData.ItemClass)
     {
-         VehicleTurret = MountWeapon<ATurret>(TurretData.ItemClass, TurretSocketName);
-         if (VehicleTurret)
-         {
-             VehicleTurret->SetupWeapon(TurretData.MaxAmmoCapacity, TurretData.ReloadingTime);
-             VehicleTurret->OnChangeAmmoInWeapon.AddUObject(this, &UWeaponComponent::OnChangeAmmo_Client);
-             VehicleTurret->OnStartWeaponReloading.AddUObject(this, &UWeaponComponent::OnStartReloading_Client);
-             OnItemMount_Client(TurretData);
-         }
-     }
-     if (SecondWeaponData.ItemClass)
+        VehicleTurret = MountWeapon<ATurret>(TurretData.ItemClass, TurretSocketName);
+        if (VehicleTurret)
+        {
+            VehicleTurret->SetupWeapon(TurretData.MaxAmmoCapacity, TurretData.ReloadingTime);
+            VehicleTurret->OnChangeAmmoInWeapon.AddUObject(this, &UWeaponComponent::OnChangeAmmo_Client);
+            VehicleTurret->OnStartWeaponReloading.AddUObject(this, &UWeaponComponent::OnStartReloading_Client);
+            OnItemMount_Client(TurretData);
+        }
+    }
+    if (SecondWeaponData.ItemClass)
     {
-         SecondWeapon = MountWeapon<ASecondWeapon>(SecondWeaponData.ItemClass, SecondWeaponSocketName);
-         if (SecondWeapon)
-         {
-             SecondWeapon->SetupWeapon(SecondWeaponData.MaxAmmoCapacity, SecondWeaponData.ReloadingTime);
-             SecondWeapon->OnChangeAmmoInWeapon.AddUObject(this, &UWeaponComponent::OnChangeAmmo_Client);
-             SecondWeapon->OnStartWeaponReloading.AddUObject(this, &UWeaponComponent::OnStartReloading_Client);
-             OnItemMount_Client(SecondWeaponData);
-         }
-     }
+        SecondWeapon = MountWeapon<ASecondWeapon>(SecondWeaponData.ItemClass, SecondWeaponSocketName);
+        if (SecondWeapon)
+        {
+            SecondWeapon->SetupWeapon(SecondWeaponData.MaxAmmoCapacity, SecondWeaponData.ReloadingTime);
+            SecondWeapon->OnChangeAmmoInWeapon.AddUObject(this, &UWeaponComponent::OnChangeAmmo_Client);
+            SecondWeapon->OnStartWeaponReloading.AddUObject(this, &UWeaponComponent::OnStartReloading_Client);
+            OnItemMount_Client(SecondWeaponData);
+        }
+    }
     /* end debug */
 
     if (VehicleTurret && !VehicleTurret->Controller)
@@ -105,12 +105,12 @@ void UWeaponComponent::UpdateWidgets()
     if (!GetOwner() || !GetOwner()->GetInstigatorController()) return;
     const auto PlayerState = GetOwner()->GetInstigatorController()->GetPlayerState<AValkyriePlayerState>();
 
-    if (!PlayerState || PlayerState->GetVehicleItems().Num() == 0) return;
+    // if (!PlayerState || PlayerState->GetVehicleItems().Num() == 0) return;
 
-    for (auto& VehicleItem : PlayerState->GetVehicleItems())
-    {
-        OnItemMount_Client(VehicleItem);
-    }
+    // for (auto& VehicleItem : PlayerState->GetVehicleItems())
+    //{
+    //     OnItemMount_Client(VehicleItem);
+    // }
 }
 
 void UWeaponComponent::BeginPlay()

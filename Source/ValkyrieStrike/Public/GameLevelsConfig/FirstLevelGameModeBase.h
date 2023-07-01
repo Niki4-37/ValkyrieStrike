@@ -20,6 +20,7 @@ public:
     virtual void HandleSeamlessTravelPlayer(AController*& C) override;
 
     virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
+    virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
 
     virtual void RestartPlayer(AController* NewPlayer) override;
 

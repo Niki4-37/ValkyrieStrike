@@ -16,7 +16,7 @@ public:
     UWheelManagerComponent();
 
     void SetWheelsGroups(TArray<FWheelsGroup>& InWheelGroups) { WheelsGroups = InWheelGroups; }
-    void SetControlInput(float Value) { ControlInput = Value; }
+    void SetControlInput(float Value);
     float GetWheelDefultDistance() const { return WheelDefaultDistance; }
 
     bool GetVelocityAverage(FVector& VelocityAverage) const;

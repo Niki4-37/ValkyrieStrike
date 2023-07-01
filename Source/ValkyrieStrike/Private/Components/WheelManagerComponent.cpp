@@ -8,6 +8,11 @@ UWheelManagerComponent::UWheelManagerComponent()
     PrimaryComponentTick.bCanEverTick = true;
 }
 
+void UWheelManagerComponent::SetControlInput(float Value)
+{
+    ControlInput = Value;
+}
+
 bool UWheelManagerComponent::GetVelocityAverage(FVector& VelocityAverage) const
 {
     FVector VelocityCache{FVector::ZeroVector};
@@ -67,13 +72,10 @@ bool UWheelManagerComponent::WheelSphereTrace(const FWheelData& Wheel, FHitResul
 void UWheelManagerComponent::ManageWheels()
 {
     bIsWheelContact = false;
-    // use for each loop
-    // for (int WheelsGroupIndex = 0; WheelsGroupIndex < WheelsGroups.Num(); ++WheelsGroupIndex)
     if (!WheelsGroups.Num()) return;
     for (auto& WheelGroup : WheelsGroups)
     {
         ComputeWeelGroup(WheelGroup);
-        // ComputeWeelGroup(WheelsGroupIndex, WheelsGroups[WheelsGroupIndex]);
     }
 }
 

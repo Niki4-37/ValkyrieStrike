@@ -11,7 +11,6 @@
 class UCameraComponent;
 class USpringArmComponent;
 class UWheelManagerComponent;
-class USkeletalMeshComponent;
 class UWeaponComponent;
 class UVehicleIndicatorsComponent;
 class UWorkshopComponent;
@@ -25,14 +24,11 @@ public:
     AModularVehicleBase();
 
 protected:
-    // UPROPERTY(VisibleDefaultsOnly)
-    // USceneComponent* PawnRootComponent;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    USkeletalMeshComponent* Chassis;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     UStaticMeshComponent* VehicleBody;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    USkeletalMeshComponent* Chassis;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     USpringArmComponent* SpringArm;
@@ -81,6 +77,26 @@ private:
     float SmoothTurnValue;
     float PawnDeltaTime;
 
+    float MoveForvardAxis;
+    float MoveSideAxis;
+
     void MoveForward(float Amount);
     void MoveRight(float Value);
+
+    void WheelsTurn();
+
+    /* replicates movement */
+    FTimerHandle DataTickTimer;
+    UFUNCTION(NetMulticast, unreliable)
+    void SendDataTick_Multicast();
+    UFUNCTION(Server, unreliable)
+    void SendMoveControls_Server(float InMoveForvardAxis, float InMoveSideAxis, float InSmoothTurnValue);
+    UFUNCTION(NetMulticast, unreliable)
+    void SendMoveControls_Multicast(float InMoveForvardAxis, float InMoveSideAxis, float InSmoothTurnValue);
+
+    UFUNCTION(Server, reliable)
+    void SetStaticMesh_OnServer(UStaticMesh* NewMesh);
+
+    UFUNCTION(NetMulticast, reliable)
+    void SetStaticMesh_Multcast(UStaticMesh* NewMesh);
 };

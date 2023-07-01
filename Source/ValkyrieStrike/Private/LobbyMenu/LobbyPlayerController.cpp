@@ -45,7 +45,7 @@ void ALobbyPlayerController::VehicleUnitHasSelected_OnServer_Implementation(cons
 
     if (const auto ValkyriePlayerState = GetPlayerState<AValkyriePlayerState>())
     {
-        // ValkyriePlayerState->RememberChoise(VehicleUnit);
+        ValkyriePlayerState->SaveMountedUnit(VehicleUnit);
     }
 }
 

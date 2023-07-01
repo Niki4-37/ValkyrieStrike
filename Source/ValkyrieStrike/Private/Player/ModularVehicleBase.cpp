@@ -10,26 +10,26 @@
 #include "Components/BoxComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "GameLevelsConfig/ValkyriePlayerState.h"
+
+#include "Engine.h"
 
 AModularVehicleBase::AModularVehicleBase()
 {
     PrimaryActorTick.bCanEverTick = true;
     bReplicates = true;
 
-    // PawnRootComponent = CreateDefaultSubobject<USceneComponent>("PawnRootComponent");
-    // SetRootComponent(PawnRootComponent);
+    Chassis = CreateDefaultSubobject<USkeletalMeshComponent>("Chassis");
+    Chassis->BodyInstance.bSimulatePhysics = true;
+    SetRootComponent(Chassis);
 
     VehicleBody = CreateDefaultSubobject<UStaticMeshComponent>("VehicleBody");
-    // VehicleBody->SetupAttachment(RootComponent);
-    SetRootComponent(VehicleBody);
+    VehicleBody->SetupAttachment(RootComponent, "Root_bone");
     VehicleBody->SetCanEverAffectNavigation(false);
     VehicleBody->SetMobility(EComponentMobility::Movable);
     // VehicleBody->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     // VehicleBody->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-
-    Chassis = CreateDefaultSubobject<USkeletalMeshComponent>("Chassis");
-    Chassis->BodyInstance.bSimulatePhysics = true;
-    Chassis->SetupAttachment(VehicleBody);
+    VehicleBody->SetIsReplicated(true);
 
     SpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
     SpringArm->TargetOffset = FVector(0.f, 0.f, 1500.f);
@@ -66,6 +66,26 @@ AModularVehicleBase::AModularVehicleBase()
 void AModularVehicleBase::BeginPlay()
 {
     Super::BeginPlay();
+
+    // GetNetMode() != NM_Client ? GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Purple, TEXT("SERVER")) : GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Orange, TEXT("CLIENT"));
+
+    if (const auto ValkyriePlayerState = GetPlayerState<AValkyriePlayerState>())
+    {
+        GetNetMode() != NM_Client ? GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Purple, TEXT("SERVER, EnablePlayerState")) :
+                                    GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Orange, TEXT("CLIENT, EnablePlayerState"));
+
+        const auto UnitPtr = ValkyriePlayerState->GetVehicleUnits().FindByPredicate([](const FVehicleUnitData& Data) { return Data.UnitType == EVehicleUnitType::Body; });
+
+        if (UnitPtr && UnitPtr->UnitComponents[0].UnitComponentMesh)
+        {
+            SetStaticMesh_OnServer(UnitPtr->UnitComponents[0].UnitComponentMesh);
+        }
+    }
+
+    if (HasAuthority())
+    {
+        GetWorld()->GetTimerManager().SetTimer(DataTickTimer, this, &AModularVehicleBase::SendDataTick_Multicast, 0.03f, true);
+    }
 }
 
 void AModularVehicleBase::PostInitializeComponents()
@@ -91,6 +111,8 @@ void AModularVehicleBase::Tick(float DeltaTime)
     Super::Tick(DeltaTime);
 
     PawnDeltaTime = DeltaTime;
+
+    WheelsTurn();
 }
 
 void AModularVehicleBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -115,17 +137,71 @@ bool AModularVehicleBase::GetWheelsGroups(TArray<FWheelsGroup>& WheelsGroups) co
 
 void AModularVehicleBase::MoveForward(float Amount)
 {
-    WheelManagerComponent->SetControlInput(Amount);
+    MoveForvardAxis = Amount;
 }
 
 void AModularVehicleBase::MoveRight(float Value)
 {
-    SmoothTurnValue = FMath::FInterpTo(SmoothTurnValue, Value, PawnDeltaTime, 6.f);
+    MoveSideAxis = Value;
+    SmoothTurnValue = FMath::FInterpTo(SmoothTurnValue, MoveSideAxis, PawnDeltaTime, 6.f);
+}
 
+void AModularVehicleBase::WheelsTurn()
+{
     const FRotator NewRotationFrontWheels{FRotator(0.f, SmoothTurnValue * 20.f, 0.f)};
     const FRotator NewRotationRareWheels{FRotator(0.f, SmoothTurnValue * -20.f, 0.f)};
     WheelFR->SetRelativeRotation(NewRotationFrontWheels);
     WheelFL->SetRelativeRotation(NewRotationFrontWheels);
     WheelRR->SetRelativeRotation(NewRotationRareWheels);
     WheelRL->SetRelativeRotation(NewRotationRareWheels);
+}
+
+void AModularVehicleBase::SendDataTick_Multicast_Implementation()
+{
+    if (HasAuthority())
+    {
+        SendMoveControls_Multicast(MoveForvardAxis, MoveSideAxis, SmoothTurnValue);
+    }
+    else
+    {
+
+        if (!IsLocallyControlled()) return;
+
+        SendMoveControls_Server(MoveForvardAxis, MoveSideAxis, SmoothTurnValue);
+    }
+    WheelManagerComponent->SetControlInput(MoveForvardAxis);
+}
+
+void AModularVehicleBase::SendMoveControls_Server_Implementation(float InMoveForvardAxis, float InMoveSideAxis, float InSmoothTurnValue)
+{
+
+    if (IsLocallyControlled()) return;
+
+    MoveForvardAxis = InMoveForvardAxis;
+    MoveSideAxis = InMoveSideAxis;
+    SmoothTurnValue = InSmoothTurnValue;
+}
+
+void AModularVehicleBase::SendMoveControls_Multicast_Implementation(float InMoveForvardAxis, float InMoveSideAxis, float InSmoothTurnValue)
+{
+
+    if (IsLocallyControlled()) return;
+
+    MoveForvardAxis = InMoveForvardAxis;
+    MoveSideAxis = InMoveSideAxis;
+    SmoothTurnValue = InSmoothTurnValue;
+}
+
+void AModularVehicleBase::SetStaticMesh_OnServer_Implementation(UStaticMesh* NewMesh)
+{
+    VehicleBody->SetStaticMesh(NewMesh);
+    SetStaticMesh_Multcast(NewMesh);
+}
+
+void AModularVehicleBase::SetStaticMesh_Multcast_Implementation(UStaticMesh* NewMesh)
+{
+    if (!HasAuthority())
+    {
+        VehicleBody->SetStaticMesh(NewMesh);
+    }
 }

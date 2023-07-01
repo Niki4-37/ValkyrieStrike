@@ -10,7 +10,7 @@ void AValkyriePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME(AValkyriePlayerState, Lives);
-    DOREPLIFETIME(AValkyriePlayerState, VehicleItems);
+    DOREPLIFETIME(AValkyriePlayerState, VehicleUnits);
     DOREPLIFETIME(AValkyriePlayerState, bNoLives);
     DOREPLIFETIME(AValkyriePlayerState, Coins);
 }
@@ -20,10 +20,10 @@ void AValkyriePlayerState::UpdateWidgetsInfo()
     OnLivesChanged_OnClient(Lives);
 }
 
-void AValkyriePlayerState::SaveMountedItem(const FVehicleItemData& VehicleItemData)
+void AValkyriePlayerState::SaveMountedUnit(const FVehicleUnitData& VehicleUnit)
 {
-    const auto ItemPtr = VehicleItems.FindByPredicate([&](FVehicleItemData Data) { return Data.ItemType == VehicleItemData.ItemType; });
-    ItemPtr ? (*ItemPtr = VehicleItemData) : VehicleItems.Add_GetRef(VehicleItemData);
+    const auto UnitPtr = VehicleUnits.FindByPredicate([&](FVehicleUnitData Data) { return Data.UnitType == VehicleUnit.UnitType; });
+    UnitPtr ? (*UnitPtr = VehicleUnit) : VehicleUnits.Add_GetRef(VehicleUnit);
 }
 
 void AValkyriePlayerState::CopyProperties(APlayerState* PlayerState)
@@ -32,7 +32,7 @@ void AValkyriePlayerState::CopyProperties(APlayerState* PlayerState)
 
     if (auto ValkyriePlayerState = Cast<AValkyriePlayerState>(PlayerState))
     {
-        ValkyriePlayerState->SetVehicleItems(VehicleItems);
+        ValkyriePlayerState->SetVehicleUnits(VehicleUnits);
     }
 }
 
@@ -42,7 +42,7 @@ void AValkyriePlayerState::OverrideWith(APlayerState* PlayerState)
 
     if (auto ValkyriePlayerState = Cast<AValkyriePlayerState>(PlayerState))
     {
-        SetVehicleItems(ValkyriePlayerState->GetVehicleItems());
+        SetVehicleUnits(ValkyriePlayerState->GetVehicleUnits());
     }
 }
 

@@ -30,10 +30,10 @@ public:
 
     void UpdateWidgetsInfo();
 
-    void SaveMountedItem(const FVehicleItemData& VehicleItemData);
+    void SaveMountedUnit(const FVehicleUnitData& VehicleUnit);
 
-    const TArray<FVehicleItemData>& GetVehicleItems() const { return VehicleItems; };
-    void SetVehicleItems(const TArray<FVehicleItemData>& Items) { VehicleItems = Items; };
+    const TArray<FVehicleUnitData>& GetVehicleUnits() const { return VehicleUnits; };
+    void SetVehicleUnits(const TArray<FVehicleUnitData>& Units) { VehicleUnits = Units; };
 
     void SetRespawnTransform(const FTransform& NewRespawnTransform)
     {
@@ -52,7 +52,7 @@ protected:
 
 private:
     UPROPERTY(Transient, Replicated)
-    TArray<FVehicleItemData> VehicleItems;
+    TArray<FVehicleUnitData> VehicleUnits;
 
     bool bIsNotDiedYet{true};
     UPROPERTY(Replicated)

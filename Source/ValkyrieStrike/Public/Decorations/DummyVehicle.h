@@ -27,9 +27,6 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     UStaticMeshComponent* ChassisMesh;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    FVehicleUnitData TestBodyUnit;
-
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 private:

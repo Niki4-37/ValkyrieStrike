@@ -4,8 +4,6 @@
 #include "Camera/CameraComponent.h"
 #include "Weapon/BaseVehicleWeapon.h"
 
-#include "Engine.h"
-
 ADummyVehicle::ADummyVehicle()
 {
     PrimaryActorTick.bCanEverTick = false;
