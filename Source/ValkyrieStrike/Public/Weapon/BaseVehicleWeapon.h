@@ -17,6 +17,12 @@ public:
 
     void SetStaticMesh(EUnitComponentType Type, UStaticMesh* NewMesh, FName SocketName);
 
+    void DefineSidePosition(float DotProduct);
+    void DefineSideMode(float InAcos);
+
+    void SetWeaponMovable(bool bEnable);
+    void SetGunMovable(bool bEnable) { bGunCanMove = bEnable; }
+
 protected:
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
     UStaticMeshComponent* Platform;
@@ -25,7 +31,21 @@ protected:
     UStaticMeshComponent* Gun;
 
     virtual void BeginPlay() override;
+    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
     virtual void Tick(float DeltaTime) override;
+
+private:
+    bool bPlatformCanMove{true};
+    bool bGunCanMove{true};
+    UPROPERTY(Replicated)
+    bool bIsSideMode{false};
+    UPROPERTY(Replicated)
+    float SidePositionModifier{1.f};
+
+    FTimerHandle RotationTimer;
+
+    UFUNCTION(NetMulticast, unreliable)
+    void RotateToTarget();
 };

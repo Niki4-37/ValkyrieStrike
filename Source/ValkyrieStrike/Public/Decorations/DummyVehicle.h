@@ -41,8 +41,8 @@ private:
     void MountArmor(const FVehicleUnitData& UnitData);
     UFUNCTION()
     void MountBody(const FVehicleUnitData& UnitData);
-    UFUNCTION(NetMulticast, unreliable)
-    void MountChassis_Multicast(const FVehicleUnitData& UnitData);
+    UFUNCTION(Server, unreliable)
+    void MountChassis_OnServer(const FVehicleUnitData& UnitData);
     UFUNCTION()
     void MountWeapon(const FVehicleUnitData& UnitData);
 

@@ -24,7 +24,8 @@ AModularVehicleBase::AModularVehicleBase()
     SetRootComponent(Chassis);
 
     VehicleBody = CreateDefaultSubobject<UStaticMeshComponent>("VehicleBody");
-    VehicleBody->SetupAttachment(RootComponent, "Root_bone");
+    VehicleBody->SetupAttachment(Chassis);
+    VehicleBody->SetRelativeScale3D(FVector(1.f));
     VehicleBody->SetCanEverAffectNavigation(false);
     VehicleBody->SetMobility(EComponentMobility::Movable);
     // VehicleBody->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -67,23 +68,9 @@ void AModularVehicleBase::BeginPlay()
 {
     Super::BeginPlay();
 
-    // GetNetMode() != NM_Client ? GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Purple, TEXT("SERVER")) : GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Orange, TEXT("CLIENT"));
-
-    if (const auto ValkyriePlayerState = GetPlayerState<AValkyriePlayerState>())
-    {
-        GetNetMode() != NM_Client ? GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Purple, TEXT("SERVER, EnablePlayerState")) :
-                                    GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Orange, TEXT("CLIENT, EnablePlayerState"));
-
-        const auto UnitPtr = ValkyriePlayerState->GetVehicleUnits().FindByPredicate([](const FVehicleUnitData& Data) { return Data.UnitType == EVehicleUnitType::Body; });
-
-        if (UnitPtr && UnitPtr->UnitComponents[0].UnitComponentMesh)
-        {
-            SetStaticMesh_OnServer(UnitPtr->UnitComponents[0].UnitComponentMesh);
-        }
-    }
-
     if (HasAuthority())
     {
+        // Set ClearTimer!!!
         GetWorld()->GetTimerManager().SetTimer(DataTickTimer, this, &AModularVehicleBase::SendDataTick_Multicast, 0.03f, true);
     }
 }
@@ -113,6 +100,36 @@ void AModularVehicleBase::Tick(float DeltaTime)
     PawnDeltaTime = DeltaTime;
 
     WheelsTurn();
+}
+
+void AModularVehicleBase::Restart()
+{
+    Super::Restart();
+
+    if (const auto ValkyriePlayerState = GetPlayerState<AValkyriePlayerState>())
+    {
+        GetNetMode() != NM_Client ? GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Purple, TEXT("SERVER, EnablePlayerState")) :
+                                    GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Orange, TEXT("CLIENT, EnablePlayerState"));
+
+        const auto UnitPtr = ValkyriePlayerState->GetVehicleUnits().FindByPredicate([](const FVehicleUnitData& Data) { return Data.UnitType == EVehicleUnitType::Body; });
+
+        if (UnitPtr && UnitPtr->UnitComponents[0].UnitComponentMesh)
+        {
+            SetStaticMesh_OnServer(UnitPtr->UnitComponents[0].UnitComponentMesh);
+        }
+    }
+
+    if (HasAuthority())
+    {
+        WeaponComponent->SetCompToAttachWeapons(VehicleBody);
+
+        WeaponComponent->InitWeapons_OnServer();
+    }
+
+    // if (const auto ValkyriePS = GetPlayerState<AValkyriePlayerState>())
+    //{
+    //     WorkshopComponent->AddCoins(ValkyriePS->GetCoins());
+    // }
 }
 
 void AModularVehicleBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -164,11 +181,11 @@ void AModularVehicleBase::SendDataTick_Multicast_Implementation()
     }
     else
     {
-
         if (!IsLocallyControlled()) return;
 
         SendMoveControls_Server(MoveForvardAxis, MoveSideAxis, SmoothTurnValue);
     }
+
     WheelManagerComponent->SetControlInput(MoveForvardAxis);
 }
 
@@ -194,13 +211,17 @@ void AModularVehicleBase::SendMoveControls_Multicast_Implementation(float InMove
 
 void AModularVehicleBase::SetStaticMesh_OnServer_Implementation(UStaticMesh* NewMesh)
 {
-    VehicleBody->SetStaticMesh(NewMesh);
+    if (IsLocallyControlled())
+    {
+        VehicleBody->SetStaticMesh(NewMesh);
+    }
+
     SetStaticMesh_Multcast(NewMesh);
 }
 
 void AModularVehicleBase::SetStaticMesh_Multcast_Implementation(UStaticMesh* NewMesh)
 {
-    if (!HasAuthority())
+    if (!IsLocallyControlled())
     {
         VehicleBody->SetStaticMesh(NewMesh);
     }

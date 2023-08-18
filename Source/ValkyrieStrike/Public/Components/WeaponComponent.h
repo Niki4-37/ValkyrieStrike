@@ -7,8 +7,7 @@
 #include "GameCoreTypes.h"
 #include "WeaponComponent.generated.h"
 
-class ATurret;
-class ASecondWeapon;
+class ABaseVehicleWeapon;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class VALKYRIESTRIKE_API UWeaponComponent : public UActorComponent
@@ -30,29 +29,18 @@ public:
     void InitWeapons_OnServer();
     void UpdateWidgets();
 
-protected:
-    /* used in game level for debug */
-    UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly)
-    FVehicleItemData TurretData;
-    /* used in game level for debug */
-    UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly)
-    FVehicleItemData SecondWeaponData;
-    /* used in game level for debug */
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    FName TurretSocketName{"TurretSocket"};
-    /* used in game level for debug */
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    FName SecondWeaponSocketName{"SecondWeaponSocket"};
+    void SetCompToAttachWeapons(USceneComponent* NewComp) { CompToAttachWeapons = NewComp; };
 
+protected:
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
     UPROPERTY(Replicated)
-    ATurret* VehicleTurret{nullptr};
+    USceneComponent* CompToAttachWeapons{nullptr};
 
     UPROPERTY(Replicated)
-    ASecondWeapon* SecondWeapon{nullptr};
+    TArray<ABaseVehicleWeapon*> VehicleWeapons;
 
     void OnDeath();
 

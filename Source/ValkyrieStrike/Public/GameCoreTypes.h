@@ -170,10 +170,19 @@ struct FUnitComponent
     EUnitComponentType ComponentType;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    UStaticMesh* UnitComponentMesh;
+    UStaticMesh* UnitComponentMesh{nullptr};
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     FName SocketName;
+
+    // UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    // bool bIsRotate{false};
+
+    // UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    // bool bIsSideMount{false};
+
+    // UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (EditCondition = "bIsSideMode"))
+    // bool bIsReversed{false};
 };
 
 USTRUCT(BlueprintType)

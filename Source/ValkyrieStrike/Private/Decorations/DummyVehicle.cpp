@@ -4,6 +4,8 @@
 #include "Camera/CameraComponent.h"
 #include "Weapon/BaseVehicleWeapon.h"
 
+#include "Engine.h"
+
 ADummyVehicle::ADummyVehicle()
 {
     PrimaryActorTick.bCanEverTick = false;
@@ -18,11 +20,11 @@ ADummyVehicle::ADummyVehicle()
     ChassisMesh->SetIsReplicated(true);
 
     const TMap<EVehicleUnitType, FName> FunctionsByType{
-        {EVehicleUnitType::Armor, "MountArmor"},                //
-        {EVehicleUnitType::Body, "MountBody"},                  //
-        {EVehicleUnitType::Chassis, "MountChassis_Multicast"},  //
-        {EVehicleUnitType::SecondWeapon, "MountWeapon"},        //
-        {EVehicleUnitType::Turret, "MountWeapon"}               //
+        {EVehicleUnitType::Armor, "MountArmor"},               //
+        {EVehicleUnitType::Body, "MountBody"},                 //
+        {EVehicleUnitType::Chassis, "MountChassis_OnServer"},  //
+        {EVehicleUnitType::SecondWeapon, "MountWeapon"},       //
+        {EVehicleUnitType::Turret, "MountWeapon"}              //
     };
 
     for (const TPair<EVehicleUnitType, FName>& Function : FunctionsByType)
@@ -67,7 +69,7 @@ void ADummyVehicle::MountBody(const FVehicleUnitData& UnitData)
     }
 }
 
-void ADummyVehicle::MountChassis_Multicast_Implementation(const FVehicleUnitData& UnitData)
+void ADummyVehicle::MountChassis_OnServer_Implementation(const FVehicleUnitData& UnitData)
 {
     ConstructVehicle(ChassisMesh, UnitData);
 }
@@ -76,9 +78,10 @@ void ADummyVehicle::MountWeapon(const FVehicleUnitData& UnitData)
 {
     if (!GetWorld() || !UnitData.UnitComponents.Num() || !UnitData.UnitSpawnClass) return;
 
-    auto VehicleItem = GetWorld()->SpawnActor<ABaseVehicleWeapon>(UnitData.UnitSpawnClass);
+    auto VehicleWeapon = GetWorld()->SpawnActor<ABaseVehicleWeapon>(UnitData.UnitSpawnClass);
 
-    if (!VehicleItem) return;
+    if (!VehicleWeapon) return;
+    VehicleWeapon->SetWeaponMovable(false);
 
     FName SocketName{NAME_None};
     for (const auto& UnitComponent : UnitData.UnitComponents)
@@ -88,7 +91,7 @@ void ADummyVehicle::MountWeapon(const FVehicleUnitData& UnitData)
             SocketName = UnitComponent.SocketName;
         }
 
-        VehicleItem->SetStaticMesh(UnitComponent.ComponentType, UnitComponent.UnitComponentMesh, UnitComponent.SocketName);
+        VehicleWeapon->SetStaticMesh(UnitComponent.ComponentType, UnitComponent.UnitComponentMesh, UnitComponent.SocketName);
     }
 
     if (AttachedActorsMap.Contains(SocketName))
@@ -96,7 +99,8 @@ void ADummyVehicle::MountWeapon(const FVehicleUnitData& UnitData)
         AttachedActorsMap[SocketName]->Destroy();
     }
 
-    AttachedActorsMap.Add(SocketName, VehicleItem);
+    AttachedActorsMap.Add(SocketName, VehicleWeapon);
+
     AttachedActorsMap[SocketName]->SetActorTransform(MeshComp->GetSocketTransform(SocketName));
 }
 

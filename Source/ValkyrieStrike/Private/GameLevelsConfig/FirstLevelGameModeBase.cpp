@@ -12,7 +12,6 @@
 
 AFirstLevelGameModeBase::AFirstLevelGameModeBase()
 {
-
     PlayerControllerClass = AVehiclePlayerController::StaticClass();
     PlayerStateClass = AValkyriePlayerState::StaticClass();
     HUDClass = AGameHUD::StaticClass();
