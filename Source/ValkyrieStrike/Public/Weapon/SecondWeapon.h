@@ -48,8 +48,8 @@ protected:
 private:
     FTimerHandle ReloadingTimer;
 
-    UPROPERTY(Replicated)
-    FVehicleItemData WeaponData;
+    //UPROPERTY(Replicated)
+    //FVehicleItemData WeaponData;
 
     UPROPERTY(Replicated)
     bool bIsReady{true};

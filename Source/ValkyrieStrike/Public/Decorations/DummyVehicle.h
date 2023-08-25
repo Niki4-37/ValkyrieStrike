@@ -41,10 +41,13 @@ private:
     void MountArmor(const FVehicleUnitData& UnitData);
     UFUNCTION()
     void MountBody(const FVehicleUnitData& UnitData);
-    UFUNCTION(Server, unreliable)
-    void MountChassis_OnServer(const FVehicleUnitData& UnitData);
+    UFUNCTION(NetMulticast, reliable)
+    void MountChassis_Multicast(const FVehicleUnitData& UnitData);
     UFUNCTION()
     void MountWeapon(const FVehicleUnitData& UnitData);
 
     void ConstructVehicle(UStaticMeshComponent* VehicleMeshComponent, const FVehicleUnitData& UnitData);
+
+    UFUNCTION(NetMulticast, reliable)
+    void SetActorTransform_Multicast(AActor* TransformingActor, const FTransform& NewTransform);
 };

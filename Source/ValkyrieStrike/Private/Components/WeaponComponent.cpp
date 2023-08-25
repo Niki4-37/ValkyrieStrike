@@ -2,6 +2,7 @@
 
 #include "Components/WeaponComponent.h"
 #include "Components/HealthComponent.h"
+#include "Weapon/TurretHubPawn.h"
 #include "Weapon/BaseVehicleWeapon.h"
 #include "Net/UnrealNetwork.h"
 #include "GameLevelsConfig/ValkyriePlayerState.h"
@@ -30,8 +31,27 @@ bool UWeaponComponent::AddAmmo(int32 Amount)
     return false;
 }
 
-void UWeaponComponent::InitWeapons_OnServer_Implementation()
+void UWeaponComponent::InitWeapons()
 {
+    // spawn turret hub
+    checkf(TurretHubClass, TEXT("TurretHubPawnHubClass not define!"));
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+    SpawnParams.Owner = GetOwner();
+    TurretHub = GetWorld()->SpawnActor<ATurretHubPawn>(TurretHubClass, SpawnParams);
+
+    if (TurretHub)
+    {
+        TurretHub->AttachToActor(GetOwner(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
+        TurretHub->SetWeaponComponent(this);
+    }
+
+    if (TurretHub && !TurretHub->Controller)
+    {
+        TurretHub->SpawnDefaultController();
+    }
+
+    // spawn weapons
     if (!CompToAttachWeapons || !GetOwner() || !GetOwner()->GetInstigatorController()) return;
     const auto PlayerState = GetOwner()->GetInstigatorController()->GetPlayerState<AValkyriePlayerState>();
 
@@ -43,42 +63,39 @@ void UWeaponComponent::InitWeapons_OnServer_Implementation()
         {
             if (!GetWorld() || !Unit.UnitComponents.Num() || !Unit.UnitSpawnClass) continue;
 
-            auto VehicleItem = GetWorld()->SpawnActor<ABaseVehicleWeapon>(Unit.UnitSpawnClass);  // use to undo unittyte checking
+            auto VehicleWeapon = GetWorld()->SpawnActor<ABaseVehicleWeapon>(Unit.UnitSpawnClass);  // how to undo unittyte checking?
 
-            if (!VehicleItem) continue;
+            if (!VehicleWeapon) continue;
 
             FName SocketName{NAME_None};
             for (const auto& UnitComponent : Unit.UnitComponents)
             {
-                VehicleItem->SetStaticMesh(UnitComponent.ComponentType, UnitComponent.UnitComponentMesh, UnitComponent.SocketName);
+                VehicleWeapon->SetStaticMesh(UnitComponent.ComponentType, UnitComponent.UnitComponentMesh, UnitComponent.SocketName);
 
                 if (UnitComponent.ComponentType != EUnitComponentType::Platform) continue;
                 SocketName = UnitComponent.SocketName;
             }
 
-            // GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, CompToAttachWeapons->GetComponentLocation().ToString());
+            VehicleWeapon->SetOwner(GetOwner());
+            // GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, VehicleWeapon->ActorLocation().ToString());
+
+            FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
+            VehicleWeapon->AttachToComponent(CompToAttachWeapons, AttachmentRules, SocketName);
+
+            /* Side mode checking */
+            const auto AngleBetween = FMath::Acos(FVector::DotProduct(GetOwner()->GetActorUpVector(), VehicleWeapon->GetActorUpVector()));
+            VehicleWeapon->DefineSideMode(AngleBetween);
 
             /* Side checking. Minus for the left */
             const auto SocketVector = (CompToAttachWeapons->GetSocketLocation(SocketName) - GetOwner()->GetActorLocation()).GetSafeNormal();
             const auto DotProduct = FVector::DotProduct(SocketVector, GetOwner()->GetActorRightVector());
-            VehicleItem->DefineSidePosition(DotProduct);
+            VehicleWeapon->DefineSidePosition(DotProduct);
 
-            FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
-            VehicleItem->AttachToComponent(CompToAttachWeapons, AttachmentRules, SocketName);
+            VehicleWeapon->SetupWeapon(Unit.UnitType, Unit.UnitMaxValue, Unit.ExecutionTime);
 
-            const auto AngleBetween = FMath::Acos(FVector::DotProduct(GetOwner()->GetActorUpVector(), VehicleItem->GetActorUpVector()));
-            VehicleItem->DefineSideMode(AngleBetween);
-
-            VehicleItem->SetWeaponMovable(true);
-
-            VehicleWeapons.Add(VehicleItem);
+            VehicleWeapons.Add(VehicleWeapon);
         }
     }
-
-    // if (VehicleTurret && !VehicleTurret->Controller)
-    //{
-    //     VehicleTurret->SpawnDefaultController();
-    // }
 }
 
 void UWeaponComponent::UpdateWidgets()
@@ -88,9 +105,9 @@ void UWeaponComponent::UpdateWidgets()
 
     // if (!PlayerState || PlayerState->GetVehicleItems().Num() == 0) return;
 
-    // for (auto& VehicleItem : PlayerState->GetVehicleItems())
+    // for (auto& VehicleWeapon : PlayerState->GetVehicleItems())
     //{
-    //     OnItemMount_Client(VehicleItem);
+    //     OnItemMount_Client(VehicleWeapon);
     // }
 }
 
@@ -116,23 +133,25 @@ void UWeaponComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
     DOREPLIFETIME(UWeaponComponent, CompToAttachWeapons);
     DOREPLIFETIME(UWeaponComponent, VehicleWeapons);
+
+    // DOREPLIFETIME(UWeaponComponent, TurretHub);
 }
 
 void UWeaponComponent::OnDeath()
 {
-    // if (VehicleTurret && VehicleTurret->Controller)
+    // if (VehicleTurretHubPawn && VehicleTurretHubPawn->Controller)
     //{
-    //     VehicleTurret->Controller->Destroy();
+    //     VehicleTurretHubPawn->Controller->Destroy();
     // }
 }
 
-void UWeaponComponent::OnItemMount_Client_Implementation(const FVehicleItemData& Data)
-{
-    FString Test = "UWeaponComponent : OnItemMount " + Data.ItemName.ToString();
-    GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, Test);
-
-    OnItemMount.Broadcast(Data);
-}
+// void UWeaponComponent::OnItemMount_Client_Implementation(const FVehicleItemData& Data)
+//{
+//     FString Test = "UWeaponComponent : OnItemMount " + Data.ItemName.ToString();
+//     GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, Test);
+//
+//     OnItemMount.Broadcast(Data);
+// }
 
 void UWeaponComponent::OnChangeAmmo_Client_Implementation(EVehicleItemType Type, int32 Amount)
 {

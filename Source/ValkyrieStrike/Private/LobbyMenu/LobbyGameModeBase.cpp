@@ -62,6 +62,16 @@ void ALobbyGameModeBase::Logout(AController* Exiting)
     }
 }
 
+void ALobbyGameModeBase::StartToLeaveMap()
+{
+    Super::StartToLeaveMap();
+
+    for (const auto& FoundActor : TActorRange<ADummyVehicle>(GetWorld()))
+    {
+        FoundActor->Destroy();
+    }
+}
+
 void ALobbyGameModeBase::SpawnLobbyVehicle(APlayerStart* Position, APlayerController* Controller)
 {
     if (!Position || !Controller) return;

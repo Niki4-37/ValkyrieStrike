@@ -94,10 +94,4 @@ private:
     void SendMoveControls_Server(float InMoveForvardAxis, float InMoveSideAxis, float InSmoothTurnValue);
     UFUNCTION(NetMulticast, unreliable)
     void SendMoveControls_Multicast(float InMoveForvardAxis, float InMoveSideAxis, float InSmoothTurnValue);
-
-    UFUNCTION(Server, reliable)
-    void SetStaticMesh_OnServer(UStaticMesh* NewMesh);
-
-    UFUNCTION(NetMulticast, reliable)
-    void SetStaticMesh_Multcast(UStaticMesh* NewMesh);
 };

@@ -30,6 +30,8 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     TSubclassOf<ADummyVehicle> DummyVehicleClass;
 
+    virtual void StartToLeaveMap() override;
+
 private:
     UPROPERTY()
     TMap<APlayerStart*, APlayerController*> SpawningMap;

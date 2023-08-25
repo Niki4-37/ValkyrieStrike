@@ -115,7 +115,7 @@ void AModularVehicleBase::Restart()
 
         if (UnitPtr && UnitPtr->UnitComponents[0].UnitComponentMesh)
         {
-            SetStaticMesh_OnServer(UnitPtr->UnitComponents[0].UnitComponentMesh);
+            VehicleBody->SetStaticMesh(UnitPtr->UnitComponents[0].UnitComponentMesh);
         }
     }
 
@@ -123,7 +123,7 @@ void AModularVehicleBase::Restart()
     {
         WeaponComponent->SetCompToAttachWeapons(VehicleBody);
 
-        WeaponComponent->InitWeapons_OnServer();
+        WeaponComponent->InitWeapons();
     }
 
     // if (const auto ValkyriePS = GetPlayerState<AValkyriePlayerState>())
@@ -207,22 +207,4 @@ void AModularVehicleBase::SendMoveControls_Multicast_Implementation(float InMove
     MoveForvardAxis = InMoveForvardAxis;
     MoveSideAxis = InMoveSideAxis;
     SmoothTurnValue = InSmoothTurnValue;
-}
-
-void AModularVehicleBase::SetStaticMesh_OnServer_Implementation(UStaticMesh* NewMesh)
-{
-    if (IsLocallyControlled())
-    {
-        VehicleBody->SetStaticMesh(NewMesh);
-    }
-
-    SetStaticMesh_Multcast(NewMesh);
-}
-
-void AModularVehicleBase::SetStaticMesh_Multcast_Implementation(UStaticMesh* NewMesh)
-{
-    if (!IsLocallyControlled())
-    {
-        VehicleBody->SetStaticMesh(NewMesh);
-    }
 }

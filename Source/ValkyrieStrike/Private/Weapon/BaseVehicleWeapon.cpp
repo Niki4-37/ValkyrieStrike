@@ -1,7 +1,8 @@
 // Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 
 #include "Weapon/BaseVehicleWeapon.h"
-#include "Net/UnrealNetwork.h"
+#include "Net/UnrealNetwork.h"  //to delete
+
 #include "Engine.h"
 
 ABaseVehicleWeapon::ABaseVehicleWeapon()
@@ -9,8 +10,11 @@ ABaseVehicleWeapon::ABaseVehicleWeapon()
     PrimaryActorTick.bCanEverTick = true;
     bReplicates = true;
 
+    WeaponRootComponent = CreateDefaultSubobject<USceneComponent>("WeaponRootComponent");
+    SetRootComponent(WeaponRootComponent);
+
     Platform = CreateDefaultSubobject<UStaticMeshComponent>("Platform");
-    SetRootComponent(Platform);
+    Platform->SetupAttachment(RootComponent);
     Platform->SetMobility(EComponentMobility::Movable);
     Platform->SetIsReplicated(true);
     Platform->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -60,9 +64,53 @@ void ABaseVehicleWeapon::DefineSideMode(float InAcos)
     bIsSideMode = !FMath::IsNearlyZero(InAcos);
 }
 
-void ABaseVehicleWeapon::SetWeaponMovable(bool bEnable)
+void ABaseVehicleWeapon::SetupWeapon(EVehicleUnitType InWeaponType, int32 InMaxAmmoCapacity, float InReloadingTime)
 {
-    bEnable ? GetWorld()->GetTimerManager().SetTimer(RotationTimer, this, &ABaseVehicleWeapon::RotateToTarget, 0.05f, true) : GetWorld()->GetTimerManager().ClearTimer(RotationTimer);
+    WeaponType = InWeaponType;
+    AmmoCapacity = MaxAmmoCapacity = InMaxAmmoCapacity;
+    ReloadingTime = InReloadingTime;
+}
+
+void ABaseVehicleWeapon::UpdateAimActor(AActor* NewAimActor, float UpdateTimeRate)
+{
+    GetWorldTimerManager().ClearTimer(RotationTimer);
+    bHasAim = NewAimActor != nullptr;
+    auto TimerDelegate = FTimerDelegate::CreateUObject(this, &ABaseVehicleWeapon::RotateToTarget, NewAimActor);
+    GetWorldTimerManager().SetTimer(RotationTimer, TimerDelegate, UpdateTimeRate / 10.f, true);
+}
+
+void ABaseVehicleWeapon::MakeShot()
+{
+    GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Red, "ABaseVehicleWeapon::MakeShot");
+    /* handled on server */
+
+    // const FVector TraceStart = Gun->GetSocketLocation(MuzzleSocketName);
+    // const FVector TraceEnd = TraceStart + Gun->GetSocketRotation(MuzzleSocketName).Vector() * 2000.f;
+
+    // TArray<FHitResult> Hits;
+    // UKismetSystemLibrary::SphereTraceMulti(GetWorld(),                                                           //
+    //                                        TraceStart,                                                           //
+    //                                        TraceEnd,                                                             //
+    //                                        /*BeemRadius*/ 10.f,                                                  //
+    //                                        UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility),  //
+    //                                        false,                                                                //
+    //                                        {GetOwner(), this},                                                   //
+    //                                        EDrawDebugTrace::ForDuration,                                         //
+    //                                        Hits,                                                                 //
+    //                                        true);
+    ///* debug */
+    // TArray<AActor*> HitActors;
+    // for (auto& Hit : Hits)
+    //{
+    //     if (!Hit.GetActor()) continue;
+    //     HitActors.AddUnique(Hit.GetActor());
+    // }
+
+    // for (auto HitActor : HitActors)
+    //{
+    //     // UGameplayStatics::ApplyDamage(HitActor, WeaponDamage, GetInstigatorController(), GetOwner(), UDamageType::StaticClass());
+    //     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, HitActor->GetName());
+    // }
 }
 
 void ABaseVehicleWeapon::BeginPlay()
@@ -73,9 +121,11 @@ void ABaseVehicleWeapon::BeginPlay()
 void ABaseVehicleWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+}
 
-    DOREPLIFETIME(ABaseVehicleWeapon, bIsSideMode);
-    DOREPLIFETIME(ABaseVehicleWeapon, SidePositionModifier);
+void ABaseVehicleWeapon::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    Super::EndPlay(EndPlayReason);
 }
 
 void ABaseVehicleWeapon::Tick(float DeltaTime)
@@ -83,22 +133,25 @@ void ABaseVehicleWeapon::Tick(float DeltaTime)
     Super::Tick(DeltaTime);
 }
 
-void ABaseVehicleWeapon::RotateToTarget_Implementation()
+void ABaseVehicleWeapon::RotateToTarget(AActor* Target)
 {
-    // if (!bPlatformCanMove) return;
+    const auto NoneAimLocation = GetOwner() ? GetOwner()->GetActorForwardVector() * 1000.f : FVector::ZeroVector;
 
-    const auto AimLocation = FVector::ZeroVector;
-    const auto TurretLocatiom = Platform->GetComponentLocation();
-    const FRotator Direction = FRotationMatrix::MakeFromXZ(AimLocation, TurretLocatiom).Rotator();
-    const FRotator FromRotation = Platform->GetComponentRotation();
+    const auto AimLocation = Target ? Target->GetActorLocation() : NoneAimLocation;
+    const auto PlatformLocatiom = Platform->GetComponentLocation();
 
-    FRotator Delta = (Direction - FromRotation);
+    const FRotator Direction = FRotationMatrix::MakeFromX(AimLocation - GetActorLocation()).Rotator();
+
+    const FRotator PlatfromRotation = Platform->GetComponentRotation();
+
+    FRotator Delta = Direction - PlatfromRotation;
+    Delta.Normalize();
 
     const auto DeltaValue = bIsSideMode  //
                                 ?
-                                FMath::Clamp(Delta.Pitch, -15.f, 15.f)  //
+                                FMath::Clamp(Delta.Pitch, -1.f, 1.f)  //
                                 :
-                                FMath::Clamp(Delta.Yaw, -15.f, 15.f);
+                                FMath::Clamp(Delta.Yaw, -1.f, 1.f);
 
     const auto ValueToSet = bIsSideMode  //
                                 ?
@@ -107,4 +160,19 @@ void ABaseVehicleWeapon::RotateToTarget_Implementation()
                                 Platform->GetRelativeRotation().Yaw + DeltaValue;
 
     Platform->SetRelativeRotation(FRotator(0.f, ValueToSet, 0.f));
+}
+
+void ABaseVehicleWeapon::ReduceAmmo()
+{
+    if (!AmmoCapacity) return;
+    --AmmoCapacity;
+}
+
+void ABaseVehicleWeapon::ReloadWeapon()
+{
+    if (bIsReloading) return;
+    bIsReloading = true;
+    GetWorldTimerManager().SetTimer(
+        ReloadingTimer, [&]() { bIsReloading = false; }, ReloadingTime, false);
+    // OnStartWeaponReloading.Broadcast(EVehicleItemType::Turret);
 }

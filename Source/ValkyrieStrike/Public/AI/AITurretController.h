@@ -7,7 +7,7 @@
 #include "AITurretController.generated.h"
 
 class UUniversalAIPerceptionComponent;
-class ATurret;
+class ATurretHubPawn;
 
 UCLASS()
 class VALKYRIESTRIKE_API AAITurretController : public AAIController
@@ -21,7 +21,7 @@ public:
 
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-    UUniversalAIPerceptionComponent* TurretPerceptionComponent;
+    UUniversalAIPerceptionComponent* TurretHubPerceptionComponent;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     float AimingUpdateRate{0.1f};
@@ -35,7 +35,7 @@ private:
     FTimerHandle ChoosingTargetTimer;
 
     UPROPERTY()
-    ATurret* TurretPawn{nullptr};
+    ATurretHubPawn* TurretHub{nullptr};
 
     void RotateToTarget();
 };

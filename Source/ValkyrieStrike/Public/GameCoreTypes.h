@@ -91,15 +91,6 @@ static EVehicleUnitType& operator++(EVehicleUnitType& EType)
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnMenuStateChangedSignature, EMenuState);
 
 USTRUCT(BlueprintType)
-struct FDataUnit
-{
-    GENERATED_USTRUCT_BODY()
-
-    // UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    // UTexture2D* Tumb;
-};
-
-USTRUCT(BlueprintType)
 struct FLevelData
 {
     GENERATED_USTRUCT_BODY()
@@ -116,7 +107,7 @@ struct FLevelData
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnLevelSelectedSignature, const FLevelData&);
 
-USTRUCT(BlueprintType)
+USTRUCT(BlueprintType)  // to delete
 struct FVehicleConstructPart : public FTableRowBase
 {
     GENERATED_USTRUCT_BODY()
@@ -134,7 +125,7 @@ struct FVehicleConstructPart : public FTableRowBase
     UStaticMesh* PartMesh;
 };
 
-USTRUCT(BlueprintType)
+USTRUCT(BlueprintType)  // to delete
 struct FVehicleItemData : public FTableRowBase
 {
     GENERATED_USTRUCT_BODY()
@@ -174,15 +165,6 @@ struct FUnitComponent
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     FName SocketName;
-
-    // UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    // bool bIsRotate{false};
-
-    // UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    // bool bIsSideMount{false};
-
-    // UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (EditCondition = "bIsSideMode"))
-    // bool bIsReversed{false};
 };
 
 USTRUCT(BlueprintType)
@@ -218,7 +200,7 @@ struct FVehicleUnitData : public FTableRowBase
 DECLARE_MULTICAST_DELEGATE(FOnDeathSignature);
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnItemValueChangedSignature, EItemPropertyType, float, float);
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnItemMountSignature, const FVehicleItemData&);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnItemMountSignature, const FVehicleItemData&);  // change ot FVehicleUnitData&
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnUnitMountSignature, const FVehicleUnitData&);
 

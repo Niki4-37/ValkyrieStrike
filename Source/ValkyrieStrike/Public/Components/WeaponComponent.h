@@ -7,6 +7,7 @@
 #include "GameCoreTypes.h"
 #include "WeaponComponent.generated.h"
 
+class ATurretHubPawn;
 class ABaseVehicleWeapon;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
@@ -25,13 +26,19 @@ public:
     void ShootFromSecondWeapon_OnServer();
     bool AddAmmo(int32 Amount);
 
-    UFUNCTION(Server, reliable)
-    void InitWeapons_OnServer();
+    // UFUNCTION(Server, reliable)
+    // void InitWeapons_OnServer();
+    void InitWeapons();
     void UpdateWidgets();
 
     void SetCompToAttachWeapons(USceneComponent* NewComp) { CompToAttachWeapons = NewComp; };
 
+    TArray<ABaseVehicleWeapon*> GetVehicleWeapons() const { return VehicleWeapons; };
+
 protected:
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    TSubclassOf<ATurretHubPawn> TurretHubClass;
+
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -42,10 +49,13 @@ private:
     UPROPERTY(Replicated)
     TArray<ABaseVehicleWeapon*> VehicleWeapons;
 
+    UPROPERTY(/*Replicated*/)
+    ATurretHubPawn* TurretHub;
+
     void OnDeath();
 
-    UFUNCTION(Client, reliable)
-    void OnItemMount_Client(const FVehicleItemData& Data);
+    // UFUNCTION(Client, reliable)
+    // void OnItemMount_Client(const FVehicleItemData& Data);
 
     UFUNCTION(Client, reliable)
     void OnChangeAmmo_Client(EVehicleItemType Type, int32 Amount);

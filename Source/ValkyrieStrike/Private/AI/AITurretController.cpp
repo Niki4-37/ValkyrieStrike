@@ -2,13 +2,13 @@
 
 #include "AI/AITurretController.h"
 #include "Components/UniversalAIPerceptionComponent.h"
-#include "Weapon/Turret.h"
+#include "Weapon/TurretHubPawn.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 AAITurretController::AAITurretController()
 {
-    TurretPerceptionComponent = CreateDefaultSubobject<UUniversalAIPerceptionComponent>("TurretPerceptionComponent");
-    SetPerceptionComponent(*TurretPerceptionComponent);
+    TurretHubPerceptionComponent = CreateDefaultSubobject<UUniversalAIPerceptionComponent>("TurretHubPerceptionComponent");
+    SetPerceptionComponent(*TurretHubPerceptionComponent);
 }
 
 void AAITurretController::StartChoosingTarget()
@@ -22,7 +22,7 @@ void AAITurretController::OnPossess(APawn* InPawn)
 
     StartChoosingTarget();
 
-    TurretPawn = Cast<ATurret>(InPawn);
+    TurretHub = Cast<ATurretHubPawn>(InPawn);
 }
 
 void AAITurretController::Tick(float DeltaTime)
@@ -32,11 +32,11 @@ void AAITurretController::Tick(float DeltaTime)
 
 void AAITurretController::RotateToTarget()
 {
-    if (!TurretPawn)
+    if (!TurretHub)
     {
         GetWorldTimerManager().ClearTimer(ChoosingTargetTimer);
         return;
     }
 
-    TurretPawn->RotateToTarget(TurretPerceptionComponent->GetClosestEnemy("Enemy"), AimingUpdateRate);
+    TurretHub->UpdateAimActor(TurretHubPerceptionComponent->GetClosestEnemy("Enemy"), AimingUpdateRate);
 }

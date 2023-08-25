@@ -20,11 +20,11 @@ ADummyVehicle::ADummyVehicle()
     ChassisMesh->SetIsReplicated(true);
 
     const TMap<EVehicleUnitType, FName> FunctionsByType{
-        {EVehicleUnitType::Armor, "MountArmor"},               //
-        {EVehicleUnitType::Body, "MountBody"},                 //
-        {EVehicleUnitType::Chassis, "MountChassis_OnServer"},  //
-        {EVehicleUnitType::SecondWeapon, "MountWeapon"},       //
-        {EVehicleUnitType::Turret, "MountWeapon"}              //
+        {EVehicleUnitType::Armor, "MountArmor"},                //
+        {EVehicleUnitType::Body, "MountBody"},                  //
+        {EVehicleUnitType::Chassis, "MountChassis_Multicast"},  //
+        {EVehicleUnitType::SecondWeapon, "MountWeapon"},        //
+        {EVehicleUnitType::Turret, "MountWeapon"}               //
     };
 
     for (const TPair<EVehicleUnitType, FName>& Function : FunctionsByType)
@@ -38,6 +38,7 @@ ADummyVehicle::ADummyVehicle()
 void ADummyVehicle::MountVehicleUnit(const FVehicleUnitData& UnitData)
 {
     /* handled on server */
+    if (!OperationMap.Contains(UnitData.UnitType)) return;
     OperationMap[UnitData.UnitType].ExecuteIfBound(UnitData);
 }
 
@@ -65,11 +66,11 @@ void ADummyVehicle::MountBody(const FVehicleUnitData& UnitData)
     for (const auto& SocketName : SocketNames)
     {
         if (!AttachedActorsMap.Contains(SocketName)) continue;
-        AttachedActorsMap[SocketName]->SetActorTransform(MeshComp->GetSocketTransform(SocketName));
+        SetActorTransform_Multicast(AttachedActorsMap[SocketName], MeshComp->GetSocketTransform(SocketName));
     }
 }
 
-void ADummyVehicle::MountChassis_OnServer_Implementation(const FVehicleUnitData& UnitData)
+void ADummyVehicle::MountChassis_Multicast_Implementation(const FVehicleUnitData& UnitData)
 {
     ConstructVehicle(ChassisMesh, UnitData);
 }
@@ -81,7 +82,6 @@ void ADummyVehicle::MountWeapon(const FVehicleUnitData& UnitData)
     auto VehicleWeapon = GetWorld()->SpawnActor<ABaseVehicleWeapon>(UnitData.UnitSpawnClass);
 
     if (!VehicleWeapon) return;
-    VehicleWeapon->SetWeaponMovable(false);
 
     FName SocketName{NAME_None};
     for (const auto& UnitComponent : UnitData.UnitComponents)
@@ -111,4 +111,10 @@ void ADummyVehicle::ConstructVehicle(UStaticMeshComponent* VehicleMeshComponent,
     if (!FoundUnitCompDataPtr || !FoundUnitCompDataPtr->UnitComponentMesh) return;
     VehicleMeshComponent->SetRelativeScale3D(FVector(1.f));
     VehicleMeshComponent->SetStaticMesh(FoundUnitCompDataPtr->UnitComponentMesh);
+}
+
+void ADummyVehicle::SetActorTransform_Multicast_Implementation(AActor* TransformingActor, const FTransform& NewTransform)
+{
+    if (!TransformingActor) return;
+    TransformingActor->SetActorTransform(NewTransform);
 }

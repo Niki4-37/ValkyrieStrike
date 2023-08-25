@@ -186,7 +186,8 @@ void ADefaultWeeledVehicle::Restart()
 
     if (GetRemoteRole() == ENetRole::ROLE_AutonomousProxy)
     {
-        WeaponComponent->InitWeapons_OnServer();
+        // WeaponComponent->InitWeapons_OnServer();
+        WeaponComponent->InitWeapons();
     }
 
     if (const auto ValkyriePS = GetPlayerState<AValkyriePlayerState>())
