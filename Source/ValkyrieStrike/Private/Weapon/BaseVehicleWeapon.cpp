@@ -162,10 +162,10 @@ void ABaseVehicleWeapon::RotateToTarget(AActor* Target)
     Platform->SetRelativeRotation(FRotator(0.f, ValueToSet, 0.f));
 }
 
-void ABaseVehicleWeapon::ReduceAmmo()
+void ABaseVehicleWeapon::ChangeAmmo(int32 Value)
 {
-    if (!AmmoCapacity) return;
-    --AmmoCapacity;
+    AmmoCapacity = FMath::Clamp(AmmoCapacity + Value, 0, MaxAmmoCapacity);
+    OnChangeAmmoInWeapon_OnClient(WeaponType, AmmoCapacity);
 }
 
 void ABaseVehicleWeapon::ReloadWeapon()
@@ -173,6 +173,23 @@ void ABaseVehicleWeapon::ReloadWeapon()
     if (bIsReloading) return;
     bIsReloading = true;
     GetWorldTimerManager().SetTimer(
-        ReloadingTimer, [&]() { bIsReloading = false; }, ReloadingTime, false);
-    // OnStartWeaponReloading.Broadcast(EVehicleItemType::Turret);
+        ReloadingTimer,
+        [&]()
+        {
+            bIsReloading = false;
+            AmmoCapacity = MaxAmmoCapacity;
+            OnChangeAmmoInWeapon_OnClient(WeaponType, AmmoCapacity);
+        },
+        ReloadingTime, false);
+    OnStartWeaponReloading_OnClient(WeaponType);
+}
+
+void ABaseVehicleWeapon::OnChangeAmmoInWeapon_OnClient_Implementation(EVehicleUnitType Type, int32 Value)
+{
+    OnChangeAmmoInWeapon.Broadcast(Type, Value);
+}
+
+void ABaseVehicleWeapon::OnStartWeaponReloading_OnClient_Implementation(EVehicleUnitType Type)
+{
+    OnStartWeaponReloading.Broadcast(Type);
 }

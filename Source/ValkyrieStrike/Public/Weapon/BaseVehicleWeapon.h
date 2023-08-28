@@ -57,8 +57,9 @@ protected:
 
     virtual void MakeShot();
 
-    void ReduceAmmo();
+    void ChangeAmmo(int32 Value);
     void ReloadWeapon();
+    int32 GetAmmo() const { return AmmoCapacity; };
 
 public:
     virtual void Tick(float DeltaTime) override;
@@ -75,4 +76,10 @@ private:
     bool bIsReloading{false};
 
     bool bHasAim{false};
+
+    UFUNCTION(Client, unreliable)
+    void OnChangeAmmoInWeapon_OnClient(EVehicleUnitType Type, int32 Value);
+
+    UFUNCTION(Client, unreliable)
+    void OnStartWeaponReloading_OnClient(EVehicleUnitType Type);
 };

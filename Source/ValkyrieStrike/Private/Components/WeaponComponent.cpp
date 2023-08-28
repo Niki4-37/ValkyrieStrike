@@ -77,7 +77,6 @@ void UWeaponComponent::InitWeapons()
             }
 
             VehicleWeapon->SetOwner(GetOwner());
-            // GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, VehicleWeapon->ActorLocation().ToString());
 
             FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
             VehicleWeapon->AttachToComponent(CompToAttachWeapons, AttachmentRules, SocketName);
@@ -103,12 +102,17 @@ void UWeaponComponent::UpdateWidgets()
     if (!GetOwner() || !GetOwner()->GetInstigatorController()) return;
     const auto PlayerState = GetOwner()->GetInstigatorController()->GetPlayerState<AValkyriePlayerState>();
 
-    // if (!PlayerState || PlayerState->GetVehicleItems().Num() == 0) return;
+    if (!PlayerState || PlayerState->GetVehicleUnits().Num() == 0) return;
 
-    // for (auto& VehicleWeapon : PlayerState->GetVehicleItems())
-    //{
-    //     OnItemMount_Client(VehicleWeapon);
-    // }
+    for (auto& Unit : PlayerState->GetVehicleUnits())
+    {
+        switch (Unit.UnitType)
+        {
+            case EVehicleUnitType::Turret: OnUnitMount_Client(Unit); break;
+            case EVehicleUnitType::SecondWeapon: OnUnitMount_Client(Unit); break;
+            default: break;
+        }
+    }
 }
 
 void UWeaponComponent::BeginPlay()
@@ -133,32 +137,27 @@ void UWeaponComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
     DOREPLIFETIME(UWeaponComponent, CompToAttachWeapons);
     DOREPLIFETIME(UWeaponComponent, VehicleWeapons);
-
-    // DOREPLIFETIME(UWeaponComponent, TurretHub);
 }
 
 void UWeaponComponent::OnDeath()
 {
-    // if (VehicleTurretHubPawn && VehicleTurretHubPawn->Controller)
-    //{
-    //     VehicleTurretHubPawn->Controller->Destroy();
-    // }
+    if (TurretHub && TurretHub->Controller)
+    {
+        TurretHub->Controller->Destroy();
+    }
 }
 
-// void UWeaponComponent::OnItemMount_Client_Implementation(const FVehicleItemData& Data)
-//{
-//     FString Test = "UWeaponComponent : OnItemMount " + Data.ItemName.ToString();
-//     GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, Test);
-//
-//     OnItemMount.Broadcast(Data);
-// }
+void UWeaponComponent::OnUnitMount_Client_Implementation(const FVehicleUnitData& Data)
+{
+    OnUnitMount.Broadcast(Data);
+}
 
-void UWeaponComponent::OnChangeAmmo_Client_Implementation(EVehicleItemType Type, int32 Amount)
+void UWeaponComponent::OnChangeAmmo_Client_Implementation(EVehicleUnitType Type, int32 Amount)
 {
     OnChangeAmmo.Broadcast(Type, Amount);
 }
 
-void UWeaponComponent::OnStartReloading_Client_Implementation(EVehicleItemType Type)
+void UWeaponComponent::OnStartReloading_Client_Implementation(EVehicleUnitType Type)
 {
     OnStartReloading.Broadcast(Type);
 }

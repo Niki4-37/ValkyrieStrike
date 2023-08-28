@@ -5,27 +5,27 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "GameCoreTypes.h"
-#include "InGameVehicleItemWidget.generated.h"
+#include "InGameVehicleUnitWidget.generated.h"
 
 class UImage;
 class UProgressBar;
 
 UCLASS()
-class VALKYRIESTRIKE_API UInGameVehicleItemWidget : public UUserWidget
+class VALKYRIESTRIKE_API UInGameVehicleUnitWidget : public UUserWidget
 {
     GENERATED_BODY()
 
 public:
-    void SetItemData(const FVehicleItemData& Data);
+    void SetUnitData(const FVehicleUnitData& Data);
     void UpdateAmmoCapacityBar(int32 NewValue);
     void StartReloading();
-    EVehicleItemType GetItemType() const {return ItemType;}
+    EVehicleUnitType GetUnitType() const { return UnitType; }
 
     virtual void BeginDestroy() override;
 
 protected:
     UPROPERTY(meta = (BindWidget))
-    UImage* ItemImage;
+    UImage* UnitImage;
 
     UPROPERTY(meta = (BindWidget))
     UProgressBar* AmmoCapacityBar;
@@ -36,7 +36,7 @@ protected:
 private:
     int32 MaxAmmoCapacity;
     float ReloadingTime;
-    EVehicleItemType ItemType;
+    EVehicleUnitType UnitType;
     FTimerHandle ReloadingTimer;
     FTimerHandle ProgressTimer;
 

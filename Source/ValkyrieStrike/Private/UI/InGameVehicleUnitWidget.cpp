@@ -1,15 +1,17 @@
 // Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 
-#include "UI/InGameVehicleItemWidget.h"
+#include "UI/InGameVehicleUnitWidget.h"
 #include "Components/Image.h"
 #include "Components/ProgressBar.h"
 
-void UInGameVehicleItemWidget::SetItemData(const FVehicleItemData& Data)
+#include "Engine.h"
+
+void UInGameVehicleUnitWidget::SetUnitData(const FVehicleUnitData& Data)
 {
-    if (ItemImage)
+    if (UnitImage)
     {
-        ItemImage->SetBrushFromSoftTexture(Data.ItemThumb);
-        ItemImage->SetBrushSize(FVector2D(100.f));
+        UnitImage->SetBrushFromSoftTexture(Data.UnitThumb);
+        UnitImage->SetBrushSize(FVector2D(100.f));
     }
 
     if (AmmoCapacityBar)
@@ -17,24 +19,25 @@ void UInGameVehicleItemWidget::SetItemData(const FVehicleItemData& Data)
         AmmoCapacityBar->SetPercent(1.f);
     }
 
-    MaxAmmoCapacity = Data.MaxAmmoCapacity;
+    MaxAmmoCapacity = Data.UnitMaxValue;
 
     if (ReloadingProgress)
     {
         ReloadingProgress->SetVisibility(ESlateVisibility::Hidden);
         ReloadingProgress->SetPercent(0.f);
     }
-    ReloadingTime = Data.ReloadingTime;
+    ReloadingTime = Data.ExecutionTime;
     checkf(ReloadingTime, TEXT("ReloadingTime is ZERO!"));
-    ItemType = Data.ItemType;
+    UnitType = Data.UnitType;
 }
 
-void UInGameVehicleItemWidget::UpdateAmmoCapacityBar(int32 NewValue)
+void UInGameVehicleUnitWidget::UpdateAmmoCapacityBar(int32 NewValue)
 {
+    GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, FString::Printf(TEXT("Ammo: %i"), NewValue));
     MaxAmmoCapacity > 0 ? AmmoCapacityBar->SetPercent(NewValue / FMath::CeilToFloat(MaxAmmoCapacity)) : AmmoCapacityBar->SetPercent(0.f);
 }
 
-void UInGameVehicleItemWidget::StartReloading()
+void UInGameVehicleUnitWidget::StartReloading()
 {
     if (GetWorld()->GetTimerManager().IsTimerActive(ReloadingTimer)) return;
 
@@ -42,7 +45,7 @@ void UInGameVehicleItemWidget::StartReloading()
     ReloadingProgress->SetVisibility(ESlateVisibility::Visible);
     ReloadingProgress->SetPercent(0.f);
 
-    GetWorld()->GetTimerManager().SetTimer(ReloadingTimer, this, &UInGameVehicleItemWidget::EndReloading, ReloadingTime);
+    GetWorld()->GetTimerManager().SetTimer(ReloadingTimer, this, &UInGameVehicleUnitWidget::EndReloading, ReloadingTime);
 
     FTimerDelegate TimerDelegate;
     TimerDelegate.BindLambda(
@@ -55,7 +58,7 @@ void UInGameVehicleItemWidget::StartReloading()
     GetWorld()->GetTimerManager().SetTimer(ProgressTimer, TimerDelegate, ReloadingTime / 100.f, true);
 }
 
-void UInGameVehicleItemWidget::BeginDestroy()
+void UInGameVehicleUnitWidget::BeginDestroy()
 {
     Super::BeginDestroy();
     if (GetWorld())
@@ -65,7 +68,7 @@ void UInGameVehicleItemWidget::BeginDestroy()
     }
 }
 
-void UInGameVehicleItemWidget::EndReloading()
+void UInGameVehicleUnitWidget::EndReloading()
 {
     GetWorld()->GetTimerManager().ClearTimer(ReloadingTimer);
     GetWorld()->GetTimerManager().ClearTimer(ProgressTimer);

@@ -18,7 +18,7 @@ class VALKYRIESTRIKE_API UWeaponComponent : public UActorComponent
 public:
     UWeaponComponent();
 
-    FOnItemMountSignature OnItemMount;
+    FOnUnitMountSignature OnUnitMount;
     FOnChangeAmmoSignature OnChangeAmmo;
     FOnOnStartReloadingSignature OnStartReloading;
 
@@ -26,8 +26,6 @@ public:
     void ShootFromSecondWeapon_OnServer();
     bool AddAmmo(int32 Amount);
 
-    // UFUNCTION(Server, reliable)
-    // void InitWeapons_OnServer();
     void InitWeapons();
     void UpdateWidgets();
 
@@ -49,19 +47,19 @@ private:
     UPROPERTY(Replicated)
     TArray<ABaseVehicleWeapon*> VehicleWeapons;
 
-    UPROPERTY(/*Replicated*/)
+    UPROPERTY()
     ATurretHubPawn* TurretHub;
 
     void OnDeath();
 
-    // UFUNCTION(Client, reliable)
-    // void OnItemMount_Client(const FVehicleItemData& Data);
+    UFUNCTION(Client, reliable)
+    void OnUnitMount_Client(const FVehicleUnitData& Data);
 
     UFUNCTION(Client, reliable)
-    void OnChangeAmmo_Client(EVehicleItemType Type, int32 Amount);
+    void OnChangeAmmo_Client(EVehicleUnitType Type, int32 Amount);
 
     UFUNCTION(Client, reliable)
-    void OnStartReloading_Client(EVehicleItemType Type);
+    void OnStartReloading_Client(EVehicleUnitType Type);
 
     template <class T>
     T* MountWeapon(UClass* Class, FName SocketName);

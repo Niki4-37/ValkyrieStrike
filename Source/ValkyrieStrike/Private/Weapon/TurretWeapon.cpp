@@ -45,7 +45,7 @@ void ATurretWeapon::MakeShot()
 
     if (!HasAim() || IsReloading() || IsEmpty()) return;
 
-    GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Red, "ATurretWeapon::MakeShot");
+    // GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Red, "ATurretWeapon::MakeShot");
 
     auto Rotation = Gun->GetSocketRotation(MuzzleSocketName);
 
@@ -55,8 +55,7 @@ void ATurretWeapon::MakeShot()
     auto Bullet = GetWorld()->SpawnActor<ADefaultProjectile>(DefaultProjectileClass, SpawningTransform);
     if (!Bullet) return;
 
-    void ReduceAmmo();
-    // OnChangeAmmoInWeapon.Broadcast(EVehicleItemType::TurretHubPawn, AmmoCapacity);
+    ChangeAmmo(-1);
 
     if (IsEmpty())
     {

@@ -8,7 +8,7 @@
 #include "InGameVehicleConfigWidget.generated.h"
 
 class UVerticalBox;
-class UInGameVehicleItemWidget;
+class UInGameVehicleUnitWidget;
 
 UCLASS()
 class VALKYRIESTRIKE_API UInGameVehicleConfigWidget : public UBaseWidget
@@ -17,19 +17,19 @@ class VALKYRIESTRIKE_API UInGameVehicleConfigWidget : public UBaseWidget
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    TSubclassOf<UUserWidget> InGameVehicleItemWidgetClass;
+    TSubclassOf<UUserWidget> InGameVehicleUnitWidgetClass;
 
     UPROPERTY(meta = (BindWidget))
-    UVerticalBox* ItemsBox;
+    UVerticalBox* UnitsBox;
 
     virtual void NativeOnInitialized() override;
 
 private:
     virtual void OnNewPawn(APawn* NewPawn) override;
-    void OnItemMount(const FVehicleItemData& Data);
-    void OnChangeAmmo(EVehicleItemType Type, int32 NewValue);
-    void OnStartReloading(EVehicleItemType Type);
+    void OnUnitMount(const FVehicleUnitData& Data);
+    void OnChangeAmmo(EVehicleUnitType Type, int32 NewValue);
+    void OnStartReloading(EVehicleUnitType Type);
 
     UPROPERTY()
-    TMap<EVehicleItemType, UInGameVehicleItemWidget*> ItemsMap;
+    TMap<EVehicleUnitType, UInGameVehicleUnitWidget*> UnitsMap;
 };

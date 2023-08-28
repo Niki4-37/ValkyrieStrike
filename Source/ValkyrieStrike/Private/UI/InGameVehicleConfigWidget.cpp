@@ -3,15 +3,14 @@
 #include "UI/InGameVehicleConfigWidget.h"
 #include "Components/WeaponComponent.h"
 #include "Components/VerticalBox.h"
-#include "UI/InGameVehicleItemWidget.h"
-
-#include "Engine.h"
+#include "Weapon/BaseVehicleWeapon.h"
+#include "UI/InGameVehicleUnitWidget.h"
 
 void UInGameVehicleConfigWidget::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
 
-    checkf(InGameVehicleItemWidgetClass, TEXT("InGameVehicleItemWidgetClass not define!"));
+    checkf(InGameVehicleUnitWidgetClass, TEXT("InGameVehicleUnitWidgetClass not define!"));
 }
 
 void UInGameVehicleConfigWidget::OnNewPawn(APawn* NewPawn)
@@ -20,54 +19,54 @@ void UInGameVehicleConfigWidget::OnNewPawn(APawn* NewPawn)
     const auto WeaponComponent = NewPawn->FindComponentByClass<UWeaponComponent>();
     if (!WeaponComponent) return;
 
-    if (!WeaponComponent->OnItemMount.IsBoundToObject(this))
+    if (!WeaponComponent->OnUnitMount.IsBoundToObject(this))
     {
-        WeaponComponent->OnItemMount.AddUObject(this, &UInGameVehicleConfigWidget::OnItemMount);
+        WeaponComponent->OnUnitMount.AddUObject(this, &UInGameVehicleConfigWidget::OnUnitMount);
     }
 
-    if (!WeaponComponent->OnChangeAmmo.IsBoundToObject(this))
+    for (const auto Weapon : WeaponComponent->GetVehicleWeapons())
     {
-        WeaponComponent->OnChangeAmmo.AddUObject(this, &UInGameVehicleConfigWidget::OnChangeAmmo);
-    }
-
-    if (!WeaponComponent->OnStartReloading.IsBoundToObject(this))
-    {
-        WeaponComponent->OnStartReloading.AddUObject(this, &UInGameVehicleConfigWidget::OnStartReloading);
+        if (!Weapon->OnChangeAmmoInWeapon.IsBoundToObject(this))
+        {
+            Weapon->OnChangeAmmoInWeapon.AddUObject(this, &UInGameVehicleConfigWidget::OnChangeAmmo);
+        }
+        if (!Weapon->OnStartWeaponReloading.IsBoundToObject(this))
+        {
+            Weapon->OnStartWeaponReloading.AddUObject(this, &UInGameVehicleConfigWidget::OnStartReloading);
+        }
     }
 
     WeaponComponent->UpdateWidgets();
 }
 
-void UInGameVehicleConfigWidget::OnItemMount(const FVehicleItemData& Data)
+void UInGameVehicleConfigWidget::OnUnitMount(const FVehicleUnitData& Data)
 {
-    GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Blue, Data.ItemName.ToString());
-
-    const auto ItemWidget = CreateWidget<UInGameVehicleItemWidget>(GetWorld(), InGameVehicleItemWidgetClass);
-    if (ItemsBox && ItemWidget)
+    const auto UnitWidget = CreateWidget<UInGameVehicleUnitWidget>(GetWorld(), InGameVehicleUnitWidgetClass);
+    if (UnitsBox && UnitWidget)
     {
-        ItemWidget->SetItemData(Data);
+        UnitWidget->SetUnitData(Data);
 
-        for (auto Child : ItemsBox->GetAllChildren())
+        for (auto Child : UnitsBox->GetAllChildren())
         {
-            const auto VehicleItemWidget = Cast<UInGameVehicleItemWidget>(Child);
-            if (!VehicleItemWidget) continue;
-            if (VehicleItemWidget->GetItemType() != Data.ItemType) continue;
-            ItemsBox->RemoveChild(Child);
+            const auto VehicleUnitWidget = Cast<UInGameVehicleUnitWidget>(Child);
+            if (!VehicleUnitWidget) continue;
+            if (VehicleUnitWidget->GetUnitType() != Data.UnitType) continue;
+            UnitsBox->RemoveChild(Child);
         }
 
-        ItemsBox->AddChild(ItemWidget);
-        ItemsMap.FindOrAdd(Data.ItemType) = ItemWidget;
+        UnitsBox->AddChild(UnitWidget);
+        UnitsMap.FindOrAdd(Data.UnitType) = UnitWidget;
     }
 }
 
-void UInGameVehicleConfigWidget::OnChangeAmmo(EVehicleItemType Type, int32 NewValue)
+void UInGameVehicleConfigWidget::OnChangeAmmo(EVehicleUnitType Type, int32 NewValue)
 {
-    if (!ItemsMap.Contains(Type)) return;
-    ItemsMap.FindChecked(Type)->UpdateAmmoCapacityBar(NewValue);
+    if (!UnitsMap.Contains(Type)) return;
+    UnitsMap.FindChecked(Type)->UpdateAmmoCapacityBar(NewValue);
 }
 
-void UInGameVehicleConfigWidget::OnStartReloading(EVehicleItemType Type)
+void UInGameVehicleConfigWidget::OnStartReloading(EVehicleUnitType Type)
 {
-    if (!ItemsMap.Contains(Type)) return;
-    ItemsMap.FindChecked(Type)->StartReloading();
+    if (!UnitsMap.Contains(Type)) return;
+    UnitsMap.FindChecked(Type)->StartReloading();
 }

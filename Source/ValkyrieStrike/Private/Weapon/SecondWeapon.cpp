@@ -33,7 +33,7 @@ bool ASecondWeapon::ChangeAmmoCapacity(int32 Value)
 
     AmmoCapacity = FMath::Clamp(AmmoCapacity + Value, 0, MaxAmmoCapacity);
 
-    OnChangeAmmoInWeapon.Broadcast(EVehicleItemType::SecondWeapon, AmmoCapacity);
+    OnChangeAmmoInWeapon.Broadcast(EVehicleUnitType::SecondWeapon, AmmoCapacity);
     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::FromInt(AmmoCapacity));
 
     return bCanChanged;
@@ -132,5 +132,5 @@ void ASecondWeapon::ReloadWeapon()
     TimerDelegate.BindLambda([&]() { bIsReady = true; });
     GetWorldTimerManager().SetTimer(ReloadingTimer, TimerDelegate, ReloadingTime, false);
 
-    OnStartWeaponReloading.Broadcast(EVehicleItemType::SecondWeapon);
+    OnStartWeaponReloading.Broadcast(EVehicleUnitType::SecondWeapon);
 }

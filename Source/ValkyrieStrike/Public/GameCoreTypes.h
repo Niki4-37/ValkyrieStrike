@@ -16,21 +16,6 @@ enum class EMenuState : uint8
 };
 
 UENUM(BlueprintType)
-enum class EVehicleConstructPartType : uint8
-{
-    Body,
-    Chassis
-};
-
-UENUM(BlueprintType)
-enum class EVehicleItemType : uint8
-{
-    Turret,
-    SecondWeapon,
-    Armor
-};
-
-UENUM(BlueprintType)
 enum class EVehicleUnitType : uint8
 {
     Body,
@@ -86,6 +71,7 @@ static EItemPropertyType& operator++(EItemPropertyType& EType)
 static EVehicleUnitType& operator++(EVehicleUnitType& EType)
 {
     EType = EVehicleUnitType(static_cast<std::underlying_type<EVehicleUnitType>::type>(EType) + 1);
+    return EType;
 }
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnMenuStateChangedSignature, EMenuState);
@@ -106,51 +92,6 @@ struct FLevelData
 };
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnLevelSelectedSignature, const FLevelData&);
-
-USTRUCT(BlueprintType)  // to delete
-struct FVehicleConstructPart : public FTableRowBase
-{
-    GENERATED_USTRUCT_BODY()
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    EVehicleConstructPartType PartType;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    FString PartName;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    UTexture2D* PartThumb;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    UStaticMesh* PartMesh;
-};
-
-USTRUCT(BlueprintType)  // to delete
-struct FVehicleItemData : public FTableRowBase
-{
-    GENERATED_USTRUCT_BODY()
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    FName ItemName{NAME_None};
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    UTexture2D* ItemThumb;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    TSubclassOf<AActor> ItemClass;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    EVehicleItemType ItemType;
-
-    UPROPERTY(EditDefaultsONly, BlueprintReadWrite)
-    bool bIsLocked{false};
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    int32 MaxAmmoCapacity{10};
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    float ReloadingTime{2.f};
-};
 
 USTRUCT(BlueprintType)
 struct FUnitComponent
@@ -200,12 +141,10 @@ struct FVehicleUnitData : public FTableRowBase
 DECLARE_MULTICAST_DELEGATE(FOnDeathSignature);
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnItemValueChangedSignature, EItemPropertyType, float, float);
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnItemMountSignature, const FVehicleItemData&);  // change ot FVehicleUnitData&
-
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnUnitMountSignature, const FVehicleUnitData&);
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnChangeAmmoSignature, EVehicleItemType, int32);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnOnStartReloadingSignature, EVehicleItemType);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnChangeAmmoSignature, EVehicleUnitType, int32);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnOnStartReloadingSignature, EVehicleUnitType);
 
 USTRUCT(BlueprintType)
 struct FInteractionData
