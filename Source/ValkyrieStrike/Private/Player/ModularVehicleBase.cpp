@@ -64,6 +64,38 @@ AModularVehicleBase::AModularVehicleBase()
     WorkshopComponent = CreateDefaultSubobject<UWorkshopComponent>("WorkshopComponent");
 }
 
+bool AModularVehicleBase::AddAmount(const FInteractionData& Data)
+{
+    bool bResult{false};
+    switch (Data.Type)
+    {
+        case EItemPropertyType::Ammo: bResult = WeaponComponent->AddAmmo(Data.Amount); break;
+        case EItemPropertyType::Money:
+            WorkshopComponent->AddCoins(Data.Amount);
+            bResult = true;
+            break;
+        case EItemPropertyType::Endurance:
+            VehicleIndicatorsComp->AddHealth(Data.Amount);
+            bResult = true;
+            break;
+        case EItemPropertyType::Fuel: bResult = VehicleIndicatorsComp->AddFuel(Data.Amount); break;
+    }
+
+    return bResult;
+}
+
+bool AModularVehicleBase::MakeMaintenance(EItemPropertyType Type)
+{
+    WorkshopComponent->MakeMaintenance(Type);
+    return true;
+}
+
+bool AModularVehicleBase::SetWorkshopTasksData(const TArray<FInteractionData>& Tasks)
+{
+    WorkshopComponent->SetWorkshopTasks(Tasks);
+    return false;
+}
+
 void AModularVehicleBase::BeginPlay()
 {
     Super::BeginPlay();
@@ -126,10 +158,10 @@ void AModularVehicleBase::Restart()
         WeaponComponent->InitWeapons();
     }
 
-    // if (const auto ValkyriePS = GetPlayerState<AValkyriePlayerState>())
-    //{
-    //     WorkshopComponent->AddCoins(ValkyriePS->GetCoins());
-    // }
+    if (const auto ValkyriePS = GetPlayerState<AValkyriePlayerState>())
+    {
+        WorkshopComponent->AddCoins(ValkyriePS->GetCoins());
+    }
 }
 
 void AModularVehicleBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

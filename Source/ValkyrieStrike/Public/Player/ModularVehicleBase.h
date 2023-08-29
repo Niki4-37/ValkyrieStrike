@@ -16,12 +16,20 @@ class UVehicleIndicatorsComponent;
 class UWorkshopComponent;
 
 UCLASS()
-class VALKYRIESTRIKE_API AModularVehicleBase : public APawn
+class VALKYRIESTRIKE_API AModularVehicleBase : public APawn, public IGameInterface
 {
     GENERATED_BODY()
 
 public:
     AModularVehicleBase();
+
+    /** for workshop widget */
+    FOnWorkshopTasksUpdatedSignature OnWorkshopTasksUpdated;
+
+    /** Interface functions */
+    virtual bool AddAmount(const FInteractionData& Data) override;
+    virtual bool MakeMaintenance(EItemPropertyType Type) override;
+    virtual bool SetWorkshopTasksData(const TArray<FInteractionData>& Tasks) override;
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
