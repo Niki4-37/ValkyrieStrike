@@ -19,21 +19,26 @@ UWeaponComponent::UWeaponComponent()
 
 void UWeaponComponent::ShootFromSecondWeapon_OnServer_Implementation()
 {
-    // if (!SecondWeapon) return;
-    // SecondWeapon->MakeShot();
+    for (const auto VehicleWeapon : VehicleWeapons)
+    {
+        VehicleWeapon->AlternativeShot();
+    }
 }
 
 bool UWeaponComponent::AddAmmo(int32 Amount)
 {
-    /** handled on server. Pickup->DefaultWeeledVehicle */
-    // return SecondWeapon ? SecondWeapon->ChangeAmmoCapacity(Amount) : false;
+    /** handled on server. Pickup */
+    for (const auto VehicleWeapon : VehicleWeapons)
+    {
+        if (VehicleWeapon->AddAmmo(Amount, EVehicleUnitType::SecondWeapon)) return true;
+    }
 
     return false;
 }
 
 void UWeaponComponent::InitWeapons()
 {
-    // spawn turret hub
+    /** spawn turret hub */
     checkf(TurretHubClass, TEXT("TurretHubPawnHubClass not define!"));
     FActorSpawnParameters SpawnParams;
     SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -51,7 +56,7 @@ void UWeaponComponent::InitWeapons()
         TurretHub->SpawnDefaultController();
     }
 
-    // spawn weapons
+    /** spawn weapons */
     if (!CompToAttachWeapons || !GetOwner() || !GetOwner()->GetInstigatorController()) return;
     const auto PlayerState = GetOwner()->GetInstigatorController()->GetPlayerState<AValkyriePlayerState>();
 
@@ -123,12 +128,6 @@ void UWeaponComponent::BeginPlay()
     {
         HealthComponent->OnDeath.AddUObject(this, &UWeaponComponent::OnDeath);
     }
-
-    /* debug */
-    // if (GetOwner()->GetRemoteRole() == ENetRole::ROLE_Authority)
-    //{
-    //     InitWeapons_OnServer();
-    // }
 }
 
 void UWeaponComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

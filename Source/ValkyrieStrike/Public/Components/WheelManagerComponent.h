@@ -22,6 +22,8 @@ public:
     bool GetVelocityAverage(FVector& VelocityAverage) const;
     bool GetWheelsGroups(TArray<FWheelsGroup>& OutWheelsGroup) const;
 
+    void StartSendData(float SendDataRate);
+
 protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TArray<TEnumAsByte<EObjectTypeQuery>> TreceForObjectTypes;
@@ -60,6 +62,8 @@ private:
     float ControlInput;
     bool bIsWheelContact{false};
     bool bIsBreake{false};
+
+    FTimerHandle ManageWheelsTimer;
 
     bool WheelSphereTrace(const FWheelData& Wheel, FHitResult& Hit);
 

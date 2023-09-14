@@ -1,7 +1,6 @@
 // Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 
 #include "Weapon/BaseVehicleWeapon.h"
-#include "Net/UnrealNetwork.h"  //to delete
 
 #include "Engine.h"
 
@@ -79,48 +78,26 @@ void ABaseVehicleWeapon::UpdateAimActor(AActor* NewAimActor, float UpdateTimeRat
     GetWorldTimerManager().SetTimer(RotationTimer, TimerDelegate, UpdateTimeRate / 10.f, true);
 }
 
+bool ABaseVehicleWeapon::AddAmmo(int32 Amount, EVehicleUnitType InType)
+{
+    if (WeaponType != InType) return false;
+    IsEmpty() ? ReloadWeapon() : ChangeAmmo(Amount);
+    return true;
+}
+
+void ABaseVehicleWeapon::AlternativeShot()
+{
+    GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "ABaseVehicleWeapon::AlternativeShot");
+}
+
 void ABaseVehicleWeapon::MakeShot()
 {
-    GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Red, "ABaseVehicleWeapon::MakeShot");
     /* handled on server */
-
-    // const FVector TraceStart = Gun->GetSocketLocation(MuzzleSocketName);
-    // const FVector TraceEnd = TraceStart + Gun->GetSocketRotation(MuzzleSocketName).Vector() * 2000.f;
-
-    // TArray<FHitResult> Hits;
-    // UKismetSystemLibrary::SphereTraceMulti(GetWorld(),                                                           //
-    //                                        TraceStart,                                                           //
-    //                                        TraceEnd,                                                             //
-    //                                        /*BeemRadius*/ 10.f,                                                  //
-    //                                        UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility),  //
-    //                                        false,                                                                //
-    //                                        {GetOwner(), this},                                                   //
-    //                                        EDrawDebugTrace::ForDuration,                                         //
-    //                                        Hits,                                                                 //
-    //                                        true);
-    ///* debug */
-    // TArray<AActor*> HitActors;
-    // for (auto& Hit : Hits)
-    //{
-    //     if (!Hit.GetActor()) continue;
-    //     HitActors.AddUnique(Hit.GetActor());
-    // }
-
-    // for (auto HitActor : HitActors)
-    //{
-    //     // UGameplayStatics::ApplyDamage(HitActor, WeaponDamage, GetInstigatorController(), GetOwner(), UDamageType::StaticClass());
-    //     GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, HitActor->GetName());
-    // }
 }
 
 void ABaseVehicleWeapon::BeginPlay()
 {
     Super::BeginPlay();
-}
-
-void ABaseVehicleWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
 void ABaseVehicleWeapon::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -168,19 +145,24 @@ void ABaseVehicleWeapon::ChangeAmmo(int32 Value)
     OnChangeAmmoInWeapon_OnClient(WeaponType, AmmoCapacity);
 }
 
-void ABaseVehicleWeapon::ReloadWeapon()
+void ABaseVehicleWeapon::Recharge() 
 {
     if (bIsReloading) return;
     bIsReloading = true;
     GetWorldTimerManager().SetTimer(
-        ReloadingTimer,
+        ReloadingTimer, 
         [&]()
-        {
-            bIsReloading = false;
-            AmmoCapacity = MaxAmmoCapacity;
-            OnChangeAmmoInWeapon_OnClient(WeaponType, AmmoCapacity);
-        },
+            { 
+                bIsReloading = false; 
+            },
         ReloadingTime, false);
+    OnStartWeaponReloading_OnClient(WeaponType);
+}
+
+void ABaseVehicleWeapon::ReloadWeapon()
+{
+    Recharge();
+    ChangeAmmo(MaxAmmoCapacity);
     OnStartWeaponReloading_OnClient(WeaponType);
 }
 

@@ -65,6 +65,9 @@ protected:
     UPROPERTY(VisibleDefaultsOnly)
     USceneComponent* WheelRL;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite) 
+    float SendDataRate{0.03f};
+
     virtual void BeginPlay() override;
 
 public:

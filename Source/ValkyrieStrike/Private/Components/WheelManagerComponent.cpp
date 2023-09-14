@@ -36,6 +36,11 @@ bool UWheelManagerComponent::GetWheelsGroups(TArray<FWheelsGroup>& OutWheelsGrou
     return true;
 }
 
+void UWheelManagerComponent::StartSendData(float SendDataRate) 
+{
+    GetWorld()->GetTimerManager().SetTimer(ManageWheelsTimer, this, &UWheelManagerComponent::ManageWheels, SendDataRate, true);
+}
+
 void UWheelManagerComponent::BeginPlay()
 {
     Super::BeginPlay();
@@ -44,8 +49,6 @@ void UWheelManagerComponent::BeginPlay()
 void UWheelManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-    ManageWheels();
 }
 
 bool UWheelManagerComponent::WheelSphereTrace(const FWheelData& Wheel, FHitResult& Hit)

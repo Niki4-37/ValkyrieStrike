@@ -26,12 +26,16 @@ public:
     void DefineSideMode(float InAcos);
 
     void SetupWeapon(EVehicleUnitType InWeaponType, int32 InMaxAmmoCapacity, float InReloadingTime);
+    EVehicleUnitType GetWeaponType() const { return WeaponType; }   //???
     void UpdateAimActor(AActor* NewAimActor, float UpdateTimeRate);
 
     bool HasAim() const { return bHasAim; }
     bool IsReloading() const { return bIsReloading; }
 
     bool IsEmpty() const { return AmmoCapacity == 0; }
+    bool AddAmmo(int32 Amount, EVehicleUnitType InType);
+
+    virtual void AlternativeShot();
 
 protected:
     UPROPERTY(VisibleDefaultsOnly)
@@ -50,7 +54,6 @@ protected:
     float SidePositionModifier{1.f};
 
     virtual void BeginPlay() override;
-    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
     virtual void RotateToTarget(AActor* Target);
@@ -58,6 +61,7 @@ protected:
     virtual void MakeShot();
 
     void ChangeAmmo(int32 Value);
+    void Recharge();
     void ReloadWeapon();
     int32 GetAmmo() const { return AmmoCapacity; };
 

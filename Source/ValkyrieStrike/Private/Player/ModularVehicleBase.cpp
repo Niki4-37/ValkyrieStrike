@@ -103,7 +103,8 @@ void AModularVehicleBase::BeginPlay()
     if (HasAuthority())
     {
         // Set ClearTimer!!!
-        GetWorld()->GetTimerManager().SetTimer(DataTickTimer, this, &AModularVehicleBase::SendDataTick_Multicast, 0.03f, true);
+        WheelManagerComponent->StartSendData(SendDataRate);
+        GetWorld()->GetTimerManager().SetTimer(DataTickTimer, this, &AModularVehicleBase::SendDataTick_Multicast, SendDataRate, true);
     }
 }
 
@@ -172,6 +173,8 @@ void AModularVehicleBase::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
     PlayerInputComponent->BindAxis("MoveForward", this, &AModularVehicleBase::MoveForward);
     PlayerInputComponent->BindAxis("MoveRight", this, &AModularVehicleBase::MoveRight);
+
+    PlayerInputComponent->BindAction("Fire", IE_Pressed, WeaponComponent, &UWeaponComponent::ShootFromSecondWeapon_OnServer);
 }
 
 bool AModularVehicleBase::GetVelocityAverage(FVector& VelocityAverage) const
