@@ -27,6 +27,7 @@ public:
     bool AddAmmo(int32 Amount);
 
     void InitWeapons();
+    void CleanWeapons();
     void UpdateWidgets();
 
     void SetCompToAttachWeapons(USceneComponent* NewComp) { CompToAttachWeapons = NewComp; };

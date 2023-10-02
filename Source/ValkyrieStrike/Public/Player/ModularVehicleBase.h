@@ -65,7 +65,7 @@ protected:
     UPROPERTY(VisibleDefaultsOnly)
     USceneComponent* WheelRL;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite) 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
     float SendDataRate{0.03f};
 
     virtual void BeginPlay() override;
@@ -74,7 +74,7 @@ public:
     virtual void PostInitializeComponents() override;
     virtual void Tick(float DeltaTime) override;
     virtual void Restart() override;
-
+    virtual void UnPossessed() override;
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
     /* used in AnimationBP */

@@ -102,6 +102,17 @@ void UWeaponComponent::InitWeapons()
     }
 }
 
+void UWeaponComponent::CleanWeapons()
+{
+    if (!VehicleWeapons.Num()) return;
+    for (auto Weapon : VehicleWeapons)
+    {
+        if (!Weapon) continue;
+        // detach, simulate physics
+        Weapon->Destroy();
+    }
+}
+
 void UWeaponComponent::UpdateWidgets()
 {
     if (!GetOwner() || !GetOwner()->GetInstigatorController()) return;

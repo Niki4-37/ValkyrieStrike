@@ -36,7 +36,7 @@ bool UWheelManagerComponent::GetWheelsGroups(TArray<FWheelsGroup>& OutWheelsGrou
     return true;
 }
 
-void UWheelManagerComponent::StartSendData(float SendDataRate) 
+void UWheelManagerComponent::StartSendData(float SendDataRate)
 {
     GetWorld()->GetTimerManager().SetTimer(ManageWheelsTimer, this, &UWheelManagerComponent::ManageWheels, SendDataRate, true);
 }

@@ -11,6 +11,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameLevelsConfig/ValkyriePlayerState.h"
+#include "Decorations/DecorationActor.h"
 
 #include "Engine.h"
 
@@ -100,6 +101,11 @@ void AModularVehicleBase::BeginPlay()
 {
     Super::BeginPlay();
 
+    check(WeaponComponent);
+    check(VehicleIndicatorsComp);
+
+    Tags.Add("Player");
+
     if (HasAuthority())
     {
         // Set ClearTimer!!!
@@ -163,6 +169,19 @@ void AModularVehicleBase::Restart()
     {
         WorkshopComponent->AddCoins(ValkyriePS->GetCoins());
     }
+}
+
+void AModularVehicleBase::UnPossessed()
+{
+    if (const auto ValkyriePS = GetPlayerState<AValkyriePlayerState>())
+    {
+        ValkyriePS->SaveCoins(WorkshopComponent->GetCoins());
+    }
+
+    WeaponComponent->CleanWeapons();
+
+    Super::UnPossessed();
+    Tags.Empty();
 }
 
 void AModularVehicleBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

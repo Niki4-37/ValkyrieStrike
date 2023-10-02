@@ -100,12 +100,12 @@ void AFirstLevelGameModeBase::Killed(AController* VictimController, const FTrans
 {
     if (VictimController && VictimController->IsA<APlayerController>())
     {
-        auto BrokenVehicle = GetWorld()->SpawnActorDeferred<ADecorationActor>(ADecorationActor::StaticClass(), VictimTransform);
-        if (BrokenVehicle)
-        {
-            BrokenVehicle->SetupDecoration(BrokenVehicleMesh);
-            BrokenVehicle->FinishSpawning(VictimTransform);
-        }
+        //auto BrokenVehicle = GetWorld()->SpawnActorDeferred<ADecorationActor>(ADecorationActor::StaticClass(), VictimTransform);
+        //if (BrokenVehicle)
+        //{
+        //    BrokenVehicle->SetupDecoration(BrokenVehicleMesh);
+        //    BrokenVehicle->FinishSpawning(VictimTransform);
+        //}
 
         if (const auto ValkyriePlayerState = VictimController->GetPlayerState<AValkyriePlayerState>())
         {

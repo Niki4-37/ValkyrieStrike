@@ -28,7 +28,7 @@ public:
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    UStaticMesh* BrokenVehicleMesh;
+    UStaticMesh* BrokenVehicleMesh; //to delete
 
 private:
     UPROPERTY()
