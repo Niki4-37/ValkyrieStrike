@@ -25,7 +25,8 @@ protected:
     virtual void OnPossess(APawn* InPawn) override;
     virtual void SetupInputComponent() override;
     virtual void BeginPlayingState();
-    virtual void FailedToSpawnPawn() override;  // to do
+    virtual void FailedToSpawnPawn() override;  // to do next
+    virtual bool SetPause(bool bPause, FCanUnpause CanUnpauseDelegate = FCanUnpause()) override;
 
     void OnPauseGame();
 };

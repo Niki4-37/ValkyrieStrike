@@ -18,3 +18,13 @@ bool IGameInterface::SetWorkshopTasksData(const TArray<FInteractionData>&)
 {
     return false;
 }
+
+bool IGameInterface::ShootFromWeapon()
+{
+    return false;
+}
+
+bool IGameInterface::UseReverseGear(bool bIsUsing)
+{
+    return false;
+}

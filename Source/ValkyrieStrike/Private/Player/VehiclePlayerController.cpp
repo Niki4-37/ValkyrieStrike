@@ -15,8 +15,10 @@ void AVehiclePlayerController::ChangeGameState(EValkyrieGameState State)
 {
     if (State == EValkyrieGameState::InProgress)
     {
-        SetInputMode(FInputModeGameOnly());
-        bShowMouseCursor = false;
+        // SetInputMode(FInputModeGameOnly());
+        // bShowMouseCursor = false;
+        SetInputMode(FInputModeGameAndUI());
+        bShowMouseCursor = true;
     }
     else
     {
@@ -44,7 +46,7 @@ void AVehiclePlayerController::SetupInputComponent()
     Super::SetupInputComponent();
 
     if (!InputComponent) return;
-    InputComponent->BindAction("PauseGame", IE_Pressed, this, &AVehiclePlayerController::OnPauseGame);
+    InputComponent->BindAction("PauseGame", IE_Pressed, this, &AVehiclePlayerController::OnPauseGame).bExecuteWhenPaused = true;
 }
 
 void AVehiclePlayerController::BeginPlayingState()
@@ -53,6 +55,13 @@ void AVehiclePlayerController::BeginPlayingState()
 }
 
 void AVehiclePlayerController::FailedToSpawnPawn() {}
+
+bool AVehiclePlayerController::SetPause(bool bPause, FCanUnpause CanUnpauseDelegate)
+{
+    bPause ? ChangeGameState(EValkyrieGameState::Pause) : ChangeGameState(EValkyrieGameState::InProgress);
+    //Super::SetPause(bPause, CanUnpauseDelegate);
+    return false;
+}
 
 void AVehiclePlayerController::OnPauseGame()
 {

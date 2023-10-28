@@ -33,10 +33,8 @@ void UPauseMenuWidget::OnSettingClicked()
 
 void UPauseMenuWidget::OnGoBackClicked()
 {
-    if (const auto PlayerController = Cast<AVehiclePlayerController>(GetOwningPlayer()))
-    {
-        PlayerController->ChangeGameState(EValkyrieGameState::InProgress);
-    }
+    if (!GetOwningPlayer()) return;
+    GetOwningPlayer()->SetPause(false);
 }
 
 void UPauseMenuWidget::OnQuitClicked()

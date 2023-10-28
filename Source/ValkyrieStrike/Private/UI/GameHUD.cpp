@@ -51,6 +51,6 @@ void AGameHUD::OnGameStateChanged(EValkyrieGameState State)
 
     if (CurrentWidget)
     {
-        CurrentWidget->SetVisibility(ESlateVisibility::Visible);
+        CurrentWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
     }
 }

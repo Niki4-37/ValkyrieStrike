@@ -61,25 +61,4 @@ private:
 
     UFUNCTION(Client, reliable)
     void OnStartReloading_Client(EVehicleUnitType Type);
-
-    template <class T>
-    T* MountWeapon(UClass* Class, FName SocketName);
 };
-
-template <class T>
-inline T* UWeaponComponent::MountWeapon(UClass* Class, FName SocketName)
-{
-    const auto WeeledVehicle = Cast<AWheeledVehicle>(GetOwner());
-    if (!WeeledVehicle) return nullptr;
-
-    FActorSpawnParameters SpawnParams;
-    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-    SpawnParams.Owner = GetOwner();
-    auto Weapon = GetWorld()->SpawnActor<T>(Class, SpawnParams);
-
-    if (!Weapon) return nullptr;
-
-    FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
-    Weapon->AttachToComponent(WeeledVehicle->GetMesh(), AttachmentRules, SocketName);
-    return Weapon;
-}

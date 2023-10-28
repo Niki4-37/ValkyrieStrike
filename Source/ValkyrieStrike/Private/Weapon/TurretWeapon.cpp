@@ -20,8 +20,8 @@ void ATurretWeapon::RotateToTarget(AActor* Target)
 {
     Super::RotateToTarget(Target);
 
-    const auto NoneAimLocation = GetOwner() ? GetOwner()->GetActorForwardVector() * 1000.f : FVector::ZeroVector;
-    const auto AimLocation = Target ? Target->GetActorLocation() : NoneAimLocation;
+    const auto NoneAimLocation = GetOwner() ? (GetOwner()->GetActorLocation() + GetOwner()->GetActorForwardVector() * 1000.f) : FVector::ZeroVector;
+    const auto AimLocation = Target ? (Target->GetActorLocation() + FVector(0.f, 0.f, 45.f)) : NoneAimLocation;
 
     const FRotator Direction = FRotationMatrix::MakeFromX(AimLocation - GetActorLocation()).Rotator();
 
@@ -46,12 +46,15 @@ void ATurretWeapon::MakeShot()
 
     if (!HasAim() || IsReloading() || IsEmpty()) return;
 
-    // GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Red, "ATurretWeapon::MakeShot");
-
     auto Rotation = Gun->GetSocketRotation(MuzzleSocketName);
 
+    const auto BulletSpread = 7.f;
+    const auto HalfRad = FMath::DegreesToRadians(BulletSpread);
+    const FVector ShootDirection = FMath::VRandCone(Rotation.Vector(), HalfRad);
+
     auto MuzzleLocation = Gun->GetSocketLocation(MuzzleSocketName);
-    FTransform SpawningTransform(Rotation, MuzzleLocation);
+    // FTransform SpawningTransform(Rotation, MuzzleLocation);
+    FTransform SpawningTransform(ShootDirection.Rotation(), MuzzleLocation);
 
     auto Bullet = GetWorld()->SpawnActor<ADefaultProjectile>(DefaultProjectileClass, SpawningTransform);
     if (!Bullet) return;

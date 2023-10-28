@@ -75,7 +75,8 @@ void ABaseVehicleWeapon::UpdateAimActor(AActor* NewAimActor, float UpdateTimeRat
     GetWorldTimerManager().ClearTimer(RotationTimer);
     bHasAim = NewAimActor != nullptr;
     auto TimerDelegate = FTimerDelegate::CreateUObject(this, &ABaseVehicleWeapon::RotateToTarget, NewAimActor);
-    GetWorldTimerManager().SetTimer(RotationTimer, TimerDelegate, UpdateTimeRate / 10.f, true);
+    const float RotationSpeed = UpdateTimeRate / 15.f;
+    GetWorldTimerManager().SetTimer(RotationTimer, TimerDelegate, RotationSpeed, true);
 }
 
 bool ABaseVehicleWeapon::AddAmmo(int32 Amount, EVehicleUnitType InType)
@@ -145,25 +146,25 @@ void ABaseVehicleWeapon::ChangeAmmo(int32 Value)
     OnChangeAmmoInWeapon_OnClient(WeaponType, AmmoCapacity);
 }
 
-void ABaseVehicleWeapon::Recharge() 
+void ABaseVehicleWeapon::Recharge()
 {
     if (bIsReloading) return;
     bIsReloading = true;
     GetWorldTimerManager().SetTimer(
-        ReloadingTimer, 
+        ReloadingTimer,
         [&]()
-            { 
-                bIsReloading = false; 
-            },
+        {
+            bIsReloading = false;
+            OnChangeAmmoInWeapon_OnClient(WeaponType, AmmoCapacity);
+        },
         ReloadingTime, false);
     OnStartWeaponReloading_OnClient(WeaponType);
 }
 
 void ABaseVehicleWeapon::ReloadWeapon()
 {
+    AmmoCapacity = MaxAmmoCapacity;
     Recharge();
-    ChangeAmmo(MaxAmmoCapacity);
-    OnStartWeaponReloading_OnClient(WeaponType);
 }
 
 void ABaseVehicleWeapon::OnChangeAmmoInWeapon_OnClient_Implementation(EVehicleUnitType Type, int32 Value)

@@ -2,7 +2,7 @@
 
 #include "UI/InGameVehicleConfigWidget.h"
 #include "Components/WeaponComponent.h"
-#include "Components/VerticalBox.h"
+#include "Components/HorizontalBox.h"
 #include "Weapon/BaseVehicleWeapon.h"
 #include "UI/InGameVehicleUnitWidget.h"
 

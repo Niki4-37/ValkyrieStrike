@@ -28,7 +28,7 @@ void UWorkshopWidget::OnWorkshopTasksUpdated(const TArray<FInteractionData>& Tas
 
     if (!WorkshopTaskSlots || !Tasks.Num())
     {
-        GetOwningPlayer()->bShowMouseCursor = false;
+        //GetOwningPlayer()->bShowMouseCursor = false;
 
         SetVisibility(ESlateVisibility::Collapsed);
         return;

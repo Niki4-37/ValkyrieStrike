@@ -8,6 +8,7 @@
 
 class UBorder;
 class UBaseWidget;
+class UButton;
 
 UCLASS()
 class VALKYRIESTRIKE_API UPlayerHUDWidget : public UUserWidget
@@ -32,6 +33,15 @@ protected:
 
     UPROPERTY(meta = (BindWidget))
     UBorder* WorkshopPosition;
+
+    UPROPERTY(meta = (BindWidget))
+    UButton* SettingsButton;
+
+    UPROPERTY(meta = (BindWidget))
+    UButton* ReverseGearButton;
+
+    UPROPERTY(meta = (BindWidget))
+    UButton* FireButton;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     TSubclassOf<UUserWidget> VehicleEndurenceWidgetClass;
@@ -59,4 +69,13 @@ private:
     TArray<UBaseWidget*> InGameWidgets;
 
     void OnNewPawn(APawn* NewPawn);
+
+    UFUNCTION()
+    void OnPauseClicked();
+    UFUNCTION()
+    void OnReversePressed();
+    UFUNCTION()
+    void OnReverseReleased();
+    UFUNCTION()
+    void OnFireClicked();
 };

@@ -14,6 +14,7 @@
 #include "Decorations/DecorationActor.h"
 
 #include "Engine.h"
+#include "DrawDebugHelpers.h"
 
 AModularVehicleBase::AModularVehicleBase()
 {
@@ -97,6 +98,19 @@ bool AModularVehicleBase::SetWorkshopTasksData(const TArray<FInteractionData>& T
     return false;
 }
 
+bool AModularVehicleBase::ShootFromWeapon()
+{
+    WeaponComponent->ShootFromSecondWeapon_OnServer();
+    return false;
+}
+
+bool AModularVehicleBase::UseReverseGear(bool bIsUsing)
+{
+    bIsReverse = bIsUsing;
+    MoveForvardAxis = -1.f;
+    return false;
+}
+
 void AModularVehicleBase::BeginPlay()
 {
     Super::BeginPlay();
@@ -110,6 +124,7 @@ void AModularVehicleBase::BeginPlay()
     {
         // Set ClearTimer!!!
         WheelManagerComponent->StartSendData(SendDataRate);
+
         GetWorld()->GetTimerManager().SetTimer(DataTickTimer, this, &AModularVehicleBase::SendDataTick_Multicast, SendDataRate, true);
     }
 }
@@ -208,13 +223,48 @@ bool AModularVehicleBase::GetWheelsGroups(TArray<FWheelsGroup>& WheelsGroups) co
 
 void AModularVehicleBase::MoveForward(float Amount)
 {
-    MoveForvardAxis = Amount;
+    if (!bIsReverse)
+    {
+        MoveForvardAxis = FMath::Abs(Amount);
+    }
+
+    SmoothTurnHandle(Amount);
 }
 
 void AModularVehicleBase::MoveRight(float Value)
 {
     MoveSideAxis = Value;
-    SmoothTurnValue = FMath::FInterpTo(SmoothTurnValue, MoveSideAxis, PawnDeltaTime, 6.f);
+    if (FMath::Abs(MoveForvardAxis) < FMath::Abs(Value) && !bIsReverse)
+    {
+        MoveForvardAxis = FMath::Abs(Value);
+    }
+}
+
+void AModularVehicleBase::SmoothTurnHandle(float YAxisValue)
+{
+    if (FMath::IsNearlyZero(MoveSideAxis) && FMath::IsNearlyZero(YAxisValue)) return;
+    const auto DirectionAngle = FMath::Atan2(MoveSideAxis, YAxisValue);
+    const auto DirectionAngleDeg = FMath::RadiansToDegrees(DirectionAngle);
+    const auto WehicleAngleDeg = GetActorForwardVector().Rotation().Yaw * (bIsReverse ? -1.f : 1.f);
+    const auto AngleBetween = DirectionAngleDeg - WehicleAngleDeg;
+
+    //
+    //DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + FRotator(0.f, DirectionAngleDeg, 0.f).Vector() * 1000.f, FColor::White);
+    //DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + FRotator(0.f, WehicleAngleDeg, 0.f).Vector() * 1000.f, FColor::White);
+    //
+
+    auto Modifier = 0.f;
+    if (AngleBetween > 180.f)
+    {
+        Modifier = 360.f;
+    }
+    else if (AngleBetween < -180.f)
+    {
+        Modifier = -360.f;
+    }
+    const auto MoveSideValue = (AngleBetween - Modifier) / 180.f;
+    GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Green, FString::SanitizeFloat((AngleBetween - Modifier), 2));
+    SmoothTurnValue = FMath::FInterpTo(SmoothTurnValue, MoveSideValue, PawnDeltaTime, 6.f);
 }
 
 void AModularVehicleBase::WheelsTurn()
@@ -245,7 +295,6 @@ void AModularVehicleBase::SendDataTick_Multicast_Implementation()
 
 void AModularVehicleBase::SendMoveControls_Server_Implementation(float InMoveForvardAxis, float InMoveSideAxis, float InSmoothTurnValue)
 {
-
     if (IsLocallyControlled()) return;
 
     MoveForvardAxis = InMoveForvardAxis;
@@ -255,7 +304,6 @@ void AModularVehicleBase::SendMoveControls_Server_Implementation(float InMoveFor
 
 void AModularVehicleBase::SendMoveControls_Multicast_Implementation(float InMoveForvardAxis, float InMoveSideAxis, float InSmoothTurnValue)
 {
-
     if (IsLocallyControlled()) return;
 
     MoveForvardAxis = InMoveForvardAxis;

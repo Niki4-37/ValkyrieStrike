@@ -3,6 +3,7 @@
 #include "UI/InGameVehicleUnitWidget.h"
 #include "Components/Image.h"
 #include "Components/ProgressBar.h"
+#include "Materials/MaterialInstance.h"
 
 #include "Engine.h"
 
@@ -14,36 +15,33 @@ void UInGameVehicleUnitWidget::SetUnitData(const FVehicleUnitData& Data)
         UnitImage->SetBrushSize(FVector2D(100.f));
     }
 
-    if (AmmoCapacityBar)
-    {
-        AmmoCapacityBar->SetPercent(1.f);
-    }
-
     MaxAmmoCapacity = Data.UnitMaxValue;
 
-    if (ReloadingProgress)
-    {
-        ReloadingProgress->SetVisibility(ESlateVisibility::Hidden);
-        ReloadingProgress->SetPercent(0.f);
-    }
     ReloadingTime = Data.ExecutionTime;
     checkf(ReloadingTime, TEXT("ReloadingTime is ZERO!"));
     UnitType = Data.UnitType;
+
+    if (CapacityBarImage && CapacityBarImage->GetDynamicMaterial())
+    {
+        CapacityBarImage->SetBrushSize(FVector2D(150.f));
+        CircleBarMaterial = CapacityBarImage->GetDynamicMaterial();
+        CircleBarMaterial->SetScalarParameterValue(AmmoCapacityParamName, MaxAmmoCapacity);
+    }
 }
 
 void UInGameVehicleUnitWidget::UpdateAmmoCapacityBar(int32 NewValue)
 {
-    GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, FString::Printf(TEXT("Ammo: %i"), NewValue));
-    MaxAmmoCapacity > 0 ? AmmoCapacityBar->SetPercent(NewValue / FMath::CeilToFloat(MaxAmmoCapacity)) : AmmoCapacityBar->SetPercent(0.f);
+    if (!CircleBarMaterial) return;
+    const float PercentageToSet = MaxAmmoCapacity > 0 ? NewValue / FMath::CeilToFloat(MaxAmmoCapacity) : 0.f;
+    CircleBarMaterial->SetScalarParameterValue(PercentParamName, PercentageToSet);
 }
 
 void UInGameVehicleUnitWidget::StartReloading()
 {
-    if (GetWorld()->GetTimerManager().IsTimerActive(ReloadingTimer)) return;
+    if (GetWorld()->GetTimerManager().IsTimerActive(ReloadingTimer) || !CircleBarMaterial) return;
 
-    AmmoCapacityBar->SetVisibility(ESlateVisibility::Hidden);
-    ReloadingProgress->SetVisibility(ESlateVisibility::Visible);
-    ReloadingProgress->SetPercent(0.f);
+    CircleBarMaterial->SetVectorParameterValue(BaseColorParamName, FLinearColor(FVector(0.f, 0.9f, 1.f)));
+    CircleBarMaterial->SetScalarParameterValue(PercentParamName, 0.f);
 
     GetWorld()->GetTimerManager().SetTimer(ReloadingTimer, this, &UInGameVehicleUnitWidget::EndReloading, ReloadingTime);
 
@@ -51,8 +49,9 @@ void UInGameVehicleUnitWidget::StartReloading()
     TimerDelegate.BindLambda(
         [&]()
         {
+            if (!CircleBarMaterial) return;
             const float RemainingReloadingTime = GetWorld()->GetTimerManager().GetTimerElapsed(ReloadingTimer);
-            ReloadingProgress->SetPercent(RemainingReloadingTime / ReloadingTime);
+            CircleBarMaterial->SetScalarParameterValue(PercentParamName, RemainingReloadingTime / ReloadingTime);
         });
 
     GetWorld()->GetTimerManager().SetTimer(ProgressTimer, TimerDelegate, ReloadingTime / 100.f, true);
@@ -73,6 +72,6 @@ void UInGameVehicleUnitWidget::EndReloading()
     GetWorld()->GetTimerManager().ClearTimer(ReloadingTimer);
     GetWorld()->GetTimerManager().ClearTimer(ProgressTimer);
 
-    AmmoCapacityBar->SetVisibility(ESlateVisibility::Visible);
-    ReloadingProgress->SetVisibility(ESlateVisibility::Hidden);
+    if (!CircleBarMaterial) return;
+    CircleBarMaterial->SetVectorParameterValue(BaseColorParamName, FLinearColor(FVector(0.f, 1.f, 0.f)));
 }

@@ -8,7 +8,6 @@
 #include "InGameVehicleUnitWidget.generated.h"
 
 class UImage;
-class UProgressBar;
 
 UCLASS()
 class VALKYRIESTRIKE_API UInGameVehicleUnitWidget : public UUserWidget
@@ -28,12 +27,21 @@ protected:
     UImage* UnitImage;
 
     UPROPERTY(meta = (BindWidget))
-    UProgressBar* AmmoCapacityBar;
+    UImage* CapacityBarImage;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FName BaseColorParamName{"BaseColor"};
 
-    UPROPERTY(meta = (BindWidget))
-    UProgressBar* ReloadingProgress;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FName PercentParamName{"Percent"};
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FName AmmoCapacityParamName{"NumberOfSections"};
 
 private:
+    UPROPERTY()
+    UMaterialInstanceDynamic* CircleBarMaterial;
+
     int32 MaxAmmoCapacity;
     float ReloadingTime;
     EVehicleUnitType UnitType;

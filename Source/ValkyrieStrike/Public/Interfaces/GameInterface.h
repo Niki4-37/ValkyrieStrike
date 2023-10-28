@@ -24,4 +24,6 @@ public:
     virtual bool AddAmount(const FInteractionData&);
     virtual bool MakeMaintenance(EItemPropertyType);
     virtual bool SetWorkshopTasksData(const TArray<FInteractionData>&);
+    virtual bool ShootFromWeapon();
+    virtual bool UseReverseGear(bool bIsUsing);
 };

@@ -30,6 +30,8 @@ public:
     virtual bool AddAmount(const FInteractionData& Data) override;
     virtual bool MakeMaintenance(EItemPropertyType Type) override;
     virtual bool SetWorkshopTasksData(const TArray<FInteractionData>& Tasks) override;
+    virtual bool ShootFromWeapon() override;
+    virtual bool UseReverseGear(bool bIsUsing) override;
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -92,13 +94,17 @@ private:
     float MoveForvardAxis;
     float MoveSideAxis;
 
+    bool bIsReverse{false};
+
     void MoveForward(float Amount);
     void MoveRight(float Value);
 
+    void SmoothTurnHandle(float YAxisValue);
     void WheelsTurn();
 
     /* replicates movement */
     FTimerHandle DataTickTimer;
+
     UFUNCTION(NetMulticast, unreliable)
     void SendDataTick_Multicast();
     UFUNCTION(Server, unreliable)

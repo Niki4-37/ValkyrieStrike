@@ -7,7 +7,7 @@
 #include "GameCoreTypes.h"
 #include "InGameVehicleConfigWidget.generated.h"
 
-class UVerticalBox;
+class UHorizontalBox;
 class UInGameVehicleUnitWidget;
 
 UCLASS()
@@ -20,7 +20,7 @@ protected:
     TSubclassOf<UUserWidget> InGameVehicleUnitWidgetClass;
 
     UPROPERTY(meta = (BindWidget))
-    UVerticalBox* UnitsBox;
+    UHorizontalBox* UnitsBox;
 
     virtual void NativeOnInitialized() override;
 

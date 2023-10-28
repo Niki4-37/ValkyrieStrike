@@ -3,6 +3,9 @@
 #include "UI/PlayerHUDWidget.h"
 #include "Components/Border.h"
 #include "UI/BaseWidget.h"
+#include "Components/Button.h"
+#include "Player/VehiclePlayerController.h"
+#include "Interfaces/GameInterface.h"
 
 #include "Engine.h"
 
@@ -75,6 +78,22 @@ void UPlayerHUDWidget::NativeOnInitialized()
         }
     }
 
+    if (SettingsButton)
+    {
+        SettingsButton->OnClicked.AddDynamic(this, &UPlayerHUDWidget::OnPauseClicked);
+    }
+
+    if (ReverseGearButton)
+    {
+        ReverseGearButton->OnPressed.AddDynamic(this, &UPlayerHUDWidget::OnReversePressed);
+        ReverseGearButton->OnReleased.AddDynamic(this, &UPlayerHUDWidget::OnReverseReleased);
+    }
+
+    if (FireButton)
+    {
+        FireButton->OnClicked.AddDynamic(this, &UPlayerHUDWidget::OnFireClicked);
+    }
+
     if (GetOwningPlayer())
     {
         GetOwningPlayer()->GetOnNewPawnNotifier().AddUObject(this, &UPlayerHUDWidget::OnNewPawn);
@@ -94,6 +113,7 @@ void UPlayerHUDWidget::RemoveFromParent()
 void UPlayerHUDWidget::OnNewPawn(APawn* NewPawn)
 {
     // add fails counter
+    // add check to avoid endless repeat
     FTimerDelegate TimerDelegate;
     TimerDelegate.BindLambda(
         [&]()
@@ -119,4 +139,34 @@ void UPlayerHUDWidget::OnNewPawn(APawn* NewPawn)
         });
 
     GetWorld()->GetTimerManager().SetTimer(FindingPawnTimer, TimerDelegate, 0.1f, true);
+}
+
+void UPlayerHUDWidget::OnPauseClicked()
+{
+    if (!GetOwningPlayer()) return;
+    GetOwningPlayer()->SetPause(true);
+}
+
+void UPlayerHUDWidget::OnReversePressed()
+{
+    const auto PlayerInterface = Cast<IGameInterface>(GetOwningPlayerPawn());
+    if (!PlayerInterface) return;
+
+    PlayerInterface->UseReverseGear(true);
+}
+
+void UPlayerHUDWidget::OnReverseReleased()
+{
+    const auto PlayerInterface = Cast<IGameInterface>(GetOwningPlayerPawn());
+    if (!PlayerInterface) return;
+
+    PlayerInterface->UseReverseGear(false);
+}
+
+void UPlayerHUDWidget::OnFireClicked()
+{
+    const auto PlayerInterface = Cast<IGameInterface>(GetOwningPlayerPawn());
+    if (!PlayerInterface) return;
+
+    PlayerInterface->ShootFromWeapon();
 }
