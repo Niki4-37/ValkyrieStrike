@@ -42,11 +42,15 @@ void ADefaultWeapon::MakeShot(const FVector& AimPosition)
 
     const FVector Direction = (AimPosition - MuzzleLocation).GetSafeNormal();
 
+    const auto BulletSpread = 7.f;
+    const auto HalfRad = FMath::DegreesToRadians(BulletSpread);
+    const FVector ShootDirection = FMath::VRandCone(Direction, HalfRad);
+
     FTransform SpawnTransform(MuzzleRotation, MuzzleLocation);
     auto Bullet = GetWorld()->SpawnActor<ADefaultProjectile>(ProjectileClass, SpawnTransform);
     if (Bullet)
     {
-        Bullet->SetShootDirection(Direction);
+        Bullet->SetShootDirection(ShootDirection);
         Bullet->SetLifeSpan(2.f);
     }
 }

@@ -248,11 +248,6 @@ void AModularVehicleBase::SmoothTurnHandle(float YAxisValue)
     const auto WehicleAngleDeg = GetActorForwardVector().Rotation().Yaw * (bIsReverse ? -1.f : 1.f);
     const auto AngleBetween = DirectionAngleDeg - WehicleAngleDeg;
 
-    //
-    //DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + FRotator(0.f, DirectionAngleDeg, 0.f).Vector() * 1000.f, FColor::White);
-    //DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + FRotator(0.f, WehicleAngleDeg, 0.f).Vector() * 1000.f, FColor::White);
-    //
-
     auto Modifier = 0.f;
     if (AngleBetween > 180.f)
     {
@@ -263,14 +258,13 @@ void AModularVehicleBase::SmoothTurnHandle(float YAxisValue)
         Modifier = -360.f;
     }
     const auto MoveSideValue = (AngleBetween - Modifier) / 180.f;
-    GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Green, FString::SanitizeFloat((AngleBetween - Modifier), 2));
-    SmoothTurnValue = FMath::FInterpTo(SmoothTurnValue, MoveSideValue, PawnDeltaTime, 6.f);
+    SmoothTurnValue = FMath::FInterpTo(SmoothTurnValue, MoveSideValue, PawnDeltaTime, 8.f);  // 6.f
 }
 
 void AModularVehicleBase::WheelsTurn()
 {
-    const FRotator NewRotationFrontWheels{FRotator(0.f, SmoothTurnValue * 20.f, 0.f)};
-    const FRotator NewRotationRareWheels{FRotator(0.f, SmoothTurnValue * -20.f, 0.f)};
+    const FRotator NewRotationFrontWheels{FRotator(0.f, SmoothTurnValue * 30.f, 0.f)};  // 20.f, 0.f
+    const FRotator NewRotationRareWheels{FRotator(0.f, SmoothTurnValue * -30.f, 0.f)};  //-20.f, 0.f
     WheelFR->SetRelativeRotation(NewRotationFrontWheels);
     WheelFL->SetRelativeRotation(NewRotationFrontWheels);
     WheelRR->SetRelativeRotation(NewRotationRareWheels);

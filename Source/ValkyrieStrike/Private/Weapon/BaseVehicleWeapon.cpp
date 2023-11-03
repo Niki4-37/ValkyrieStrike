@@ -113,8 +113,7 @@ void ABaseVehicleWeapon::Tick(float DeltaTime)
 
 void ABaseVehicleWeapon::RotateToTarget(AActor* Target)
 {
-    const auto NoneAimLocation = GetOwner() ? GetOwner()->GetActorForwardVector() * 1000.f : FVector::ZeroVector;
-
+    const auto NoneAimLocation = GetOwner() ? (GetOwner()->GetActorLocation() + GetOwner()->GetActorForwardVector() * 1000.f) : FVector::ZeroVector;
     const auto AimLocation = Target ? Target->GetActorLocation() : NoneAimLocation;
     const auto PlatformLocatiom = Platform->GetComponentLocation();
 

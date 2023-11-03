@@ -9,7 +9,7 @@
 class USphereComponent;
 class UStaticMeshComponent;
 class UProjectileMovementComponent;
-class UNiagaraSystem;
+class UWeaponFXComponent;
 
 UCLASS()
 class VALKYRIESTRIKE_API ADefaultProjectile : public AActor
@@ -28,6 +28,9 @@ protected:
 
     UPROPERTY(VisibleDefaultsOnly)
     UProjectileMovementComponent* ProjectileMovementComponent{nullptr};
+
+    UPROPERTY(VisibleAnywhere)
+    UWeaponFXComponent* WeaponFXComponent;
 
     UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
     float DamageAmount = 1.0f;

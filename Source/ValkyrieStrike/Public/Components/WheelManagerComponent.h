@@ -19,6 +19,7 @@ public:
     void SetControlInput(float Value);
     float GetWheelDefultDistance() const { return WheelDefaultDistance; }
 
+    /* used in Animation Blueprint */
     bool GetVelocityAverage(FVector& VelocityAverage) const;
     bool GetWheelsGroups(TArray<FWheelsGroup>& OutWheelsGroup) const;
 
@@ -53,12 +54,15 @@ protected:
     float WheelSlideResist{1.f};
 
     virtual void BeginPlay() override;
+    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
+    UPROPERTY(Replicated)
     TArray<FWheelsGroup> WheelsGroups;
+
     float ControlInput;
     bool bIsWheelContact{false};
     bool bIsBreake{false};

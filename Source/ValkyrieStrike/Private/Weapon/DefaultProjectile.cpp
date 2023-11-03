@@ -2,6 +2,7 @@
 
 #include "Weapon/DefaultProjectile.h"
 #include "Components/SphereComponent.h"
+#include "Components/WeaponFXComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -36,6 +37,8 @@ ADefaultProjectile::ADefaultProjectile()
 
     ProjectileMovementComponent->SetIsReplicated(true);
     ProjectileMovementComponent->bInterpMovement = true;
+
+    WeaponFXComponent = CreateDefaultSubobject<UWeaponFXComponent>("WeaponFXComponent");
 }
 
 void ADefaultProjectile::BeginPlay()
@@ -44,8 +47,8 @@ void ADefaultProjectile::BeginPlay()
 
     check(CollisionComponent);
 
-    // CollisionComponent->OnComponentHit.AddDynamic(this, &ADefaultProjectile::ProjectileCollisionComponentHit);
-    CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &ADefaultProjectile::ComponentBeginOverlap);
+    CollisionComponent->OnComponentHit.AddDynamic(this, &ADefaultProjectile::ProjectileCollisionComponentHit);
+    //CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &ADefaultProjectile::ComponentBeginOverlap);
 }
 
 void ADefaultProjectile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -66,9 +69,10 @@ void ADefaultProjectile::ProjectileCollisionComponentHit(UPrimitiveComponent* Hi
                                         GetOwner(),                 //
                                         nullptr);
 
-     if (Hit.bBlockingHit && Hit.GetActor())
+     if (Hit.bBlockingHit /*&& Hit.GetActor()*/)
     {
          // UE_LOG(LogTemp, Display, TEXT("%s"), *Hit.GetActor()->GetName());
+         WeaponFXComponent->PlayImpactFX(Hit);
          Destroy();
      }
 }
@@ -81,14 +85,14 @@ void ADefaultProjectile::SetShootDirection(const FVector& Direction)
 void ADefaultProjectile::ComponentBeginOverlap(
     UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    if (!OtherActor) return;
-    UGameplayStatics::ApplyPointDamage(OtherActor,                 //
-                                       DamageAmount,               //
-                                       SweepResult.TraceStart,     //
-                                       SweepResult,                //
-                                       GetInstigatorController(),  //
-                                       GetOwner(),                 //
-                                       nullptr);
+    //if (!OtherActor) return;
+    //UGameplayStatics::ApplyPointDamage(OtherActor,                 //
+    //                                   DamageAmount,               //
+    //                                   SweepResult.TraceStart,     //
+    //                                   SweepResult,                //
+    //                                   GetInstigatorController(),  //
+    //                                   GetOwner(),                 //
+    //                                   nullptr);
 
-    Destroy();
+    //Destroy();
 }

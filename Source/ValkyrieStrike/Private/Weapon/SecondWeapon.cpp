@@ -3,6 +3,8 @@
 #include "Weapon/SecondWeapon.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 
 #include "DrawDebugHelpers.h"
 #include "Engine.h"
@@ -17,29 +19,19 @@ void ASecondWeapon::MakeShot()
     const FVector TraceEnd = TraceStart + Gun->GetSocketRotation(MuzzleSocketName).Vector() * 2000.f;
 
     TArray<FHitResult> Hits;
-    // UKismetSystemLibrary::SphereTraceMulti(GetWorld(),                                                           //
-    //                                        TraceStart,                                                           //
-    //                                        TraceEnd,                                                             //
-    //                                        BeemRadius,                                                           //
-    //                                        UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility),  //
-    //                                        false,                                                                //
-    //                                        {GetOwner(), this},                                                   //
-    //                                        EDrawDebugTrace::ForDuration,                                         //
-    //                                        Hits,                                                                 //
-    //                                        true);
+    UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(),             //
+                                                     TraceStart,             //
+                                                     TraceEnd,               //
+                                                     BeemRadius,             //
+                                                     TreceForObjectTypes,    //
+                                                     false,                  //
+                                                     {GetOwner(), this},     //
+                                                     EDrawDebugTrace::None,  //
+                                                     Hits,                   //
+                                                     true);                  //
 
-    UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(),                    //
-                                                     TraceStart,                    //
-                                                     TraceEnd,                      //
-                                                     BeemRadius,                    //
-                                                     TreceForObjectTypes,           //
-                                                     false,                         //
-                                                     {GetOwner(), this},            //
-                                                     EDrawDebugTrace::ForDuration,  //
-                                                     Hits,                          //
-                                                     true);                         //
+    SpawnTraceFX_Multicast(TraceStart, TraceEnd);
 
-    /* debug */
     TArray<AActor*> HitActors;
     for (auto& Hit : Hits)
     {
@@ -65,6 +57,21 @@ void ASecondWeapon::AlternativeShot()
 {
     Super::AlternativeShot();
     MakeShot();
+}
+
+void ASecondWeapon::SpawnTraceFX_Multicast_Implementation(const FVector& TraceStart, const FVector& TraceEnd)
+{
+    SpawnTraceFX(TraceStart, TraceEnd);
+}
+
+void ASecondWeapon::SpawnTraceFX(const FVector& TraceStart, const FVector& TraceEnd)
+{
+    const auto TraceFXComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), TraceFX, TraceStart);
+    if (TraceFXComponent)
+    {
+        TraceFXComponent->SetNiagaraVariableFloat(BeamWidthName, BeemRadius * 2.f);
+        TraceFXComponent->SetNiagaraVariableVec3(TraceTargetName, TraceEnd);
+    }
 }
 
 void ASecondWeapon::BeginPlay()

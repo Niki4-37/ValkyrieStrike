@@ -8,6 +8,7 @@
 
 class USphereComponent;
 class UStaticMeshComponent;
+class UNiagaraSystem;
 
 UCLASS()
 class VALKYRIESTRIKE_API AKamikaze : public AAICharacter
@@ -23,6 +24,9 @@ protected:
 
     UPROPERTY(EditDefaultsOnly)
     UStaticMeshComponent* BombMesh;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    UNiagaraSystem* ExpoleEffect;
 
     UPROPERTY(EditAnywhere)
     float Radius{300.f};

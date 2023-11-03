@@ -4,6 +4,7 @@
 #include "Components/SphereComponent.h"
 #include "AIController.h"
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraFunctionLibrary.h"
 
 #include "DrawDebugHelpers.h"
 
@@ -33,7 +34,7 @@ void AKamikaze::NotifyActorBeginOverlap(AActor* OtherActor)
                                         UDamageType::StaticClass(),  //
                                         {});
 
-    DrawDebugSphere(GetWorld(), GetActorLocation(), Radius, 12, FColor::Yellow, false, 5.f);
+    UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ExpoleEffect, GetActorLocation(), FRotator::ZeroRotator);
 
     OnDeath();
 }

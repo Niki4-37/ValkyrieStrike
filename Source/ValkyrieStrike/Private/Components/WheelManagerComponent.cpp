@@ -2,10 +2,12 @@
 
 #include "Components/WheelManagerComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Net/UnrealNetwork.h"
 
 UWheelManagerComponent::UWheelManagerComponent()
 {
     PrimaryComponentTick.bCanEverTick = true;
+    SetIsReplicatedByDefault(true);
 }
 
 void UWheelManagerComponent::SetControlInput(float Value)
@@ -44,6 +46,13 @@ void UWheelManagerComponent::StartSendData(float SendDataRate)
 void UWheelManagerComponent::BeginPlay()
 {
     Super::BeginPlay();
+}
+
+void UWheelManagerComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME(UWheelManagerComponent, WheelsGroups);
 }
 
 void UWheelManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -127,7 +136,7 @@ FVector UWheelManagerComponent::GetSideFriction(float WheelVelocityYValue, const
 
 FVector UWheelManagerComponent::GetMoveForce(float WheelVelocityXValue, float ContactNormalPointZValue, const FVector& ForwardVector)
 {
-    const float ValueWitoutBrake = FMath::Clamp((ControlInput * -1.f * WheelMaxSpeed + WheelVelocityXValue), -800.f, 800.f);
+    const float ValueWitoutBrake = FMath::Clamp((ControlInput * -1.f * WheelMaxSpeed + WheelVelocityXValue), -1000.f, 1000.f);  //-800.f, 800.f
     const float ValueWithBrake = FMath::Clamp(WheelVelocityXValue, -160.f, 160.f) * 10;
 
     const float ResultValue = ContactNormalPointZValue * WheelMoveForceMultipler * -100.f * (bIsBreake ? ValueWithBrake : ValueWitoutBrake);

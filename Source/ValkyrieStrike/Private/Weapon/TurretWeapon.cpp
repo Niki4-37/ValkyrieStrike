@@ -21,7 +21,7 @@ void ATurretWeapon::RotateToTarget(AActor* Target)
     Super::RotateToTarget(Target);
 
     const auto NoneAimLocation = GetOwner() ? (GetOwner()->GetActorLocation() + GetOwner()->GetActorForwardVector() * 1000.f) : FVector::ZeroVector;
-    const auto AimLocation = Target ? (Target->GetActorLocation() + FVector(0.f, 0.f, 45.f)) : NoneAimLocation;
+    const auto AimLocation = Target ? (Target->GetActorLocation()) : NoneAimLocation;
 
     const FRotator Direction = FRotationMatrix::MakeFromX(AimLocation - GetActorLocation()).Rotator();
 
@@ -29,10 +29,10 @@ void ATurretWeapon::RotateToTarget(AActor* Target)
     auto Delta = Direction - GunRotation;
     Delta.Normalize();
     const auto GunDeltaValue = bIsSideMode  //
-                                   ?
-                                   FMath::Clamp(Delta.Yaw, -1.f, 1.f)  //
-                                   :
-                                   FMath::Clamp(Delta.Pitch, -1.f, 1.f);
+                                ?
+                                FMath::Clamp(Delta.Yaw, -1.f, 1.f)  //
+                                :
+                                FMath::Clamp(Delta.Pitch, -1.f, 1.f);
 
     const auto GunValueToClamp = Gun->GetRelativeRotation().Pitch + (bIsSideMode ? SidePositionModifier : 1.f) * GunDeltaValue;
     const auto GunValueToSet = FMath::Clamp(GunValueToClamp, -20.f, 90.f);
@@ -46,18 +46,20 @@ void ATurretWeapon::MakeShot()
 
     if (!HasAim() || IsReloading() || IsEmpty()) return;
 
-    auto Rotation = Gun->GetSocketRotation(MuzzleSocketName);
+    const FRotator MuzzleRotation = Gun->GetSocketRotation(MuzzleSocketName);
+    const FVector MuzzleLocation = Gun->GetSocketLocation(MuzzleSocketName);
 
-    const auto BulletSpread = 7.f;
+    const auto BulletSpread = 5.f;
     const auto HalfRad = FMath::DegreesToRadians(BulletSpread);
-    const FVector ShootDirection = FMath::VRandCone(Rotation.Vector(), HalfRad);
+    const FVector ShootDirection = FMath::VRandCone(MuzzleRotation.Vector(), HalfRad);
 
-    auto MuzzleLocation = Gun->GetSocketLocation(MuzzleSocketName);
-    // FTransform SpawningTransform(Rotation, MuzzleLocation);
-    FTransform SpawningTransform(ShootDirection.Rotation(), MuzzleLocation);
-
-    auto Bullet = GetWorld()->SpawnActor<ADefaultProjectile>(DefaultProjectileClass, SpawningTransform);
-    if (!Bullet) return;
+    FTransform SpawnTransform(MuzzleRotation, MuzzleLocation);
+    auto Bullet = GetWorld()->SpawnActor<ADefaultProjectile>(DefaultProjectileClass, SpawnTransform);
+    if (Bullet)
+    {
+        Bullet->SetShootDirection(ShootDirection);
+        Bullet->SetLifeSpan(2.f);
+    }
 
     ChangeAmmo(-1);
 

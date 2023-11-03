@@ -24,12 +24,17 @@ public class ValkyrieStrike : ModuleRules
 
         PublicIncludePaths.AddRange(new string[]
         {
-            "ValkyrieStrike/Public/Player",
             "ValkyrieStrike/Public/AI",
             "ValkyrieStrike/Public/AI/Services",
             "ValkyrieStrike/Public/Components",
             "ValkyrieStrike/Public/GameLevelsConfig",
             "ValkyrieStrike/Public/GameMenu",
+            "ValkyrieStrike/Public/Interactables",
+            "ValkyrieStrike/Public/Interfaces",
+            "ValkyrieStrike/Public/LobbyMenu",
+            "ValkyrieStrike/Public/Player",
+            "ValkyrieStrike/Public/Subsystems",
+            "ValkyrieStrike/Public/UI",
             "ValkyrieStrike/Public/Weapon"
         });
 
