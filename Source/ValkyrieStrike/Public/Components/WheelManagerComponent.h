@@ -23,6 +23,8 @@ public:
     bool GetVelocityAverage(FVector& VelocityAverage) const;
     bool GetWheelsGroups(TArray<FWheelsGroup>& OutWheelsGroup) const;
 
+    bool IsWheelContact() const { return bIsWheelContact; }
+
     void StartSendData(float SendDataRate);
 
 protected:

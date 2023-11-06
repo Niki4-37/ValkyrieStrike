@@ -21,7 +21,7 @@ void ATurretWeapon::RotateToTarget(AActor* Target)
     Super::RotateToTarget(Target);
 
     const auto NoneAimLocation = GetOwner() ? (GetOwner()->GetActorLocation() + GetOwner()->GetActorForwardVector() * 1000.f) : FVector::ZeroVector;
-    const auto AimLocation = Target ? (Target->GetActorLocation()) : NoneAimLocation;
+    const auto AimLocation = Target ? Target->GetActorLocation() : NoneAimLocation;
 
     const FRotator Direction = FRotationMatrix::MakeFromX(AimLocation - GetActorLocation()).Rotator();
 

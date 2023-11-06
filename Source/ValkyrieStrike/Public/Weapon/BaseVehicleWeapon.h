@@ -26,7 +26,7 @@ public:
     void DefineSideMode(float InAcos);
 
     void SetupWeapon(EVehicleUnitType InWeaponType, int32 InMaxAmmoCapacity, float InReloadingTime);
-    EVehicleUnitType GetWeaponType() const { return WeaponType; }   //???
+    EVehicleUnitType GetWeaponType() const { return WeaponType; }  //???
     void UpdateAimActor(AActor* NewAimActor, float UpdateTimeRate);
 
     bool HasAim() const { return bHasAim; }

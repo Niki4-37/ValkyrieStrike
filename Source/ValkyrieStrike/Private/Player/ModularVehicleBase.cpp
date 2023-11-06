@@ -12,6 +12,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameLevelsConfig/ValkyriePlayerState.h"
 #include "Decorations/DecorationActor.h"
+#include "NiagaraComponent.h"
 
 #include "Engine.h"
 #include "DrawDebugHelpers.h"
@@ -64,6 +65,12 @@ AModularVehicleBase::AModularVehicleBase()
     WeaponComponent = CreateDefaultSubobject<UWeaponComponent>("WeaponComponent");
     VehicleIndicatorsComp = CreateDefaultSubobject<UVehicleIndicatorsComponent>("VehicleIndicatorsComp");
     WorkshopComponent = CreateDefaultSubobject<UWorkshopComponent>("WorkshopComponent");
+
+    RareLeftWheelDust = CreateDefaultSubobject<UNiagaraComponent>("RareLeftWheelDust");
+    RareLeftWheelDust->SetupAttachment(WheelRL);
+
+    RareRightWheelDust = CreateDefaultSubobject<UNiagaraComponent>("RareRightWheelDust");
+    RareRightWheelDust->SetupAttachment(WheelRR);
 }
 
 bool AModularVehicleBase::AddAmount(const FInteractionData& Data)
@@ -117,6 +124,8 @@ void AModularVehicleBase::BeginPlay()
 
     check(WeaponComponent);
     check(VehicleIndicatorsComp);
+    check(RareLeftWheelDust);
+    check(RareRightWheelDust);
 
     Tags.Add("Player");
 
@@ -229,6 +238,16 @@ void AModularVehicleBase::MoveForward(float Amount)
     }
 
     SmoothTurnHandle(Amount);
+
+    //////
+    if (WheelManagerComponent->IsWheelContact())
+    {
+        FVector VelocityAverage;
+        GetVelocityAverage(VelocityAverage);
+
+        RareLeftWheelDust->SetNiagaraVariableFloat(DustSpawnRateParamName, VelocityAverage.Size() / MinVelocityToDust);
+        RareRightWheelDust->SetNiagaraVariableFloat(DustSpawnRateParamName, VelocityAverage.Size() / MinVelocityToDust);
+    }
 }
 
 void AModularVehicleBase::MoveRight(float Value)

@@ -17,16 +17,16 @@ class VALKYRIESTRIKE_API UMenuWidget : public UUserWidget
     GENERATED_BODY()
 
 protected:
-    UPROPERTY(meta = (BindWidget))
+    UPROPERTY(meta = (BindWidget), BlueprintReadWrite)
     UButton* CreateSessionButton;
 
-    UPROPERTY(meta = (BindWidget))
+    UPROPERTY(meta = (BindWidget), BlueprintReadWrite)
     UButton* FindSessionButton;
 
-    UPROPERTY(meta = (BindWidget))
+    UPROPERTY(meta = (BindWidget), BlueprintReadWrite)
     UButton* SettingsButton;
 
-    UPROPERTY(meta = (BindWidget))
+    UPROPERTY(meta = (BindWidget), BlueprintReadWrite)
     UButton* QuitButton;
 
     UPROPERTY(meta = (BindWidget))

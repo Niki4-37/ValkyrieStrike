@@ -7,6 +7,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
+#include "Engine.h"
+
 ADefaultProjectile::ADefaultProjectile()
 {
     PrimaryActorTick.bCanEverTick = false;
@@ -61,20 +63,20 @@ void ADefaultProjectile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 
 void ADefaultProjectile::ProjectileCollisionComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-     UGameplayStatics::ApplyPointDamage(Hit.GetActor(),             //
-                                        DamageAmount,               //
-                                        Hit.TraceStart,             //
-                                        Hit,                        //
-                                        GetInstigatorController(),  //
-                                        GetOwner(),                 //
-                                        nullptr);
+    UGameplayStatics::ApplyPointDamage(Hit.GetActor(),             //
+                                    DamageAmount,               //
+                                    Hit.TraceStart,             //
+                                    Hit,                        //
+                                    GetInstigatorController(),  //
+                                    GetOwner(),                 //
+                                    nullptr);
 
-     if (Hit.bBlockingHit /*&& Hit.GetActor()*/)
+    if (Hit.bBlockingHit /*&& Hit.GetActor()*/)
     {
-         // UE_LOG(LogTemp, Display, TEXT("%s"), *Hit.GetActor()->GetName());
-         WeaponFXComponent->PlayImpactFX(Hit);
-         Destroy();
-     }
+        // UE_LOG(LogTemp, Display, TEXT("%s"), *Hit.GetActor()->GetName());
+        WeaponFXComponent->PlayImpactFX(Hit);
+        Destroy();
+    }
 }
 
 void ADefaultProjectile::SetShootDirection(const FVector& Direction)

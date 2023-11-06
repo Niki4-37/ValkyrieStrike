@@ -20,6 +20,9 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     TSubclassOf<ADefaultWeapon> WeaponClass;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.1", ClampMax = "10.0"))
+    float FireRate{1.0f};
+
     virtual void BeginPlay() override;
 
     virtual void OnDeath() override;

@@ -42,7 +42,7 @@ void ASecondWeapon::MakeShot()
     for (auto HitActor : HitActors)
     {
         UGameplayStatics::ApplyDamage(HitActor, WeaponDamage, GetInstigatorController(), GetOwner(), UDamageType::StaticClass());
-        GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, HitActor->GetName());
+        // GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, HitActor->GetName());
     }
 
     ChangeAmmo(-1);

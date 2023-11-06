@@ -5,6 +5,8 @@
 #include "AIController.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraFunctionLibrary.h"
+#include "GameFramework/Controller.h"
+#include "Camera/CameraShakeBase.h"
 
 #include "DrawDebugHelpers.h"
 
@@ -37,4 +39,9 @@ void AKamikaze::NotifyActorBeginOverlap(AActor* OtherActor)
     UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ExpoleEffect, GetActorLocation(), FRotator::ZeroRotator);
 
     OnDeath();
+
+    const auto PlayerController = OtherActor->GetInstigatorController<APlayerController>();
+    if (!PlayerController || !PlayerController->PlayerCameraManager) return;
+    checkf(CameraShake, TEXT("CameraShake not define!"));
+    PlayerController->PlayerCameraManager->StartCameraShake(CameraShake);
 }

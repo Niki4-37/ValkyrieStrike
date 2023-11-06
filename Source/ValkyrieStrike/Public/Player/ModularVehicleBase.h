@@ -14,6 +14,7 @@ class UWheelManagerComponent;
 class UWeaponComponent;
 class UVehicleIndicatorsComponent;
 class UWorkshopComponent;
+class UNiagaraComponent;
 
 UCLASS()
 class VALKYRIESTRIKE_API AModularVehicleBase : public APawn, public IGameInterface
@@ -57,6 +58,18 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     UWorkshopComponent* WorkshopComponent;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "VFX")
+    UNiagaraComponent* RareLeftWheelDust;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "VFX")
+    UNiagaraComponent* RareRightWheelDust;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "VFX")
+    FString DustSpawnRateParamName{"DustSpawnRate"};
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX", meta = (ClampMin = "0.1", ClampMax = "1000.0"))
+    float MinVelocityToDust{75.f};
 
     UPROPERTY(VisibleDefaultsOnly)
     USceneComponent* WheelFR;

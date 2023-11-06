@@ -45,4 +45,5 @@ void ARanger::SpawnAndAttachWeapon()
 
     FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
     OwnedWeapon->AttachToComponent(GetMesh(), AttachmentRules, WeaponSocketName);
+    OwnedWeapon->SetFireRate(FireRate);
 }

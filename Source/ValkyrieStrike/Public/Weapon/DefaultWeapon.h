@@ -18,6 +18,7 @@ public:
     ADefaultWeapon();
 
     void StartFire(bool bIsPressed, const FVector& AimPosition);
+    void SetFireRate(float NewFireRate);
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -28,6 +29,9 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     FName MuzzleSocketName{"MuzzleSocket"};
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (ClampMin = "0.1", ClampMax = "10.0"))
+    float FireRate{0.5f};
 
     virtual void BeginPlay() override;
 

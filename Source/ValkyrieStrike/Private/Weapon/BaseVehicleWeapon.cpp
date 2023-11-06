@@ -55,6 +55,7 @@ void ABaseVehicleWeapon::SetStaticMesh(EUnitComponentType Type, UStaticMesh* New
 
 void ABaseVehicleWeapon::DefineSidePosition(float DotProduct)
 {
+    /** Minus for the left */
     SidePositionModifier = DotProduct > 0.f ? 1.f : -1.f;
 }
 
@@ -136,7 +137,10 @@ void ABaseVehicleWeapon::RotateToTarget(AActor* Target)
                                 :
                                 Platform->GetRelativeRotation().Yaw + DeltaValue;
 
-    Platform->SetRelativeRotation(FRotator(0.f, ValueToSet, 0.f));
+    /** checking side platform to prevetn turn down */
+    auto PlatformValueToSet = (bIsSideMode && SidePositionModifier * ValueToSet > 0.f) ? 0.f : ValueToSet;
+
+    Platform->SetRelativeRotation(FRotator(0.f, PlatformValueToSet, 0.f));
 }
 
 void ABaseVehicleWeapon::ChangeAmmo(int32 Value)

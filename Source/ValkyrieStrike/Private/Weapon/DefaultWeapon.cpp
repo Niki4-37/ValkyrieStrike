@@ -18,12 +18,18 @@ void ADefaultWeapon::StartFire(bool bIsPressed, const FVector& AimPosition)
         FTimerDelegate Delegate;
         Delegate.BindUFunction(this, "MakeShot", AimPosition);
 
-        GetWorldTimerManager().SetTimer(FiringTimer, Delegate, 0.5f, true);
+        GetWorldTimerManager().SetTimer(FiringTimer, Delegate, FireRate, true);
     }
     else
     {
         GetWorldTimerManager().ClearTimer(FiringTimer);
     }
+}
+
+void ADefaultWeapon::SetFireRate(float NewFireRate) 
+{
+    if (NewFireRate < 0.f) return;
+    FireRate = NewFireRate;
 }
 
 void ADefaultWeapon::BeginPlay()
