@@ -7,7 +7,7 @@
 #include "GameCoreTypes.h"
 #include "VehicleEnduranceWidget.generated.h"
 
-class UProgressBar;
+class UImage;
 
 UCLASS()
 class VALKYRIESTRIKE_API UVehicleEnduranceWidget : public UBaseWidget
@@ -16,9 +16,18 @@ class VALKYRIESTRIKE_API UVehicleEnduranceWidget : public UBaseWidget
 
 protected:
     UPROPERTY(meta = (BindWidget))
-    UProgressBar* HealthBar;
+    UImage* HealthBarImage;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FName BaseColorParamName{"BaseColor"};
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FName PercentParamName{"Percent"};
 
 private:
+    UPROPERTY()
+    UMaterialInstanceDynamic* HealthBarMaterial;
+
     void OnHealthChanged(EItemPropertyType Type, float Health, float MaxHealth);
     virtual void OnNewPawn(APawn* NewPawn) override;
 };

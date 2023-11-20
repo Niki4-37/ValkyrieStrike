@@ -9,6 +9,8 @@
 class USkeletalMeshComponent;
 class ADefaultProjectile;
 
+DECLARE_MULTICAST_DELEGATE(FOnWeaponShotSignature);
+
 UCLASS()
 class VALKYRIESTRIKE_API ADefaultWeapon : public AActor
 {
@@ -17,12 +19,20 @@ class VALKYRIESTRIKE_API ADefaultWeapon : public AActor
 public:
     ADefaultWeapon();
 
+    FOnWeaponShotSignature OnWeaponShot;
+
     void StartFire(bool bIsPressed, const FVector& AimPosition);
     void SetFireRate(float NewFireRate);
 
 protected:
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+    USceneComponent* WeaponRootComponent;
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    USkeletalMeshComponent* WeaponMesh;
+    USkeletalMeshComponent* WeaponSkeletalMesh;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    UStaticMeshComponent* WeaponStaticMesh;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     TSubclassOf<ADefaultProjectile> ProjectileClass;
@@ -40,4 +50,6 @@ private:
 
     UFUNCTION()
     void MakeShot(const FVector& AimPosition);
+
+    FTransform GetWeaponSocketTransform(FName SocketName);
 };

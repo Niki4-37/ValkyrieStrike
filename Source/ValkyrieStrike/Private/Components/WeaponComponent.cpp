@@ -39,7 +39,7 @@ bool UWeaponComponent::AddAmmo(int32 Amount)
 void UWeaponComponent::InitWeapons()
 {
     /** spawn turret hub */
-    checkf(TurretHubClass, TEXT("TurretHubPawnHubClass not define!"));
+    checkf(TurretHubClass, TEXT("TurretHubClass not define!"));
     FActorSpawnParameters SpawnParams;
     SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
     SpawnParams.Owner = GetOwner();

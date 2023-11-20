@@ -2,7 +2,7 @@
 
 #include "UI/VehicleEnduranceWidget.h"
 #include "Components/VehicleIndicatorsComponent.h"
-#include "Components/ProgressBar.h"
+#include "Components/Image.h"
 
 void UVehicleEnduranceWidget::OnNewPawn(APawn* NewPawn)
 {
@@ -13,14 +13,21 @@ void UVehicleEnduranceWidget::OnNewPawn(APawn* NewPawn)
 
     VehicleIndicatorsComp->OnItemValueChanged.AddUObject(this, &UVehicleEnduranceWidget::OnHealthChanged);
     VehicleIndicatorsComp->UpdateWidgetsInfo();
+
+    if (HealthBarImage && HealthBarImage->GetDynamicMaterial())
+    {
+        HealthBarMaterial = HealthBarImage->GetDynamicMaterial();
+        HealthBarMaterial->SetScalarParameterValue(PercentParamName, 1.f);
+    }
 }
 
 void UVehicleEnduranceWidget::OnHealthChanged(EItemPropertyType Type, float Health, float MaxHealth)
 {
     if (Type != EItemPropertyType::Endurance) return;
 
-    if (HealthBar)
+    if (HealthBarMaterial)
     {
-        MaxHealth > 0.f ? HealthBar->SetPercent(Health / MaxHealth) : HealthBar->SetPercent(0.f);
+        const float PercentageToSet = MaxHealth > 0 ? Health / MaxHealth : 0.f;
+        HealthBarMaterial->SetScalarParameterValue(PercentParamName, PercentageToSet);
     }
 }

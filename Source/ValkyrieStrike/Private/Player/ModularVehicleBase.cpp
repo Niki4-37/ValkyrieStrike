@@ -152,7 +152,9 @@ void AModularVehicleBase::PostInitializeComponents()
     WheelsArray.Add(FWheelData(WheelRL, WheelManagerComponent->GetWheelDefultDistance(), FVector::ZeroVector));
 
     TArray<FWheelsGroup> WheelsGroup;
-    WheelsGroup.Add(FWheelsGroup(WheelsArray, 2000.f, 2200.f, Chassis));
+    const float SuspensionDumping = 2000.f;
+    const float SuspensionStiffness = 2200.f;
+    WheelsGroup.Add(FWheelsGroup(WheelsArray, SuspensionDumping, SuspensionStiffness, Chassis));
     WheelManagerComponent->SetWheelsGroups(WheelsGroup);
 }
 
@@ -239,7 +241,6 @@ void AModularVehicleBase::MoveForward(float Amount)
 
     SmoothTurnHandle(Amount);
 
-    //////
     if (WheelManagerComponent->IsWheelContact())
     {
         FVector VelocityAverage;

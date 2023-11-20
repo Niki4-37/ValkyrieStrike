@@ -1,6 +1,7 @@
 // Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 
 #include "Weapon/BaseVehicleWeapon.h"
+#include "NiagaraComponent.h"
 
 #include "Engine.h"
 
@@ -22,6 +23,9 @@ ABaseVehicleWeapon::ABaseVehicleWeapon()
     Gun->SetMobility(EComponentMobility::Movable);
     Gun->SetIsReplicated(true);
     Gun->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+    GunsightComponent = CreateDefaultSubobject<UNiagaraComponent>("GunsightComponent");
+    GunsightComponent->SetupAttachment(Gun, MuzzleSocketName);
 }
 
 void ABaseVehicleWeapon::SetStaticMesh(EUnitComponentType Type, UStaticMesh* NewMesh, FName SocketName)
@@ -82,15 +86,12 @@ void ABaseVehicleWeapon::UpdateAimActor(AActor* NewAimActor, float UpdateTimeRat
 
 bool ABaseVehicleWeapon::AddAmmo(int32 Amount, EVehicleUnitType InType)
 {
-    if (WeaponType != InType) return false;
+    if (WeaponType != InType || AmmoCapacity == MaxAmmoCapacity) return false;
     IsEmpty() ? ReloadWeapon() : ChangeAmmo(Amount);
     return true;
 }
 
-void ABaseVehicleWeapon::AlternativeShot()
-{
-    GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "ABaseVehicleWeapon::AlternativeShot");
-}
+void ABaseVehicleWeapon::AlternativeShot() {}
 
 void ABaseVehicleWeapon::MakeShot()
 {

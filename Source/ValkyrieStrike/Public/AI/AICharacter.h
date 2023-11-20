@@ -35,11 +35,16 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     UDropComponent* DropComponent;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
     UAnimMontage* DeathMontage;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
+    UAnimMontage* AttackMontage;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     FName WeaponSocketName{"WeaponSocket"};
+
+    bool bCanPlayMontage{true};
 
     virtual void BeginPlay() override;
 

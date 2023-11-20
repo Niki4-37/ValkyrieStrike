@@ -18,8 +18,4 @@ Config/steamvr_ue_editor_app.json
 .gitignore.bak
 *.bat
 *.log
-Content/ModularLowPolyRobots
-Content/Kobo_Nature
-Content/MapsForGame
-Content/GasStation
-Content/PipeWorksPack
+Content/Assets

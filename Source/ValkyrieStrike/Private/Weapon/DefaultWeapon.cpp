@@ -7,8 +7,14 @@
 ADefaultWeapon::ADefaultWeapon()
 {
     PrimaryActorTick.bCanEverTick = false;
-    WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponMesh");
-    WeaponMesh->SetupAttachment(RootComponent);
+    WeaponRootComponent = CreateDefaultSubobject<USceneComponent>("WeaponRootComponent");
+    SetRootComponent(WeaponRootComponent);
+
+    WeaponSkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponSkeletalMesh");
+    WeaponSkeletalMesh->SetupAttachment(RootComponent);
+
+    WeaponStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>("WeaponStaticlMesh");
+    WeaponStaticMesh->SetupAttachment(RootComponent);
 }
 
 void ADefaultWeapon::StartFire(bool bIsPressed, const FVector& AimPosition)
@@ -26,7 +32,7 @@ void ADefaultWeapon::StartFire(bool bIsPressed, const FVector& AimPosition)
     }
 }
 
-void ADefaultWeapon::SetFireRate(float NewFireRate) 
+void ADefaultWeapon::SetFireRate(float NewFireRate)
 {
     if (NewFireRate < 0.f) return;
     FireRate = NewFireRate;
@@ -37,14 +43,14 @@ void ADefaultWeapon::BeginPlay()
     Super::BeginPlay();
 
     check(GetWorld());
-    check(WeaponMesh);
+    // check(WeaponMesh);
 }
 
 void ADefaultWeapon::MakeShot(const FVector& AimPosition)
 {
-    if (!WeaponMesh || !GetWorld()) return;
-    const FRotator MuzzleRotation = WeaponMesh->GetSocketRotation(MuzzleSocketName);
-    const FVector MuzzleLocation = WeaponMesh->GetSocketLocation(MuzzleSocketName);
+    if (!GetWorld()) return;
+    const FRotator MuzzleRotation = GetWeaponSocketTransform(MuzzleSocketName).Rotator();
+    const FVector MuzzleLocation = GetWeaponSocketTransform(MuzzleSocketName).GetLocation();
 
     const FVector Direction = (AimPosition - MuzzleLocation).GetSafeNormal();
 
@@ -58,5 +64,13 @@ void ADefaultWeapon::MakeShot(const FVector& AimPosition)
     {
         Bullet->SetShootDirection(ShootDirection);
         Bullet->SetLifeSpan(2.f);
+        OnWeaponShot.Broadcast();
     }
+}
+
+FTransform ADefaultWeapon::GetWeaponSocketTransform(FName SocketName)
+{
+    if (WeaponSkeletalMesh->SkeletalMesh) return WeaponSkeletalMesh->GetSocketTransform(SocketName);
+    if (WeaponStaticMesh->GetStaticMesh()) return WeaponStaticMesh->GetSocketTransform(SocketName);
+    return FTransform();
 }

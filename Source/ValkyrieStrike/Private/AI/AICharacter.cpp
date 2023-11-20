@@ -37,7 +37,14 @@ void AAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
     Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void AAICharacter::AttackEnemy(AActor* AimActor) {}
+void AAICharacter::AttackEnemy(AActor* AimActor) 
+{
+    if (GetMesh() && GetMesh()->GetAnimInstance())
+    {
+        const auto MontageInstance = GetMesh()->GetAnimInstance()->GetActiveMontageInstance();
+        bCanPlayMontage = MontageInstance ? MontageInstance->IsPlaying() : false;
+    }
+}
 
 void AAICharacter::BeginPlay()
 {

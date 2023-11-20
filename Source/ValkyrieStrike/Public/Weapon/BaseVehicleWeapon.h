@@ -8,6 +8,7 @@
 #include "BaseVehicleWeapon.generated.h"
 
 class ADefaultProjectile;
+class UNiagaraComponent;
 
 UCLASS()
 class VALKYRIESTRIKE_API ABaseVehicleWeapon : public AActor
@@ -41,14 +42,17 @@ protected:
     UPROPERTY(VisibleDefaultsOnly)
     USceneComponent* WeaponRootComponent;
 
-    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Equipment")
     UStaticMeshComponent* Platform;
 
-    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Equipment")
     UStaticMeshComponent* Gun;
 
-    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Equipment")
     FName MuzzleSocketName{"MuzzleSocket"};
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "VFX")
+    UNiagaraComponent* GunsightComponent;
 
     bool bIsSideMode{false};
     float SidePositionModifier{1.f};

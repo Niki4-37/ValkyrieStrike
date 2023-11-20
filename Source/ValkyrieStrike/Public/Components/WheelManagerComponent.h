@@ -31,29 +31,29 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TArray<TEnumAsByte<EObjectTypeQuery>> TreceForObjectTypes;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wheels setup")
     float WheelMaxSpeed{1000.f};
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wheels setup")
     float WheelRadius{20.f};
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wheels setup")
     float WheelDefaultDistance{60.f};
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wheels setup")
     float WheelMaxContactDistance{65.f};
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wheels setup")
     float WheelMinContactDistance{40.f};
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.2", ClampMax = "3.0"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.2", ClampMax = "3.0"), Category = "Wheels setup")
     float WheelFrictionMultipler{1.f};
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.1", ClampMax = "5.0"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.1", ClampMax = "5.0"), Category = "Wheels setup")
     float WheelMoveForceMultipler{1.f};
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.5", ClampMax = "6.0"))
-    float WheelSlideResist{1.f};
+    // UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.5", ClampMax = "6.0"), DisplayName = "not used yet", Tooltip = "not used yet", Category = "Wheels setup")
+    // float WheelSlideResist{1.f};
 
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

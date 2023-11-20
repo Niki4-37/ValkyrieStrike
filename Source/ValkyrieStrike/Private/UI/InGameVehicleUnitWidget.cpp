@@ -2,7 +2,6 @@
 
 #include "UI/InGameVehicleUnitWidget.h"
 #include "Components/Image.h"
-#include "Components/ProgressBar.h"
 #include "Materials/MaterialInstance.h"
 
 #include "Engine.h"
