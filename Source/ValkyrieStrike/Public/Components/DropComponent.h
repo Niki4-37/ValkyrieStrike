@@ -26,19 +26,12 @@ protected:
     TSubclassOf<APickupActor> PickupActorClass;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    float DropChance{0.5f};
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    UStaticMesh* PickupMesh{nullptr};
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    UMaterialInterface* Material;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FInteractionData DropData;
+    TArray<FDropComponentElement> DropElements;
 
     virtual void BeginPlay() override;
 
-public:
-    virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+private:
+    float SumOfWeights{0};
+
+    const FDropComponentElement& Roll();
 };

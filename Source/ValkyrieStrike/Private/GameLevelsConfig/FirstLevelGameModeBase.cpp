@@ -7,8 +7,12 @@
 #include "Player/ModularVehicleBase.h"
 #include "EngineUtils.h"
 #include "GameFramework/PlayerStart.h"
-
+#include "AIController.h"
+#include "Interactables/SpawningActor.h"
 #include "Decorations/DecorationActor.h"
+#include "Components/RespawnComponent.h"
+
+#include "Engine.h"
 
 AFirstLevelGameModeBase::AFirstLevelGameModeBase()
 {
@@ -23,6 +27,12 @@ void AFirstLevelGameModeBase::InitGame(const FString& MapName, const FString& Op
     Super::InitGame(MapName, Options, ErrorMessage);
 
     FillPlayerStartMap();
+    FillSpawningActorsArray();
+
+    for (TPair<TSubclassOf<AActor>, float>& SpawnClassesWithChance : EnemieSpawnClassesWithChance)
+    {
+        SumOfWeights += SpawnClassesWithChance.Value;
+    }
 }
 
 void AFirstLevelGameModeBase::HandleSeamlessTravelPlayer(AController*& C)
@@ -58,6 +68,20 @@ UClass* AFirstLevelGameModeBase::GetDefaultPawnClassForController_Implementation
         }
     }
 
+    if (InController->IsA<AAIController>())
+    {
+        const auto Chance = FMath::RandRange(0.f, SumOfWeights);
+        float CumulativeWeights{0};
+        for (TPair<TSubclassOf<AActor>, float>& SpawnClassesWithChance : EnemieSpawnClassesWithChance)
+        {
+            CumulativeWeights += SpawnClassesWithChance.Value;
+            if (Chance < CumulativeWeights)
+            {
+                return SpawnClassesWithChance.Key;
+            }
+        }
+    }
+
     return Super::GetDefaultPawnClassForController_Implementation(InController);
 }
 
@@ -68,55 +92,26 @@ void AFirstLevelGameModeBase::RestartPlayer(AController* NewPlayer)
         return;
     }
 
-    const auto ValkyriePlayerState = NewPlayer->GetPlayerState<AValkyriePlayerState>();
-
-    if (ValkyriePlayerState && !ValkyriePlayerState->IsFirstDead() /*&& PS->IsReconnecting()*/)
-    {
-        FTransform NewTransforn = ValkyriePlayerState->GetRespawnTransform();
-        FVector NewLocation = NewTransforn.GetLocation() + FVector(300.f, 300.f, 100.f);
-        FRotator NewRotation = FRotator(0.f, NewTransforn.Rotator().Yaw, 0.f);
-        NewTransforn.SetLocation(NewLocation);
-        NewTransforn.SetRotation(FQuat(NewRotation));
-        RestartPlayerAtTransform(NewPlayer, NewTransforn);
-    }
-    else
-    {
-        AActor* StartSpot = FindPlayerStart(NewPlayer);
-
-        if (StartSpot == nullptr)
-        {
-            if (NewPlayer->StartSpot != nullptr)
-            {
-                StartSpot = NewPlayer->StartSpot.Get();
-                UE_LOG(LogGameMode, Warning, TEXT("RestartPlayer: Player start not found, using last start spot"));
-            }
-        }
-
-        RestartPlayerAtPlayerStart(NewPlayer, StartSpot);
-    }
+    RestartPlayerWithPlayerState(NewPlayer);
+    RestartPlayerWithAIController(NewPlayer);
 }
 
 void AFirstLevelGameModeBase::Killed(AController* VictimController, const FTransform& VictimTransform)
 {
-    if (VictimController && VictimController->IsA<APlayerController>())
-    {
-        //auto BrokenVehicle = GetWorld()->SpawnActorDeferred<ADecorationActor>(ADecorationActor::StaticClass(), VictimTransform);
-        //if (BrokenVehicle)
-        //{
-        //    BrokenVehicle->SetupDecoration(BrokenVehicleMesh);
-        //    BrokenVehicle->FinishSpawning(VictimTransform);
-        //}
+    if (!VictimController) return;
 
-        if (const auto ValkyriePlayerState = VictimController->GetPlayerState<AValkyriePlayerState>())
-        {
-            ValkyriePlayerState->SetRespawnTransform(VictimTransform);
-            ValkyriePlayerState->ChangeLives(-1);
-            VictimController->GetPawn()->Reset();
-            if (ValkyriePlayerState->CanRespawn())
-            {
-                RestartPlayer(VictimController);
-            }
-        }
+    StartRespawning(VictimController);
+
+    if (const auto ValkyriePlayerState = VictimController->GetPlayerState<AValkyriePlayerState>())
+    {
+        ValkyriePlayerState->SetRespawnTransform(VictimTransform);
+        ValkyriePlayerState->ChangeLives(-1);
+    }
+
+    if (VictimController->IsA<AAIController>() && bIsFinal)
+    {
+        ++Count;
+        // GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("EnemiesKilled: %i"), Count));
     }
 }
 
@@ -129,4 +124,79 @@ void AFirstLevelGameModeBase::FillPlayerStartMap()
         if (!StartActor) continue;
         PlayerStartMap.Add(StartActor, false);
     }
+}
+
+void AFirstLevelGameModeBase::FillSpawningActorsArray()
+{
+    for (TActorIterator<ASpawningActor> It(GetWorld()); It; ++It)
+    {
+        ASpawningActor* SpawningActor = *It;
+        if (!SpawningActor) continue;
+        SpawningActors.AddUnique(SpawningActor);
+    }
+}
+
+void AFirstLevelGameModeBase::StartRespawning(AController* VictimController)
+{
+    // check AIControllers number
+
+    const auto RespawnComponent = VictimController->FindComponentByClass<URespawnComponent>();
+    if (!RespawnComponent) return;
+
+    RespawnComponent->StartRespawning(3.f);
+}
+
+void AFirstLevelGameModeBase::RestartPlayerWithPlayerState(AController* NewPlayer)
+{
+    const auto ValkyriePlayerState = NewPlayer->GetPlayerState<AValkyriePlayerState>();
+    if (!ValkyriePlayerState) return;
+
+    //  const auto BrokenVehicle = GetWorld()->SpawnActorDeferred<ADecorationActor>(ADecorationActor::StaticClass(), VictimTransform);
+    //  if (BrokenVehicle)
+    //{
+    //      BrokenVehicle->SetupDecoration(BrokenVehicleMesh);
+    //      BrokenVehicle->FinishSpawning(VictimTransform);
+    //}
+
+    if (!ValkyriePlayerState->IsFirstDead() /*&& PS->IsReconnecting()*/)
+    {
+        NewPlayer->GetPawn()->Reset();
+        if (!ValkyriePlayerState->CanRespawn())
+        {
+            // spectate
+            return;
+        }
+
+        FTransform NewTransforn = ValkyriePlayerState->GetRespawnTransform();
+        FVector NewLocation = NewTransforn.GetLocation() + FVector(300.f, 300.f, 100.f);
+        FRotator NewRotation = FRotator(0.f, NewTransforn.Rotator().Yaw, 0.f);
+        NewTransforn.SetLocation(NewLocation);
+        NewTransforn.SetRotation(FQuat(NewRotation));
+        RestartPlayerAtTransform(NewPlayer, NewTransforn);
+    }
+    else
+    {
+        AActor* StartSpot = FindPlayerStart(NewPlayer);
+        if (!StartSpot)
+        {
+            if (NewPlayer->StartSpot != nullptr)
+            {
+                StartSpot = NewPlayer->StartSpot.Get();
+                UE_LOG(LogGameMode, Warning, TEXT("RestartPlayer: Player start not found, using last start spot"));
+            }
+        }
+        RestartPlayerAtPlayerStart(NewPlayer, StartSpot);
+    }
+}
+
+void AFirstLevelGameModeBase::RestartPlayerWithAIController(AController* NewPlayer)
+{
+    if (!NewPlayer->IsA<AAIController>() || !SpawningActors.Num() /*|| !bIsFinal*/) return;
+
+    NewPlayer->UnPossess();
+
+    const auto RandomIndex = FMath::RandHelper(SpawningActors.Num());
+    const auto StartSpot = SpawningActors[RandomIndex];
+
+    RestartPlayerAtPlayerStart(NewPlayer, StartSpot);
 }

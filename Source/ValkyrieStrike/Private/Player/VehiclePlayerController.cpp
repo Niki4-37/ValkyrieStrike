@@ -2,6 +2,13 @@
 
 #include "Player/VehiclePlayerController.h"
 #include "Interfaces/GameInterface.h"
+#include "Components/RespawnComponent.h"
+
+
+AVehiclePlayerController::AVehiclePlayerController() 
+{
+    RespawnComponent = CreateDefaultSubobject<URespawnComponent>("RespawnComponent");
+}
 
 void AVehiclePlayerController::MakeMaintenance_OnServer_Implementation(EItemPropertyType Type)
 {

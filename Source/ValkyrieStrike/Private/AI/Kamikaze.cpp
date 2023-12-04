@@ -2,13 +2,17 @@
 
 #include "AI/Kamikaze.h"
 #include "Components/SphereComponent.h"
+#include "Components/HealthComponent.h"
 #include "AIController.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraFunctionLibrary.h"
 #include "GameFramework/Controller.h"
 #include "Camera/CameraShakeBase.h"
+#include "Decorations/DecorationActor.h"
+#include "Net/UnrealNetwork.h"
 
 #include "DrawDebugHelpers.h"
+#include "Engine.h"
 
 AKamikaze::AKamikaze()
 {
@@ -16,32 +20,61 @@ AKamikaze::AKamikaze()
     CollisionComponent->SetSphereRadius(200.f);
     CollisionComponent->SetupAttachment(RootComponent);
     CollisionComponent->SetCanEverAffectNavigation(true);  // collision not affect navigation
-
-    BombMesh = CreateDefaultSubobject<UStaticMeshComponent>("BombMesh");
-    BombMesh->SetupAttachment(GetMesh(), WeaponSocketName);
-    BombMesh->SetCanEverAffectNavigation(false);
-    BombMesh->SetMobility(EComponentMobility::Movable);
 }
 
 void AKamikaze::NotifyActorBeginOverlap(AActor* OtherActor)
 {
-    if (bIsExploded || !OtherActor || !OtherActor->ActorHasTag("Player")) return;
+    if (!ExplosiveBomb || !OtherActor || !OtherActor->ActorHasTag("Player")) return;
 
-    bIsExploded = true;
+    // const auto PlayerController = OtherActor->GetInstigatorController<APlayerController>();
+    // if (!PlayerController || !PlayerController->PlayerCameraManager) return;
+    // checkf(CameraShake, TEXT("CameraShake not define!"));
+    // PlayerController->PlayerCameraManager->StartCameraShake(CameraShake);
 
-    UGameplayStatics::ApplyRadialDamage(GetWorld(),                  //
-                                        Damage,                      //
-                                        GetActorLocation(),          //
-                                        Radius,                      //
-                                        UDamageType::StaticClass(),  //
-                                        {});
+    FDetachmentTransformRules DetachmentRules(EDetachmentRule::KeepWorld, false);
+    ExplosiveBomb->DetachFromActor(DetachmentRules);
+    ExplosiveBomb->SetDestructionTimer(2.f);
+    ExplosiveBomb->Throw_Multicast();
+    ExplosiveBomb = nullptr;
+}
 
-    UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ExpoleEffect, GetActorLocation(), FRotator::ZeroRotator);
+void AKamikaze::BeginPlay()
+{
+    Super::BeginPlay();
 
-    OnDeath();
+    if (HasAuthority())
+    {
+        ExplosiveBomb = GetWorld()->SpawnActorDeferred<ADecorationActor>(ADecorationActor::StaticClass(), GetActorTransform());
+        if (ExplosiveBomb)
+        {
+            ExplosiveBomb->SetupDecoration(BombMesh);
+            ExplosiveBomb->IsDealsDamage(true, Damage, Radius);
+            ExplosiveBomb->SetDestructionEffect(ExplodeEffect);
+            ExplosiveBomb->SetOwner(this);
+            ExplosiveBomb->FinishSpawning(GetActorTransform());
+            FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
+            ExplosiveBomb->AttachToComponent(GetMesh(), AttachmentRules, BackpackSocketName);
+        }
+    }
+}
 
-    const auto PlayerController = OtherActor->GetInstigatorController<APlayerController>();
-    if (!PlayerController || !PlayerController->PlayerCameraManager) return;
-    checkf(CameraShake, TEXT("CameraShake not define!"));
-    PlayerController->PlayerCameraManager->StartCameraShake(CameraShake);
+void AKamikaze::OnDeath()
+{
+    Super::OnDeath();
+
+    if (ExplosiveBomb)
+    {
+        FDetachmentTransformRules DetachmentRules(EDetachmentRule::KeepWorld, false);
+        ExplosiveBomb->DetachFromActor(DetachmentRules);
+        ExplosiveBomb->SetDestructionTimer(2.f);
+        ExplosiveBomb->Throw_Multicast();
+        ExplosiveBomb = nullptr;
+    }
+}
+
+void AKamikaze::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME(AKamikaze, ExplosiveBomb);
 }

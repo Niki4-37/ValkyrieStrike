@@ -7,6 +7,7 @@
 #include "AIEnemyController.generated.h"
 
 class UUniversalAIPerceptionComponent;
+class URespawnComponent;
 
 UCLASS()
 class VALKYRIESTRIKE_API AAIEnemyController : public AAIController
@@ -21,6 +22,9 @@ public:
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     UUniversalAIPerceptionComponent* AIPerceptionComponent;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    URespawnComponent* RespawnComponent;
 
     virtual void OnPossess(APawn* InPawn) override;
 };

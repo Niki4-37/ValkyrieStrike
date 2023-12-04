@@ -20,6 +20,9 @@ public:
     void SetupPickup(UStaticMesh* Mesh, UMaterialInterface* Material, const FInteractionData& InData);
     void ThrowUp(const FVector& StartPosition);
 
+    UFUNCTION(NetMulticast, reliable)
+    void ThrowUp_Multicast(const FVector& NewLocation);
+
 protected:
     UPROPERTY(VisibleAnywhere)
     USphereComponent* CollisionComponent;

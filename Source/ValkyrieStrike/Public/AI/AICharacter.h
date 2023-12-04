@@ -44,6 +44,9 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     FName WeaponSocketName{"WeaponSocket"};
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    FName BackpackSocketName{"BackpackSocket"};
+
     bool bCanPlayMontage{true};
 
     virtual void BeginPlay() override;
@@ -53,4 +56,7 @@ protected:
 private:
     UFUNCTION(NetMulticast, unreliable)
     void PlayAnimMontage_Multicast(UAnimMontage* Animation);
+
+    UFUNCTION(NetMulticast, reliable)
+    void SwitchOffCollision_Multicast();
 };

@@ -40,9 +40,9 @@ void UHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 void UHealthComponent::Killed()
 {
-    if (!GetWorld() || !GetOwner() || !GetOwner()->GetInstigatorController()) return;
+    if (!GetWorld()) return;
     const auto FirstLevelGM = GetWorld()->GetAuthGameMode<AFirstLevelGameModeBase>();
-    if (!FirstLevelGM) return;
+    if (!FirstLevelGM || !GetOwner()) return;
     FirstLevelGM->Killed(GetOwner()->GetInstigatorController(), GetOwner()->GetActorTransform());
 }
 
@@ -57,7 +57,6 @@ void UHealthComponent::AddHealth(float Value)
     Health = FMath::Clamp(NewHealth, 0.f, MaxHealth);
 
     OnHealthChanged_Multicast(Health, MaxHealth);
-    // UE_LOG(HealthComponent_LOG, Display, TEXT("AddHealth: %f"), Health);
 }
 
 void UHealthComponent::UpdateWidgetsInfo()

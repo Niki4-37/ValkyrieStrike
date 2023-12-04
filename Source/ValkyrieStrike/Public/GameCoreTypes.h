@@ -169,6 +169,24 @@ struct FInteractionData
     }
 };
 
+USTRUCT(BlueprintType)
+struct FDropComponentElement
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    float DropChance{0.5f};
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UStaticMesh* PickupMesh{nullptr};
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UMaterialInterface* Material;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FInteractionData DropData;
+};
+
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnWorkshopTasksUpdatedSignature, const TArray<FInteractionData>&);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnUpdateCostSignature, EItemPropertyType, int32);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnCoinsChangedSignature, int32);

@@ -7,12 +7,16 @@
 #include "GameCoreTypes.h"
 #include "VehiclePlayerController.generated.h"
 
+class URespawnComponent;
+
 UCLASS()
 class VALKYRIESTRIKE_API AVehiclePlayerController : public APlayerController
 {
     GENERATED_BODY()
 
 public:
+    AVehiclePlayerController();
+
     FOnGameStateChangedSignature OnGameStateChanged;
 
     UFUNCTION(Server, reliable)
@@ -21,6 +25,9 @@ public:
     void ChangeGameState(EValkyrieGameState State);
 
 protected:
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    URespawnComponent* RespawnComponent;
+
     virtual void BeginPlay() override;
     virtual void OnPossess(APawn* InPawn) override;
     virtual void SetupInputComponent() override;

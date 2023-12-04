@@ -50,7 +50,7 @@ void APickupActor::ThrowUp(const FVector& StartPosition)
             const float LocationX = GetActorLocation().X;
             const float LocationY = GetActorLocation().Y;
 
-            SetActorLocation_Multicast(FVector(LocationX, LocationY, Height));
+            SetActorLocation(FVector(LocationX, LocationY, Height));
         });
 
     GetWorldTimerManager().SetTimer(TrowTimer, TimerDelegate, 0.01f, true);
@@ -113,4 +113,9 @@ void APickupActor::SetMaterial_Multicast_Implementation(UMaterialInterface* Mate
 void APickupActor::SetActorLocation_Multicast_Implementation(const FVector& NewLocation)
 {
     SetActorLocation(NewLocation);
+}
+
+void APickupActor::ThrowUp_Multicast_Implementation(const FVector& NewLocation)
+{
+    ThrowUp(NewLocation);
 }

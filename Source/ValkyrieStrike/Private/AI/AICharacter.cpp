@@ -37,7 +37,7 @@ void AAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
     Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void AAICharacter::AttackEnemy(AActor* AimActor) 
+void AAICharacter::AttackEnemy(AActor* AimActor)
 {
     if (GetMesh() && GetMesh()->GetAnimInstance())
     {
@@ -58,16 +58,15 @@ void AAICharacter::BeginPlay()
 void AAICharacter::OnDeath()
 {
     /** handled on server */
-    GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
     PlayAnimMontage_Multicast(DeathMontage);
-    GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    SwitchOffCollision_Multicast();
 
     const auto STUController = Cast<AAIController>(Controller);
     if (STUController && STUController->BrainComponent)
     {
         STUController->BrainComponent->Cleanup();
     }
-    DropComponent->DropItem();  // Server
+    DropComponent->DropItem();
 
     Tags.Empty();
 }
@@ -75,4 +74,10 @@ void AAICharacter::OnDeath()
 void AAICharacter::PlayAnimMontage_Multicast_Implementation(UAnimMontage* Animation)
 {
     PlayAnimMontage(Animation);
+}
+
+void AAICharacter::SwitchOffCollision_Multicast_Implementation()
+{
+    GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+    GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }

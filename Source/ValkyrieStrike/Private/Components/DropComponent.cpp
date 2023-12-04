@@ -5,31 +5,54 @@
 
 UDropComponent::UDropComponent()
 {
-    PrimaryComponentTick.bCanEverTick = true;
+    PrimaryComponentTick.bCanEverTick = false;
     SetIsReplicatedByDefault(true);
 }
 
 void UDropComponent::DropItem()
 {
     /** handled on server */
-    if (!GetWorld() || !GetOwner() || !PickupActorClass || FMath::FRandRange(0.0f, 1.0f) > DropChance) return;
+    if (!DropElements.Num()) return;
+
+    if (!GetWorld() || !GetOwner() || !PickupActorClass) return;
     FTransform SpawnTransform(FRotator::ZeroRotator, GetOwner()->GetActorLocation());
     auto Pickup = GetWorld()->SpawnActorDeferred<APickupActor>(PickupActorClass, SpawnTransform);
     if (Pickup)
     {
-        Pickup->SetupPickup(PickupMesh, Material, DropData);
+        const auto DropElement = Roll();
+        Pickup->SetupPickup(DropElement.PickupMesh, DropElement.Material, DropElement.DropData);
         Pickup->FinishSpawning(SpawnTransform);
 
-        Pickup->ThrowUp(GetOwner()->GetActorLocation());
+        Pickup->ThrowUp_Multicast(GetOwner()->GetActorLocation());
     }
 }
 
 void UDropComponent::BeginPlay()
 {
     Super::BeginPlay();
+
+    for (const auto& DropElement : DropElements)
+    {
+        SumOfWeights += DropElement.DropChance;
+    }
 }
 
-void UDropComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+const FDropComponentElement& UDropComponent::Roll()
 {
-    Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+    const auto Chance = FMath::RandRange(0.f, SumOfWeights);
+    float CumulativeWeights{0};
+
+    auto FoundElement = DropElements.FindByPredicate(
+        [Chance, &CumulativeWeights](const FDropComponentElement& Element)
+        {
+            CumulativeWeights += Element.DropChance;
+            return Chance < CumulativeWeights;
+        });
+
+    if (FoundElement)
+    {
+        return *FoundElement;
+    }
+
+    return DropElements[0];
 }

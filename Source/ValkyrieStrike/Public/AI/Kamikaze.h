@@ -10,6 +10,7 @@ class USphereComponent;
 class UStaticMeshComponent;
 class UNiagaraSystem;
 class UCameraShakeBase;
+class ADecorationActor;
 
 UCLASS()
 class VALKYRIESTRIKE_API AKamikaze : public AAICharacter
@@ -23,11 +24,11 @@ protected:
     UPROPERTY(EditDefaultsOnly)
     USphereComponent* CollisionComponent;
 
-    UPROPERTY(EditDefaultsOnly)
-    UStaticMeshComponent* BombMesh;
+    UPROPERTY(EditAnywhere)
+    UStaticMesh* BombMesh;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "VFX")
-    UNiagaraSystem* ExpoleEffect;
+    UNiagaraSystem* ExplodeEffect;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "VFX")
     TSubclassOf<UCameraShakeBase> CameraShake;
@@ -38,7 +39,12 @@ protected:
     float Damage{0.f};
 
     virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
+    virtual void BeginPlay() override;
+    virtual void OnDeath() override;
+
+    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
-    bool bIsExploded{false};
+    UPROPERTY(Replicated)  // to private
+    ADecorationActor* ExplosiveBomb{nullptr};
 };
