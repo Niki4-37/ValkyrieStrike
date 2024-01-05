@@ -29,7 +29,7 @@ void AFirstLevelGameModeBase::InitGame(const FString& MapName, const FString& Op
     FillPlayerStartMap();
     FillSpawningActorsArray();
 
-    for (TPair<TSubclassOf<AActor>, float>& SpawnClassesWithChance : EnemieSpawnClassesWithChance)
+    for (TPair<TSubclassOf<AActor>, float>& SpawnClassesWithChance : EnemySpawnClassesWithChance)
     {
         SumOfWeights += SpawnClassesWithChance.Value;
     }
@@ -72,7 +72,7 @@ UClass* AFirstLevelGameModeBase::GetDefaultPawnClassForController_Implementation
     {
         const auto Chance = FMath::RandRange(0.f, SumOfWeights);
         float CumulativeWeights{0};
-        for (TPair<TSubclassOf<AActor>, float>& SpawnClassesWithChance : EnemieSpawnClassesWithChance)
+        for (TPair<TSubclassOf<AActor>, float>& SpawnClassesWithChance : EnemySpawnClassesWithChance)
         {
             CumulativeWeights += SpawnClassesWithChance.Value;
             if (Chance < CumulativeWeights)
@@ -191,12 +191,25 @@ void AFirstLevelGameModeBase::RestartPlayerWithPlayerState(AController* NewPlaye
 
 void AFirstLevelGameModeBase::RestartPlayerWithAIController(AController* NewPlayer)
 {
-    if (!NewPlayer->IsA<AAIController>() || !SpawningActors.Num() /*|| !bIsFinal*/) return;
+    if (!NewPlayer->IsA<AAIController>() || !bIsFinal) return;
 
     NewPlayer->UnPossess();
 
-    const auto RandomIndex = FMath::RandHelper(SpawningActors.Num());
-    const auto StartSpot = SpawningActors[RandomIndex];
+    RestartPlayerAtPlayerStart(NewPlayer, GetRandomSpawningActorByTag(FinalPhaseTagName));
+}
 
-    RestartPlayerAtPlayerStart(NewPlayer, StartSpot);
+AActor* AFirstLevelGameModeBase::GetRandomSpawningActorByTag(FName TagName)
+{
+    if (!SpawningActors.Num()) return nullptr;
+    TArray<int32> IndexesByTag;
+    int32 IndexCount{0};
+    for (const auto SpawningActor : SpawningActors)
+    {
+        if (SpawningActor->ActorHasTag(TagName))
+        {
+            IndexesByTag.Add(IndexCount);
+        }
+        ++IndexCount;
+    }
+    return IndexesByTag.Num() != 0 ? SpawningActors[IndexesByTag[FMath::RandHelper(IndexesByTag.Num())]] : nullptr;
 }

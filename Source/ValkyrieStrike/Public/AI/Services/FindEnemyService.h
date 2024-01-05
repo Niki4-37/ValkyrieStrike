@@ -18,6 +18,9 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
     FBlackboardKeySelector EnemyActorKey;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+    FBlackboardKeySelector EnemyLocationKey;
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FName EnemyTag{"Player"};
 

@@ -37,13 +37,9 @@ void AAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
     Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void AAICharacter::AttackEnemy(AActor* AimActor)
+void AAICharacter::AttackEnemy(AActor* Target)
 {
-    if (GetMesh() && GetMesh()->GetAnimInstance())
-    {
-        const auto MontageInstance = GetMesh()->GetAnimInstance()->GetActiveMontageInstance();
-        bCanPlayMontage = MontageInstance ? MontageInstance->IsPlaying() : false;
-    }
+    PlayAnimMontage_Multicast(AttackMontage);
 }
 
 void AAICharacter::BeginPlay()
@@ -58,21 +54,23 @@ void AAICharacter::BeginPlay()
 void AAICharacter::OnDeath()
 {
     /** handled on server */
-    PlayAnimMontage_Multicast(DeathMontage);
-    SwitchOffCollision_Multicast();
-
     const auto STUController = Cast<AAIController>(Controller);
     if (STUController && STUController->BrainComponent)
     {
         STUController->BrainComponent->Cleanup();
     }
+    PlayAnimMontage_Multicast(DeathMontage);
+    SwitchOffCollision_Multicast();
     DropComponent->DropItem();
 
     Tags.Empty();
+
+    SetLifeSpan(10.f);
 }
 
 void AAICharacter::PlayAnimMontage_Multicast_Implementation(UAnimMontage* Animation)
 {
+    StopAnimMontage();
     PlayAnimMontage(Animation);
 }
 

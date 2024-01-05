@@ -32,7 +32,13 @@ public:
 
     void SaveMountedUnit(const FVehicleUnitData& VehicleUnit);
 
-    const TArray<FVehicleUnitData>& GetVehicleUnits() const { return VehicleUnits; };
+    const TArray<FVehicleUnitData>& GetVehicleUnits() const
+    {
+        if (VehicleUnits.Num()) return VehicleUnits;
+        /* debug used only */
+        return DebugVehicleUnits;
+        /* --------------- */
+    };
     void SetVehicleUnits(const TArray<FVehicleUnitData>& Units) { VehicleUnits = Units; };
 
     void SetRespawnTransform(const FTransform& NewRespawnTransform)
@@ -46,6 +52,11 @@ public:
 protected:
     UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadWrite)
     int32 Lives{5};
+
+    /* debug used only */
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    TArray<FVehicleUnitData> DebugVehicleUnits;
+    /* --------------- */
 
     virtual void CopyProperties(APlayerState* PlayerState) override;
     virtual void OverrideWith(APlayerState* PlayerState) override;

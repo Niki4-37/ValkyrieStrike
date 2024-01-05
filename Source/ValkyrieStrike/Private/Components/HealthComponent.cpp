@@ -3,6 +3,7 @@
 #include "Components/HealthComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "GameLevelsConfig/FirstLEvelGameModeBase.h"
+#include "Weapon/ExplosionDamageType.h"
 
 DEFINE_LOG_CATEGORY_STATIC(HealthComponent_LOG, All, All);
 
@@ -15,6 +16,8 @@ UHealthComponent::UHealthComponent()
 void UHealthComponent::BeginPlay()
 {
     Super::BeginPlay();
+
+    // checkf(ExplosionCameraShake, TEXT("CameraShake not define!"));
 
     if (GetOwnerRole() == ENetRole::ROLE_Authority)  //(GetOwner()->HasAuthority())
     {
@@ -75,9 +78,25 @@ void UHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const
         UE_LOG(HealthComponent_LOG, Display, TEXT("DEAD!"));
         Killed();
     }
+
+    if (DamageType)
+    {
+        if (DamageType->IsA<UExplosionDamageType>())
+        {
+            ShakeCamera_OnClient();
+        }
+    }
 }
 
 void UHealthComponent::OnHealthChanged_Multicast_Implementation(float Value, float MaxValue)
 {
     OnItemValueChanged.Broadcast(EItemPropertyType::Endurance, Value, MaxValue);
+}
+
+void UHealthComponent::ShakeCamera_OnClient_Implementation() 
+{
+    if (!GetOwner()) return;
+    const auto PlayerController = GetOwner()->GetInstigatorController<APlayerController>();
+    if (!PlayerController || !PlayerController->PlayerCameraManager) return;
+    PlayerController->PlayerCameraManager->StartCameraShake(ExplosionCameraShake);
 }

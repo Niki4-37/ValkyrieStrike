@@ -32,5 +32,4 @@ private:
     ADefaultWeapon* OwnedWeapon;
 
     void SpawnAndAttachWeapon();
-    void OnWeaponShot();
 };

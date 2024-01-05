@@ -29,13 +29,13 @@ void ATurretWeapon::RotateToTarget(AActor* Target)
     auto Delta = Direction - GunRotation;
     Delta.Normalize();
     const auto GunDeltaValue = bIsSideMode  //
-                                ?
-                                FMath::Clamp(Delta.Yaw, -1.f, 1.f)  //
-                                :
-                                FMath::Clamp(Delta.Pitch, -1.f, 1.f);
+                                   ?
+                                   FMath::Clamp(Delta.Yaw, -1.f, 1.f)  //
+                                   :
+                                   FMath::Clamp(Delta.Pitch, -1.f, 1.f);
 
     const auto GunValueToClamp = Gun->GetRelativeRotation().Pitch + (bIsSideMode ? SidePositionModifier : 1.f) * GunDeltaValue;
-    const auto GunValueToSet = FMath::Clamp(GunValueToClamp, -20.f, 90.f);
+    const auto GunValueToSet = FMath::Clamp(GunValueToClamp, -5.f, 90.f);
 
     Gun->SetRelativeRotation(FRotator(GunValueToSet, 0.f, 0.f));
 }

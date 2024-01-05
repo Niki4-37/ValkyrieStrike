@@ -20,6 +20,9 @@ public:
     FOnItemValueChangedSignature OnItemValueChanged;
 
 protected:
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "VFX")
+    TSubclassOf<UCameraShakeBase> ExplosionCameraShake;
+
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -43,4 +46,7 @@ private:
 
     UFUNCTION(NetMulticast, unreliable)
     void OnHealthChanged_Multicast(float Value, float MaxValue);
+
+    UFUNCTION(Client, unreliable)
+    void ShakeCamera_OnClient();
 };

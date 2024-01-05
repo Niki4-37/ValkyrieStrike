@@ -21,6 +21,11 @@ void UFindEnemyService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
         {
             Blackboard->SetValueAsObject(EnemyActorKey.SelectedKeyName, PerceptionComponent->GetClosestEnemy(EnemyTag));
             // UE_LOG(LogTemp, Display, TEXT("EnemyFound"));
+            if (PerceptionComponent->GetClosestEnemy(EnemyTag))
+            {
+                const FVector LocationToSet = PerceptionComponent->GetClosestEnemy(EnemyTag)->GetActorLocation();
+                Blackboard->SetValueAsVector(EnemyLocationKey.SelectedKeyName, LocationToSet);
+            }
         }
     }
     Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);

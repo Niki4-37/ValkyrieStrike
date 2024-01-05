@@ -27,15 +27,23 @@ public:
 
     void Killed(AController* VictimController, const FTransform& VictimTransform);
 
+    const TArray<ASpawningActor*>& GetSpawningActors() const { return SpawningActors; }
+
+    UFUNCTION(BlueprintCallable)
+    void BeginFinalPhase() { bIsFinal = true; };
+
 protected:
     // Create TMap<Controller, StaticMesh> VehicleMeshiesMap
     // UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     // UStaticMesh* BrokenVehicleMesh;
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LevelConfig")
-    TMap<TSubclassOf<AActor>, float> EnemieSpawnClassesWithChance;
+    TMap<TSubclassOf<AActor>, float> EnemySpawnClassesWithChance;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LevelConfig", meta = (ClampMin = "0", ClampMax = "1000"))
     int32 EnemiesToWin{10};
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LevelCongig")
+    FName FinalPhaseTagName{"FinalPhase"};
 
 private:
     bool bIsFinal{false};
@@ -54,4 +62,6 @@ private:
     void StartRespawning(AController* VictimController);
     void RestartPlayerWithPlayerState(AController* NewPlayer);
     void RestartPlayerWithAIController(AController* NewPlayer);
+
+    AActor* GetRandomSpawningActorByTag(FName TagName);
 };

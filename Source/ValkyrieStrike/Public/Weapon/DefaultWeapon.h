@@ -9,8 +9,6 @@
 class USkeletalMeshComponent;
 class ADefaultProjectile;
 
-DECLARE_MULTICAST_DELEGATE(FOnWeaponShotSignature);
-
 UCLASS()
 class VALKYRIESTRIKE_API ADefaultWeapon : public AActor
 {
@@ -18,8 +16,6 @@ class VALKYRIESTRIKE_API ADefaultWeapon : public AActor
 
 public:
     ADefaultWeapon();
-
-    FOnWeaponShotSignature OnWeaponShot;
 
     void StartFire(bool bIsPressed, const FVector& AimPosition);
     void SetFireRate(float NewFireRate);

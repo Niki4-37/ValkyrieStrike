@@ -181,9 +181,6 @@ struct FDropComponentElement
     UStaticMesh* PickupMesh{nullptr};
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    UMaterialInterface* Material;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FInteractionData DropData;
 };
 

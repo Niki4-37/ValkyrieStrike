@@ -8,13 +8,14 @@ ARanger::ARanger() {}
 void ARanger::AttackEnemy(AActor* AimActor)
 {
     if (!OwnedWeapon) return;
+    Super::AttackEnemy(AimActor);
+
     const bool bCanFire = AimActor ? true : false;
 
     FVector AimPosition = FVector::ZeroVector;
     if (AimActor)
     {
-        AimActor->GetVelocity();
-        AimPosition = AimActor->GetActorLocation() + AimActor->GetVelocity();
+        AimPosition = AimActor->GetActorLocation() + AimActor->GetVelocity() / 2;
     }
 
     OwnedWeapon->StartFire(bCanFire, AimPosition);
@@ -46,10 +47,4 @@ void ARanger::SpawnAndAttachWeapon()
     FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
     OwnedWeapon->AttachToComponent(GetMesh(), AttachmentRules, WeaponSocketName);
     OwnedWeapon->SetFireRate(FireRate);
-    OwnedWeapon->OnWeaponShot.AddUObject(this, &ARanger::OnWeaponShot);
-}
-
-void ARanger::OnWeaponShot()
-{
-    PlayAnimMontage(AttackMontage);
 }

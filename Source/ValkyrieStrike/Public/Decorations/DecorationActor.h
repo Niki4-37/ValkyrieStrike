@@ -7,11 +7,7 @@
 #include "DecorationActor.generated.h"
 
 class UHealthComponent;
-
-// class UNiagaraComponent;
 class UNiagaraSystem;
-
-class UBoxComponent;
 
 UCLASS()
 class VALKYRIESTRIKE_API ADecorationActor : public AActor
@@ -19,7 +15,6 @@ class VALKYRIESTRIKE_API ADecorationActor : public AActor
     GENERATED_BODY()
 
 public:
-    // Sets default values for this actor's properties
     ADecorationActor();
 
     void SetupDecoration(UStaticMesh* Mesh);
@@ -29,6 +24,9 @@ public:
 
     UFUNCTION(NetMulticast, reliable)
     void Throw_Multicast();
+
+    UFUNCTION(NetMulticast, reliable)
+    void ThrowTo_Multicast(const FVector& ToLocation);
 
 protected:
     UPROPERTY(VisibleAnywhere)
@@ -44,13 +42,13 @@ protected:
     bool bDealsDamage{false};
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bDealsDamage"), Category = "Config")
+    TSubclassOf<UDamageType> DamageType;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bDealsDamage"), Category = "Config")
     float Damage{100.f};
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bDealsDamage"), Category = "Config")
     float Radius{100.f};
-
-    // UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "VFX")
-    // UNiagaraComponent* DestructionFXComponent;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "VFX")
     UNiagaraSystem* DestructionEffect{nullptr};
@@ -71,7 +69,10 @@ private:
 
     FTimerHandle TrowTimer;
 
+    float Alpha{0.f};
+
     void Throw();
+    void ThrowTo(const FVector& ToLocation);
 
     UFUNCTION(NetMulticast, reliable)
     void PlayFXEffect_Multicast(UNiagaraSystem* FXEffect);

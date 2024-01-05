@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interfaces/BattleInterface.h"
 #include "AICharacter.generated.h"
 
 class UHealthComponent;
@@ -13,7 +14,7 @@ class UBehaviorTree;
 class UDropComponent;
 
 UCLASS()
-class VALKYRIESTRIKE_API AAICharacter : public ACharacter
+class VALKYRIESTRIKE_API AAICharacter : public ACharacter, public IBattleInterface
 {
     GENERATED_BODY()
 
@@ -26,7 +27,8 @@ public:
     virtual void Tick(float DeltaTime) override;
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-    virtual void AttackEnemy(AActor* AimActor);
+    /* interface functions */
+    virtual void AttackEnemy(AActor* Target) override;
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -47,10 +49,7 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     FName BackpackSocketName{"BackpackSocket"};
 
-    bool bCanPlayMontage{true};
-
     virtual void BeginPlay() override;
-
     virtual void OnDeath();
 
 private:

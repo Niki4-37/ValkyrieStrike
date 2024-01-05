@@ -20,23 +20,16 @@ class VALKYRIESTRIKE_API AKamikaze : public AAICharacter
 public:
     AKamikaze();
 
+    bool HasBomb() const { return ExplosiveBomb ? true : false; }
+
+    virtual void AttackEnemy(AActor* Target) override;
+
 protected:
     UPROPERTY(EditDefaultsOnly)
     USphereComponent* CollisionComponent;
 
-    UPROPERTY(EditAnywhere)
-    UStaticMesh* BombMesh;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "VFX")
-    UNiagaraSystem* ExplodeEffect;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "VFX")
-    TSubclassOf<UCameraShakeBase> CameraShake;
-
-    UPROPERTY(EditAnywhere)
-    float Radius{300.f};
-    UPROPERTY(EditAnywhere)
-    float Damage{0.f};
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    TSubclassOf<ADecorationActor> BombClass;
 
     virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
     virtual void BeginPlay() override;
@@ -45,6 +38,9 @@ protected:
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
-    UPROPERTY(Replicated)  // to private
+    UPROPERTY(Replicated)
     ADecorationActor* ExplosiveBomb{nullptr};
+
+    void TakeBomb();
+    void ThrowBomb(const FVector& ToLocation);
 };

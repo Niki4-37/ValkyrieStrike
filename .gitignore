@@ -19,3 +19,4 @@ Config/steamvr_ue_editor_app.json
 *.bat
 *.log
 Content/Assets
+Content/Maps/VehicleExampleMap_BuiltData.uasset

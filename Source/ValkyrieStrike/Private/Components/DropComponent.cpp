@@ -16,11 +16,12 @@ void UDropComponent::DropItem()
 
     if (!GetWorld() || !GetOwner() || !PickupActorClass) return;
     FTransform SpawnTransform(FRotator::ZeroRotator, GetOwner()->GetActorLocation());
+    const auto DropElement = Roll();
+    if (!DropElement.PickupMesh) return;
     auto Pickup = GetWorld()->SpawnActorDeferred<APickupActor>(PickupActorClass, SpawnTransform);
     if (Pickup)
     {
-        const auto DropElement = Roll();
-        Pickup->SetupPickup(DropElement.PickupMesh, DropElement.Material, DropElement.DropData);
+        Pickup->SetupPickup(DropElement.PickupMesh, DropElement.DropData);
         Pickup->FinishSpawning(SpawnTransform);
 
         Pickup->ThrowUp_Multicast(GetOwner()->GetActorLocation());

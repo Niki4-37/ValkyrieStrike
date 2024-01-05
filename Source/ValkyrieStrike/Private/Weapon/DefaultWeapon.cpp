@@ -19,17 +19,18 @@ ADefaultWeapon::ADefaultWeapon()
 
 void ADefaultWeapon::StartFire(bool bIsPressed, const FVector& AimPosition)
 {
-    if (bIsPressed)
-    {
-        FTimerDelegate Delegate;
-        Delegate.BindUFunction(this, "MakeShot", AimPosition);
+    // if (bIsPressed)
+    //{
+    //     FTimerDelegate Delegate;
+    //     Delegate.BindUFunction(this, "MakeShot", AimPosition);
 
-        GetWorldTimerManager().SetTimer(FiringTimer, Delegate, FireRate, true);
-    }
-    else
-    {
-        GetWorldTimerManager().ClearTimer(FiringTimer);
-    }
+    //    GetWorldTimerManager().SetTimer(FiringTimer, Delegate, FireRate, true);
+    //}
+    // else
+    //{
+    //    GetWorldTimerManager().ClearTimer(FiringTimer);
+    //}
+    MakeShot(AimPosition);
 }
 
 void ADefaultWeapon::SetFireRate(float NewFireRate)
@@ -64,7 +65,6 @@ void ADefaultWeapon::MakeShot(const FVector& AimPosition)
     {
         Bullet->SetShootDirection(ShootDirection);
         Bullet->SetLifeSpan(2.f);
-        OnWeaponShot.Broadcast();
     }
 }
 

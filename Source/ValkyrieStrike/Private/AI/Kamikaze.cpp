@@ -9,10 +9,8 @@
 #include "GameFramework/Controller.h"
 #include "Camera/CameraShakeBase.h"
 #include "Decorations/DecorationActor.h"
+#include "Interactables/SpawningActor.h"
 #include "Net/UnrealNetwork.h"
-
-#include "DrawDebugHelpers.h"
-#include "Engine.h"
 
 AKamikaze::AKamikaze()
 {
@@ -22,20 +20,19 @@ AKamikaze::AKamikaze()
     CollisionComponent->SetCanEverAffectNavigation(true);  // collision not affect navigation
 }
 
+void AKamikaze::AttackEnemy(AActor* Target)
+{
+    Super::AttackEnemy(Target);
+    if (!Target) return;
+    ThrowBomb(Target->GetActorLocation());
+}
+
 void AKamikaze::NotifyActorBeginOverlap(AActor* OtherActor)
 {
-    if (!ExplosiveBomb || !OtherActor || !OtherActor->ActorHasTag("Player")) return;
-
-    // const auto PlayerController = OtherActor->GetInstigatorController<APlayerController>();
-    // if (!PlayerController || !PlayerController->PlayerCameraManager) return;
-    // checkf(CameraShake, TEXT("CameraShake not define!"));
-    // PlayerController->PlayerCameraManager->StartCameraShake(CameraShake);
-
-    FDetachmentTransformRules DetachmentRules(EDetachmentRule::KeepWorld, false);
-    ExplosiveBomb->DetachFromActor(DetachmentRules);
-    ExplosiveBomb->SetDestructionTimer(2.f);
-    ExplosiveBomb->Throw_Multicast();
-    ExplosiveBomb = nullptr;
+    if (OtherActor->IsA<ASpawningActor>() && HasAuthority())
+    {
+        TakeBomb();
+    }
 }
 
 void AKamikaze::BeginPlay()
@@ -44,17 +41,8 @@ void AKamikaze::BeginPlay()
 
     if (HasAuthority())
     {
-        ExplosiveBomb = GetWorld()->SpawnActorDeferred<ADecorationActor>(ADecorationActor::StaticClass(), GetActorTransform());
-        if (ExplosiveBomb)
-        {
-            ExplosiveBomb->SetupDecoration(BombMesh);
-            ExplosiveBomb->IsDealsDamage(true, Damage, Radius);
-            ExplosiveBomb->SetDestructionEffect(ExplodeEffect);
-            ExplosiveBomb->SetOwner(this);
-            ExplosiveBomb->FinishSpawning(GetActorTransform());
-            FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
-            ExplosiveBomb->AttachToComponent(GetMesh(), AttachmentRules, BackpackSocketName);
-        }
+        ExplosiveBomb = nullptr;
+        TakeBomb();
     }
 }
 
@@ -62,14 +50,7 @@ void AKamikaze::OnDeath()
 {
     Super::OnDeath();
 
-    if (ExplosiveBomb)
-    {
-        FDetachmentTransformRules DetachmentRules(EDetachmentRule::KeepWorld, false);
-        ExplosiveBomb->DetachFromActor(DetachmentRules);
-        ExplosiveBomb->SetDestructionTimer(2.f);
-        ExplosiveBomb->Throw_Multicast();
-        ExplosiveBomb = nullptr;
-    }
+    ThrowBomb(FVector::ZeroVector);
 }
 
 void AKamikaze::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -77,4 +58,24 @@ void AKamikaze::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME(AKamikaze, ExplosiveBomb);
+}
+
+void AKamikaze::TakeBomb()
+{
+    if (ExplosiveBomb) return;
+    ExplosiveBomb = GetWorld()->SpawnActor<ADecorationActor>(BombClass, GetActorTransform());
+    if (!ExplosiveBomb) return;
+    ExplosiveBomb->SetOwner(this);
+    FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
+    ExplosiveBomb->AttachToComponent(GetMesh(), AttachmentRules, BackpackSocketName);
+}
+
+void AKamikaze::ThrowBomb(const FVector& ToLocation)
+{
+    if (!ExplosiveBomb) return;
+    FDetachmentTransformRules DetachmentRules(EDetachmentRule::KeepWorld, false);
+    ExplosiveBomb->DetachFromActor(DetachmentRules);
+    ExplosiveBomb->SetDestructionTimer(2.f);
+    ToLocation.Equals(FVector::ZeroVector) ? ExplosiveBomb->Throw_Multicast() : ExplosiveBomb->ThrowTo_Multicast(ToLocation);
+    ExplosiveBomb = nullptr;
 }

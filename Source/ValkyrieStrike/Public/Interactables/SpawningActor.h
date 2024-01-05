@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "SpawningActor.generated.h"
 
+class USphereComponent;
+
 UCLASS()
 class VALKYRIESTRIKE_API ASpawningActor : public AActor
 {
@@ -17,5 +19,8 @@ public:
     void SpawnEnemy(UClass* Class);
 
 protected:
+    UPROPERTY(VisibleDefaultsOnly)
+    USphereComponent* CollisionComponent;
+
     virtual void BeginPlay() override;
 };

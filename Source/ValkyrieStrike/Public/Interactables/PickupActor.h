@@ -17,8 +17,7 @@ class VALKYRIESTRIKE_API APickupActor : public AInteractionActor
 public:
     APickupActor();
 
-    void SetupPickup(UStaticMesh* Mesh, UMaterialInterface* Material, const FInteractionData& InData);
-    void ThrowUp(const FVector& StartPosition);
+    void SetupPickup(UStaticMesh* Mesh, const FInteractionData& InData);
 
     UFUNCTION(NetMulticast, reliable)
     void ThrowUp_Multicast(const FVector& NewLocation);
@@ -55,9 +54,5 @@ private:
     float Height{0.f};
 
     bool IsAppliedToActor(AActor* OtherActor);
-
-    UFUNCTION(NetMulticast, reliable)
-    void SetMaterial_Multicast(UMaterialInterface* Material);
-    UFUNCTION(NetMulticast, unreliable)
-    void SetActorLocation_Multicast(const FVector& NewLocation);
+    void ThrowUp(const FVector& StartPosition);
 };

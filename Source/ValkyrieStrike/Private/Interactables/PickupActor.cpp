@@ -17,43 +17,20 @@ APickupActor::APickupActor()
     CollisionComponent->SetupAttachment(RootComponent);
 }
 
-void APickupActor::SetupPickup(UStaticMesh* Mesh, UMaterialInterface* Material, const FInteractionData& InData)
+void APickupActor::SetupPickup(UStaticMesh* Mesh, const FInteractionData& InData)
 {
     /** handled on server */
     if (Mesh)
     {
         MeshComponent->SetStaticMesh(Mesh);
         MeshComponent->SetRelativeScale3D(FVector(1.f));
-        SetMaterial_Multicast(Material);
     }
     Data = InData;
 }
 
-void APickupActor::ThrowUp(const FVector& StartPosition)
+void APickupActor::ThrowUp_Multicast_Implementation(const FVector& NewLocation)
 {
-    const float LocationZ = StartPosition.Z;
-
-    Height = LocationZ;
-
-    FTimerDelegate TimerDelegate;
-    TimerDelegate.BindLambda(
-        [&, LocationZ]
-        {
-            Impulse -= Gravity;
-            Height += Impulse;
-
-            if (Height < LocationZ)
-            {
-                GetWorldTimerManager().ClearTimer(TrowTimer);
-                return;
-            }
-            const float LocationX = GetActorLocation().X;
-            const float LocationY = GetActorLocation().Y;
-
-            SetActorLocation(FVector(LocationX, LocationY, Height));
-        });
-
-    GetWorldTimerManager().SetTimer(TrowTimer, TimerDelegate, 0.01f, true);
+    ThrowUp(NewLocation);
 }
 
 void APickupActor::NotifyActorBeginOverlap(AActor* OtherActor)
@@ -104,18 +81,29 @@ bool APickupActor::IsAppliedToActor(AActor* OtherActor)
     return true;
 }
 
-void APickupActor::SetMaterial_Multicast_Implementation(UMaterialInterface* Material)
+void APickupActor::ThrowUp(const FVector& StartPosition)
 {
-    if (!Material) return;
-    MeshComponent->SetMaterial(0, Material);
-}
+    const float LocationZ = StartPosition.Z;
 
-void APickupActor::SetActorLocation_Multicast_Implementation(const FVector& NewLocation)
-{
-    SetActorLocation(NewLocation);
-}
+    Height = LocationZ;
 
-void APickupActor::ThrowUp_Multicast_Implementation(const FVector& NewLocation)
-{
-    ThrowUp(NewLocation);
+    FTimerDelegate TimerDelegate;
+    TimerDelegate.BindLambda(
+        [&, LocationZ]
+        {
+            Impulse -= Gravity;
+            Height += Impulse;
+
+            if (Height < LocationZ)
+            {
+                GetWorldTimerManager().ClearTimer(TrowTimer);
+                return;
+            }
+            const float LocationX = GetActorLocation().X;
+            const float LocationY = GetActorLocation().Y;
+
+            SetActorLocation(FVector(LocationX, LocationY, Height));
+        });
+
+    GetWorldTimerManager().SetTimer(TrowTimer, TimerDelegate, 0.01f, true);
 }
