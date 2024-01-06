@@ -8,6 +8,7 @@
 #include "VehiclePlayerController.generated.h"
 
 class URespawnComponent;
+class UAudioComponent;
 
 UCLASS()
 class VALKYRIESTRIKE_API AVehiclePlayerController : public APlayerController
@@ -22,7 +23,10 @@ public:
     UFUNCTION(Server, reliable)
     void MakeMaintenance_OnServer(EItemPropertyType Type);
 
-    void ChangeGameState(EValkyrieGameState State);
+    UFUNCTION(Client, reliable)
+    void ChangeGameState_OnClient(EValkyrieGameState NewState);
+    UFUNCTION(Client, reliable)
+    void CheckMusicTheme_OnClient(bool bHasAim);
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -32,8 +36,21 @@ protected:
     virtual void OnPossess(APawn* InPawn) override;
     virtual void SetupInputComponent() override;
     virtual void BeginPlayingState();
-    virtual void FailedToSpawnPawn() override;  // to do next
+    virtual void FailedToSpawnPawn() override;  // to do
     virtual bool SetPause(bool bPause, FCanUnpause CanUnpauseDelegate = FCanUnpause()) override;
 
+private:
+    FTimerHandle ChangeMusicTimer;
+
+    UPROPERTY()
+    UAudioComponent* CalmMusicComponent{nullptr};
+
+    UPROPERTY()
+    UAudioComponent* BattleMusicComponent{nullptr};
+
     void OnPauseGame();
+    void ChangeGameState(EValkyrieGameState State);
+    void OnStartRespawn(float RespawnDelay);
+
+    void ToggleMusicTheme();
 };

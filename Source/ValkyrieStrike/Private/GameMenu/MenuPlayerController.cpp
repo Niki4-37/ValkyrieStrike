@@ -3,6 +3,7 @@
 #include "GameMenu/MenuPlayerController.h"
 #include "EngineUtils.h"
 #include "GameMenu/MenuCameraActor.h"
+#include "GameUtils.h"
 
 void AMenuPlayerController::SetNewView(EMenuState MenuState)
 {
@@ -31,4 +32,9 @@ void AMenuPlayerController::BeginPlay()
         SetViewTargetWithBlend(MenuCameraActorsMap[EMenuState::MainMenu], 0.f, EViewTargetBlendFunction::VTBlend_Linear, 0.f, true);
     }
     OnMenuStateChanged.Broadcast(EMenuState::MainMenu);
+
+    if (IsLocalPlayerController())
+    {
+        GameUtils::PlayMusic(GetWorld(), EMusicTheme::MenuMusic);
+    }
 }

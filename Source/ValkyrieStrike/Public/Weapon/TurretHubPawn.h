@@ -7,11 +7,7 @@
 #include "GameCoreTypes.h"
 #include "TurretHubPawn.generated.h"
 
-class UStaticMeshComponent;
-class ADefaultProjectile;
 class UBehaviorTree;
-class ABaseVehicleWeapon;
-
 class UWeaponComponent;
 
 UCLASS()

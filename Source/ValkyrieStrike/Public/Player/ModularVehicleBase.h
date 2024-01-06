@@ -15,6 +15,7 @@ class UWeaponComponent;
 class UVehicleIndicatorsComponent;
 class UWorkshopComponent;
 class UNiagaraComponent;
+class UAudioComponent;
 
 UCLASS()
 class VALKYRIESTRIKE_API AModularVehicleBase : public APawn, public IGameInterface
@@ -71,6 +72,12 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX", meta = (ClampMin = "0.1", ClampMax = "1000.0"))
     float MinVelocityToDust{75.f};
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Sound")
+    UAudioComponent* EngineSound;
+
+    UPROPERTY(EditDefaultsOnly, BLueprintReadWrite, Category = "Sound")
+    FName EngineRPMName{"EngineRPM"};
+
     UPROPERTY(VisibleDefaultsOnly)
     USceneComponent* WheelFR;
     UPROPERTY(VisibleDefaultsOnly)
@@ -113,7 +120,7 @@ private:
     void MoveRight(float Value);
 
     void SmoothTurnHandle(float YAxisValue);
-    void WheelsTurn();
+    void UpdateWheelsTurn();
 
     /* replicates movement */
     FTimerHandle DataTickTimer;
@@ -124,4 +131,9 @@ private:
     void SendMoveControls_Server(float InMoveForvardAxis, float InMoveSideAxis, float InSmoothTurnValue);
     UFUNCTION(NetMulticast, unreliable)
     void SendMoveControls_Multicast(float InMoveForvardAxis, float InMoveSideAxis, float InSmoothTurnValue);
+
+    void OnDeath();
+
+    UFUNCTION(Client, reliable)
+    void OnDeathCameraEffect_OnClient();
 };

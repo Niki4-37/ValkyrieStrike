@@ -17,6 +17,7 @@ void USettingsWidget::NativeOnInitialized()
 
 void USettingsWidget::OnGoBackClicked()
 {
+    /* change camera view in main menu (if camera is set)*/
     if (const auto MenuPlayerController = Cast<AMenuPlayerController>(GetOwningPlayer()))
     {
         MenuPlayerController->SetNewView(EMenuState::MainMenu);
@@ -24,6 +25,6 @@ void USettingsWidget::OnGoBackClicked()
 
     if (const auto VehiclePlayerController = Cast<AVehiclePlayerController>(GetOwningPlayer()))
     {
-        VehiclePlayerController->ChangeGameState(EValkyrieGameState::Pause);
+        VehiclePlayerController->ChangeGameState_OnClient(EValkyrieGameState::Pause);
     }
 }

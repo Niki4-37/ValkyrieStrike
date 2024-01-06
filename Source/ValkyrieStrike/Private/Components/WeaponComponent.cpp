@@ -151,9 +151,12 @@ void UWeaponComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 void UWeaponComponent::OnDeath()
 {
-    if (TurretHub && TurretHub->Controller)
+    // CleanWeapons();
+    if (!VehicleWeapons.Num()) return;
+    for (auto Weapon : VehicleWeapons)
     {
-        TurretHub->Controller->Destroy();
+        if (!Weapon) continue;
+        Weapon->TurnOffWeapon();
     }
 }
 

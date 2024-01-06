@@ -2,6 +2,7 @@
 
 #include "Weapon/TurretWeapon.h"
 #include "Weapon/DefaultProjectile.h"
+#include "Sound/SoundCue.h"
 
 void ATurretWeapon::BeginPlay()
 {
@@ -18,6 +19,8 @@ void ATurretWeapon::BeginPlay()
 
 void ATurretWeapon::RotateToTarget(AActor* Target)
 {
+    if (!bIsTurnedOn) return;
+
     Super::RotateToTarget(Target);
 
     const auto NoneAimLocation = GetOwner() ? (GetOwner()->GetActorLocation() + GetOwner()->GetActorForwardVector() * 1000.f) : FVector::ZeroVector;
@@ -35,7 +38,7 @@ void ATurretWeapon::RotateToTarget(AActor* Target)
                                    FMath::Clamp(Delta.Pitch, -1.f, 1.f);
 
     const auto GunValueToClamp = Gun->GetRelativeRotation().Pitch + (bIsSideMode ? SidePositionModifier : 1.f) * GunDeltaValue;
-    const auto GunValueToSet = FMath::Clamp(GunValueToClamp, -5.f, 90.f);
+    const auto GunValueToSet = FMath::Clamp(GunValueToClamp, -7.f, 90.f);
 
     Gun->SetRelativeRotation(FRotator(GunValueToSet, 0.f, 0.f));
 }
@@ -44,7 +47,7 @@ void ATurretWeapon::MakeShot()
 {
     Super::MakeShot();
 
-    if (!HasAim() || IsReloading() || IsEmpty()) return;
+    if (!HasAim() || IsReloading() || IsEmpty() || !bIsTurnedOn) return;
 
     const FRotator MuzzleRotation = Gun->GetSocketRotation(MuzzleSocketName);
     const FVector MuzzleLocation = Gun->GetSocketLocation(MuzzleSocketName);
@@ -66,5 +69,9 @@ void ATurretWeapon::MakeShot()
     if (IsEmpty())
     {
         ReloadWeapon();
+        SpawnSound_Multicast(EmptySound);
+        return;
     }
+
+    SpawnSound_Multicast(FireSound);
 }

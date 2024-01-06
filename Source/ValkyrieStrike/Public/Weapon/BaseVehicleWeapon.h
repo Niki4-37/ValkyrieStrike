@@ -9,6 +9,7 @@
 
 class ADefaultProjectile;
 class UNiagaraComponent;
+class USoundCue;
 
 UCLASS()
 class VALKYRIESTRIKE_API ABaseVehicleWeapon : public AActor
@@ -36,7 +37,12 @@ public:
     bool IsEmpty() const { return AmmoCapacity == 0; }
     bool AddAmmo(int32 Amount, EVehicleUnitType InType);
 
+    void TurnOffWeapon() { bIsTurnedOn = false; };
+
     virtual void AlternativeShot();
+
+    UFUNCTION(NetMulticast, unreliable)
+    virtual void SpawnSound_Multicast(USoundBase* NewSound);
 
 protected:
     UPROPERTY(VisibleDefaultsOnly)
@@ -54,8 +60,16 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "VFX")
     UNiagaraComponent* GunsightComponent;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Sound")
+    USoundCue* FireSound;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Sound")
+    USoundCue* EmptySound;
+
     bool bIsSideMode{false};
     float SidePositionModifier{1.f};
+
+    bool bIsTurnedOn{true};
 
     virtual void BeginPlay() override;
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -84,6 +98,8 @@ private:
     bool bIsReloading{false};
 
     bool bHasAim{false};
+
+    void CheckMusicTheme(bool bFoundAim);
 
     UFUNCTION(Client, unreliable)
     void OnChangeAmmoInWeapon_OnClient(EVehicleUnitType Type, int32 Value);

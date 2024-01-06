@@ -2,8 +2,8 @@
 
 #include "Weapon/BaseVehicleWeapon.h"
 #include "NiagaraComponent.h"
-
-#include "Engine.h"
+#include "Player/VehiclePlayerController.h"
+#include "Kismet/GameplayStatics.h"
 
 ABaseVehicleWeapon::ABaseVehicleWeapon()
 {
@@ -77,8 +77,15 @@ void ABaseVehicleWeapon::SetupWeapon(EVehicleUnitType InWeaponType, int32 InMaxA
 
 void ABaseVehicleWeapon::UpdateAimActor(AActor* NewAimActor, float UpdateTimeRate)
 {
+    const bool bLocalHasAim = NewAimActor ? true : false;
+    if (bHasAim != bLocalHasAim)
+    {
+        bHasAim = bLocalHasAim;
+
+        CheckMusicTheme(bHasAim);
+    }
+
     GetWorldTimerManager().ClearTimer(RotationTimer);
-    bHasAim = NewAimActor != nullptr;
     auto TimerDelegate = FTimerDelegate::CreateUObject(this, &ABaseVehicleWeapon::RotateToTarget, NewAimActor);
     const float RotationSpeed = UpdateTimeRate / 15.f;
     GetWorldTimerManager().SetTimer(RotationTimer, TimerDelegate, RotationSpeed, true);
@@ -92,6 +99,11 @@ bool ABaseVehicleWeapon::AddAmmo(int32 Amount, EVehicleUnitType InType)
 }
 
 void ABaseVehicleWeapon::AlternativeShot() {}
+
+void ABaseVehicleWeapon::SpawnSound_Multicast_Implementation(USoundBase* NewSound)
+{
+    UGameplayStatics::SpawnSoundAttached(NewSound, Gun, MuzzleSocketName);
+}
 
 void ABaseVehicleWeapon::MakeShot()
 {
@@ -169,6 +181,16 @@ void ABaseVehicleWeapon::ReloadWeapon()
 {
     AmmoCapacity = MaxAmmoCapacity;
     Recharge();
+}
+
+void ABaseVehicleWeapon::CheckMusicTheme(bool bFoundAim)
+{
+    if (!GetOwner()) return;
+
+    if (const auto VehiclePC = Cast<AVehiclePlayerController>(GetOwner()->GetInstigatorController()))
+    {
+        VehiclePC->CheckMusicTheme_OnClient(bFoundAim);
+    }
 }
 
 void ABaseVehicleWeapon::OnChangeAmmoInWeapon_OnClient_Implementation(EVehicleUnitType Type, int32 Value)

@@ -32,8 +32,8 @@ EBTNodeResult::Type UBTTask_RunAway::ExecuteTask(UBehaviorTreeComponent& OwnerCo
     {
         Blackboard->SetValueAsVector(DestinationPointKey.SelectedKeyName, Hit.ImpactPoint);
 
-        DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 50.f, 16, FColor::Blue, false, 5.f);
-        DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Cyan, false, 5.f);
+        //DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 50.f, 16, FColor::Blue, false, 5.f);
+        //DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Cyan, false, 5.f);
 
         return EBTNodeResult::Succeeded;
     }

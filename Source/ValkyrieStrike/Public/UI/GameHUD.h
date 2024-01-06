@@ -22,6 +22,12 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     TSubclassOf<UUserWidget> SettingsWidgetClass;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    TSubclassOf<UUserWidget> GameOverWidgetClass;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    TSubclassOf<UUserWidget> RespawnWidgetClass;
+
     virtual void BeginPlay() override;
     virtual void Destroyed() override;
 

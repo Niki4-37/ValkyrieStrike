@@ -11,6 +11,8 @@ void AGameHUD::BeginPlay()
     GameStateWidgetsMap.Add(EValkyrieGameState::InProgress, CreateWidget<UUserWidget>(GetWorld(), PlayerHUDWidgetClass));
     GameStateWidgetsMap.Add(EValkyrieGameState::Pause, CreateWidget<UUserWidget>(GetWorld(), PauseMenuWidgetClass));
     GameStateWidgetsMap.Add(EValkyrieGameState::GameSettings, CreateWidget<UUserWidget>(GetWorld(), SettingsWidgetClass));
+    GameStateWidgetsMap.Add(EValkyrieGameState::GameOver, CreateWidget<UUserWidget>(GetWorld(), GameOverWidgetClass));
+    GameStateWidgetsMap.Add(EValkyrieGameState::Respawn, CreateWidget<UUserWidget>(GetWorld(), RespawnWidgetClass));
 
     for (TPair<EValkyrieGameState, UUserWidget*> Pair : GameStateWidgetsMap)
     {
@@ -22,7 +24,7 @@ void AGameHUD::BeginPlay()
     if (const auto PlayerController = Cast<AVehiclePlayerController>(GetOwningPlayerController()))
     {
         PlayerController->OnGameStateChanged.AddUObject(this, &AGameHUD::OnGameStateChanged);
-        PlayerController->ChangeGameState(EValkyrieGameState::InProgress);
+        PlayerController->ChangeGameState_OnClient(EValkyrieGameState::InProgress);
     }
 }
 

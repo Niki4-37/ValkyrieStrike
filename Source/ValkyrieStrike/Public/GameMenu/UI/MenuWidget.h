@@ -10,6 +10,7 @@
 class UButton;
 class UVerticalBox;
 class UCircularThrobber;
+class USoundCue;
 
 UCLASS()
 class VALKYRIESTRIKE_API UMenuWidget : public UUserWidget

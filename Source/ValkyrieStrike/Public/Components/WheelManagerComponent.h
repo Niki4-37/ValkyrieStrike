@@ -65,8 +65,10 @@ private:
     UPROPERTY(Replicated)
     TArray<FWheelsGroup> WheelsGroups;
 
-    float ControlInput;
+    UPROPERTY(Replicated)
     bool bIsWheelContact{false};
+
+    float ControlInput;
     bool bIsBreake{false};
 
     FTimerHandle ManageWheelsTimer;

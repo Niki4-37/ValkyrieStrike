@@ -7,12 +7,16 @@
 #include "GameCoreTypes.h"
 #include "ValkyrieGameInstance.generated.h"
 
+class USoundCue;
+
 UCLASS()
 class VALKYRIESTRIKE_API UValkyrieGameInstance : public UGameInstance
 {
     GENERATED_BODY()
 
 public:
+    UValkyrieGameInstance();
+
     TArray<FLevelData> GetLevelsData() const { return LevelsData; }
 
     FLevelData GetStartupLevel() const { return StartupLevel; }
@@ -26,6 +30,8 @@ public:
     FName GetLobbyMapName() const { return LobbyMapName; }
     FName GetMenuMapName() const { return MenuMapName; }
 
+    USoundCue* GetGameMusic(EMusicTheme Theme);
+
 protected:
     UPROPERTY(EditDefaultsOnly, Category = "Game", meta = (ToolTip = "Level names must be unique!"))
     TArray<FLevelData> LevelsData;
@@ -38,6 +44,9 @@ protected:
 
     UPROPERTY(VisibleAnywhere)
     int32 MaxNumPlayers{4};
+
+    UPROPERTY(EditDefaultsOnly, Category = "Music")
+    TMap<EMusicTheme, USoundCue*> GameMusicMap;
 
     virtual void OnStart() override;
 

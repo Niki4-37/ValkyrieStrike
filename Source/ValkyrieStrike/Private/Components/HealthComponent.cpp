@@ -17,8 +17,6 @@ void UHealthComponent::BeginPlay()
 {
     Super::BeginPlay();
 
-    // checkf(ExplosionCameraShake, TEXT("CameraShake not define!"));
-
     if (GetOwnerRole() == ENetRole::ROLE_Authority)  //(GetOwner()->HasAuthority())
     {
         AddHealth(MaxHealth);
@@ -47,6 +45,8 @@ void UHealthComponent::Killed()
     const auto FirstLevelGM = GetWorld()->GetAuthGameMode<AFirstLevelGameModeBase>();
     if (!FirstLevelGM || !GetOwner()) return;
     FirstLevelGM->Killed(GetOwner()->GetInstigatorController(), GetOwner()->GetActorTransform());
+
+    GetOwner()->DisableInput(Cast<APlayerController>(GetOwner()->GetInstigatorController()));
 }
 
 void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -93,7 +93,7 @@ void UHealthComponent::OnHealthChanged_Multicast_Implementation(float Value, flo
     OnItemValueChanged.Broadcast(EItemPropertyType::Endurance, Value, MaxValue);
 }
 
-void UHealthComponent::ShakeCamera_OnClient_Implementation() 
+void UHealthComponent::ShakeCamera_OnClient_Implementation()
 {
     if (!GetOwner()) return;
     const auto PlayerController = GetOwner()->GetInstigatorController<APlayerController>();

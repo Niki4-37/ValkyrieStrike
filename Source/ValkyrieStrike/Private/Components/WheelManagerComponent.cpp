@@ -53,6 +53,7 @@ void UWheelManagerComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME(UWheelManagerComponent, WheelsGroups);
+    DOREPLIFETIME(UWheelManagerComponent, bIsWheelContact);
 }
 
 void UWheelManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -113,7 +114,7 @@ void UWheelManagerComponent::ComputeWeelGroup(FWheelsGroup& WheelGroup)
 
         WheelVelocity = CurrentWheelInverseTransform.TransformVectorNoScale(LinearVelocityAtPoint);
 
-        const auto Force                                                                                                                  //
+        const FVector Force                                                                                                               //
             = GetSpringForce(WheelVelocity.Z, WheelGroup.SuspensionDumping, WheelGroup.SuspensionStiffness, ContactDistance, Hit.Normal)  //
               + GetSideFriction(WheelVelocity.Y, CurrentWheel.WheelRoot->GetRightVector())                                                //
               + GetMoveForce(WheelVelocity.X, Hit.Normal.Z, CurrentWheel.WheelRoot->GetForwardVector());

@@ -49,7 +49,11 @@ void ASecondWeapon::MakeShot()
     if (!IsEmpty())
     {
         Recharge();
+        SpawnSound_Multicast(FireSound);
+        return;
     }
+
+    SpawnSound_Multicast(EmptySound);
 }
 
 void ASecondWeapon::AlternativeShot()

@@ -3,15 +3,15 @@
 #include "Weapon/DefaultWeapon.h"
 #include "Components/StaticMeshComponent.h"
 #include "Weapon/DefaultProjectile.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 ADefaultWeapon::ADefaultWeapon()
 {
     PrimaryActorTick.bCanEverTick = false;
+    bReplicates = true;
     WeaponRootComponent = CreateDefaultSubobject<USceneComponent>("WeaponRootComponent");
     SetRootComponent(WeaponRootComponent);
-
-    WeaponSkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponSkeletalMesh");
-    WeaponSkeletalMesh->SetupAttachment(RootComponent);
 
     WeaponStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>("WeaponStaticlMesh");
     WeaponStaticMesh->SetupAttachment(RootComponent);
@@ -19,17 +19,7 @@ ADefaultWeapon::ADefaultWeapon()
 
 void ADefaultWeapon::StartFire(bool bIsPressed, const FVector& AimPosition)
 {
-    // if (bIsPressed)
-    //{
-    //     FTimerDelegate Delegate;
-    //     Delegate.BindUFunction(this, "MakeShot", AimPosition);
-
-    //    GetWorldTimerManager().SetTimer(FiringTimer, Delegate, FireRate, true);
-    //}
-    // else
-    //{
-    //    GetWorldTimerManager().ClearTimer(FiringTimer);
-    //}
+    if (!bWeaponIsReady) return;
     MakeShot(AimPosition);
 }
 
@@ -44,14 +34,17 @@ void ADefaultWeapon::BeginPlay()
     Super::BeginPlay();
 
     check(GetWorld());
-    // check(WeaponMesh);
+    check(WeaponStaticMesh);
 }
 
 void ADefaultWeapon::MakeShot(const FVector& AimPosition)
 {
     if (!GetWorld()) return;
-    const FRotator MuzzleRotation = GetWeaponSocketTransform(MuzzleSocketName).Rotator();
-    const FVector MuzzleLocation = GetWeaponSocketTransform(MuzzleSocketName).GetLocation();
+    bWeaponIsReady = false;
+    GetWorldTimerManager().ClearTimer(FireRateTimer);
+
+    const FRotator MuzzleRotation = WeaponStaticMesh->GetSocketRotation(MuzzleSocketName);
+    const FVector MuzzleLocation = WeaponStaticMesh->GetSocketLocation(MuzzleSocketName);
 
     const FVector Direction = (AimPosition - MuzzleLocation).GetSafeNormal();
 
@@ -65,12 +58,15 @@ void ADefaultWeapon::MakeShot(const FVector& AimPosition)
     {
         Bullet->SetShootDirection(ShootDirection);
         Bullet->SetLifeSpan(2.f);
+
+        SpawnSound_Multicast(FireSound, WeaponStaticMesh, MuzzleSocketName);
     }
+
+    GetWorldTimerManager().SetTimer(
+        FireRateTimer, [&]() { bWeaponIsReady = true; }, FireRate, false);
 }
 
-FTransform ADefaultWeapon::GetWeaponSocketTransform(FName SocketName)
+void ADefaultWeapon::SpawnSound_Multicast_Implementation(USoundBase* Sound, USceneComponent* AttachToComponent, FName AttachPointName)
 {
-    if (WeaponSkeletalMesh->SkeletalMesh) return WeaponSkeletalMesh->GetSocketTransform(SocketName);
-    if (WeaponStaticMesh->GetStaticMesh()) return WeaponStaticMesh->GetSocketTransform(SocketName);
-    return FTransform();
+    UGameplayStatics::SpawnSoundAttached(Sound, AttachToComponent, AttachPointName);
 }

@@ -7,6 +7,7 @@
 #include "Net/UnrealNetwork.h"
 #include "GameLevelsConfig/ValkyriePlayerState.h"
 #include "Subsystems/SessionSubsystem.h"
+#include "GameUtils.h"
 
 #include "Engine.h"
 
@@ -82,6 +83,11 @@ void ALobbyPlayerController::BeginPlay()
 
     FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &ALobbyPlayerController::SetNewView, EMenuState::GameConfig);
     GetWorldTimerManager().SetTimer(ChangeViewDelayTimer, TimerDelegate, 0.5f, false);
+
+    if (IsLocalPlayerController())
+    {
+        GameUtils::PlayMusic(GetWorld(), EMusicTheme::LobbyMusic);
+    }
 }
 
 void ALobbyPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

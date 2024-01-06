@@ -10,9 +10,9 @@ class UTexture2D;
 UENUM(BlueprintType)
 enum class EMenuState : uint8
 {
-    MainMenu        UMETA(DispayName = "Show Menu"),
-    GameSettings    UMETA(DispayName = "Show Setings"),
-    GameConfig      UMETA(DispayName = "Show Game Config")
+    MainMenu        UMETA(DisplayName = "Show Menu"),
+    GameSettings    UMETA(DisplayName = "Show Setings"),
+    GameConfig      UMETA(DisplayName = "Show Game Config")
 };
 
 UENUM(BlueprintType)
@@ -58,7 +58,21 @@ enum class EValkyrieGameState : uint8
     InProgress,
     Pause,
     GameSettings,
-    GameOver
+    GameOver,
+    Respawn
+};
+
+UENUM()
+enum class EMusicTheme : uint8
+{
+    MenuMusic = 0,
+    LobbyMusic,
+    GameMusicCalm,
+    GameMusicBattle,
+    NoType,
+
+    Begin = MenuMusic       UMETA(Hidden),
+    End = NoType   UMETA(Hidden)
 };
 // clang-format on
 
@@ -71,6 +85,12 @@ static EItemPropertyType& operator++(EItemPropertyType& EType)
 static EVehicleUnitType& operator++(EVehicleUnitType& EType)
 {
     EType = EVehicleUnitType(static_cast<std::underlying_type<EVehicleUnitType>::type>(EType) + 1);
+    return EType;
+}
+
+static EMusicTheme& operator++(EMusicTheme& EType)
+{
+    EType = EMusicTheme(static_cast<std::underlying_type<EMusicTheme>::type>(EType) + 1);
     return EType;
 }
 

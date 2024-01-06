@@ -8,6 +8,7 @@
 #include "Components/InputComponent.h"
 #include "Components/WheelManagerComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/AudioComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameLevelsConfig/ValkyriePlayerState.h"
@@ -65,6 +66,7 @@ AModularVehicleBase::AModularVehicleBase()
     WeaponComponent = CreateDefaultSubobject<UWeaponComponent>("WeaponComponent");
     VehicleIndicatorsComp = CreateDefaultSubobject<UVehicleIndicatorsComponent>("VehicleIndicatorsComp");
     WorkshopComponent = CreateDefaultSubobject<UWorkshopComponent>("WorkshopComponent");
+    EngineSound = CreateDefaultSubobject<UAudioComponent>("EngineSound");
 
     RareLeftWheelDust = CreateDefaultSubobject<UNiagaraComponent>("RareLeftWheelDust");
     RareLeftWheelDust->SetupAttachment(WheelRL);
@@ -88,6 +90,7 @@ bool AModularVehicleBase::AddAmount(const FInteractionData& Data)
             bResult = true;
             break;
         case EItemPropertyType::Fuel: bResult = VehicleIndicatorsComp->AddFuel(Data.Amount); break;
+        default: bResult = true; break;
     }
 
     return bResult;
@@ -124,6 +127,7 @@ void AModularVehicleBase::BeginPlay()
 
     check(WeaponComponent);
     check(VehicleIndicatorsComp);
+    check(EngineSound);
     check(RareLeftWheelDust);
     check(RareRightWheelDust);
 
@@ -131,11 +135,14 @@ void AModularVehicleBase::BeginPlay()
 
     if (HasAuthority())
     {
-        // Set ClearTimer!!!
         WheelManagerComponent->StartSendData(SendDataRate);
 
         GetWorld()->GetTimerManager().SetTimer(DataTickTimer, this, &AModularVehicleBase::SendDataTick_Multicast, SendDataRate, true);
     }
+
+    EngineSound->Play();
+
+    VehicleIndicatorsComp->OnDeath.AddUObject(this, &AModularVehicleBase::OnDeath);
 }
 
 void AModularVehicleBase::PostInitializeComponents()
@@ -164,7 +171,12 @@ void AModularVehicleBase::Tick(float DeltaTime)
 
     PawnDeltaTime = DeltaTime;
 
-    WheelsTurn();
+    UpdateWheelsTurn();
+
+    if (EngineSound)
+    {
+        EngineSound->SetFloatParameter(EngineRPMName, FMath::Abs(MoveForvardAxis));
+    }
 }
 
 void AModularVehicleBase::Restart()
@@ -173,8 +185,8 @@ void AModularVehicleBase::Restart()
 
     if (const auto ValkyriePlayerState = GetPlayerState<AValkyriePlayerState>())
     {
-        GetNetMode() != NM_Client ? GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Purple, TEXT("SERVER, EnablePlayerState")) :
-                                    GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Orange, TEXT("CLIENT, EnablePlayerState"));
+        // GetNetMode() != NM_Client ? GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Purple, TEXT("SERVER, EnablePlayerState")) :
+        //                             GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Orange, TEXT("CLIENT, EnablePlayerState"));
 
         const auto UnitPtr = ValkyriePlayerState->GetVehicleUnits().FindByPredicate([](const FVehicleUnitData& Data) { return Data.UnitType == EVehicleUnitType::Body; });
 
@@ -182,6 +194,8 @@ void AModularVehicleBase::Restart()
         {
             VehicleBody->SetStaticMesh(UnitPtr->UnitComponents[0].UnitComponentMesh);
         }
+
+        WorkshopComponent->AddCoins(ValkyriePlayerState->GetCoins());
     }
 
     if (HasAuthority())
@@ -191,10 +205,7 @@ void AModularVehicleBase::Restart()
         WeaponComponent->InitWeapons();
     }
 
-    if (const auto ValkyriePS = GetPlayerState<AValkyriePlayerState>())
-    {
-        WorkshopComponent->AddCoins(ValkyriePS->GetCoins());
-    }
+    Camera->PostProcessSettings.ColorSaturation = FVector4(1.f, 1.f, 1.f, 1.f);
 }
 
 void AModularVehicleBase::UnPossessed()
@@ -205,6 +216,7 @@ void AModularVehicleBase::UnPossessed()
     }
 
     WeaponComponent->CleanWeapons();
+    GetWorld()->GetTimerManager().ClearTimer(DataTickTimer);
 
     Super::UnPossessed();
     Tags.Empty();
@@ -281,7 +293,7 @@ void AModularVehicleBase::SmoothTurnHandle(float YAxisValue)
     SmoothTurnValue = FMath::FInterpTo(SmoothTurnValue, MoveSideValue, PawnDeltaTime, 8.f);  // 6.f
 }
 
-void AModularVehicleBase::WheelsTurn()
+void AModularVehicleBase::UpdateWheelsTurn()
 {
     const FRotator NewRotationFrontWheels{FRotator(0.f, SmoothTurnValue * 30.f, 0.f)};  // 20.f, 0.f
     const FRotator NewRotationRareWheels{FRotator(0.f, SmoothTurnValue * -30.f, 0.f)};  //-20.f, 0.f
@@ -296,6 +308,7 @@ void AModularVehicleBase::SendDataTick_Multicast_Implementation()
     if (HasAuthority())
     {
         SendMoveControls_Multicast(MoveForvardAxis, MoveSideAxis, SmoothTurnValue);
+        WheelManagerComponent->SetControlInput(MoveForvardAxis);
     }
     else
     {
@@ -303,8 +316,6 @@ void AModularVehicleBase::SendDataTick_Multicast_Implementation()
 
         SendMoveControls_Server(MoveForvardAxis, MoveSideAxis, SmoothTurnValue);
     }
-
-    WheelManagerComponent->SetControlInput(MoveForvardAxis);
 }
 
 void AModularVehicleBase::SendMoveControls_Server_Implementation(float InMoveForvardAxis, float InMoveSideAxis, float InSmoothTurnValue)
@@ -323,4 +334,15 @@ void AModularVehicleBase::SendMoveControls_Multicast_Implementation(float InMove
     MoveForvardAxis = InMoveForvardAxis;
     MoveSideAxis = InMoveSideAxis;
     SmoothTurnValue = InSmoothTurnValue;
+}
+
+void AModularVehicleBase::OnDeath()
+{
+    OnDeathCameraEffect_OnClient();
+}
+
+void AModularVehicleBase::OnDeathCameraEffect_OnClient_Implementation()
+{
+    Camera->PostProcessSettings.bOverride_ColorSaturation = 1;
+    Camera->PostProcessSettings.ColorSaturation = FVector4();
 }

@@ -27,7 +27,7 @@ void UPauseMenuWidget::OnSettingClicked()
 {
     if (const auto PlayerController = Cast<AVehiclePlayerController>(GetOwningPlayer()))
     {
-        PlayerController->ChangeGameState(EValkyrieGameState::GameSettings);
+        PlayerController->ChangeGameState_OnClient(EValkyrieGameState::GameSettings);
     }
 }
 

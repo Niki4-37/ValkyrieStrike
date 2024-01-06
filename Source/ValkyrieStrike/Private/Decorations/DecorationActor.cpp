@@ -5,9 +5,7 @@
 #include "Components/BoxComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
-#include "Net/UnrealNetwork.h"
-
-#include "DrawDebugHelpers.h"
+#include "Sound/SoundCue.h"
 
 ADecorationActor::ADecorationActor()
 {
@@ -67,8 +65,6 @@ void ADecorationActor::Throw()
     CollisionParams.AddIgnoredActor(GetOwner());
 
     GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, CollisionParams);
-
-    //DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Orange, false, 5.f, 0, 5.f);
 
     if (Hit.bBlockingHit)
     {
@@ -144,11 +140,12 @@ void ADecorationActor::OnDeath()
                                             Radius,              //
                                             DamageType,          //
                                             {});
-        DrawDebugSphere(GetWorld(), GetActorLocation(), Radius, 16, FColor::Red, false, 5.f);
     }
 
     GetWorldTimerManager().ClearTimer(DestructionTimer);
     GetWorldTimerManager().ClearTimer(TrowTimer);
+
+    UGameplayStatics::PlaySoundAtLocation(GetWorld(), DestructionSound, GetActorLocation());
 
     Destroy();
 }

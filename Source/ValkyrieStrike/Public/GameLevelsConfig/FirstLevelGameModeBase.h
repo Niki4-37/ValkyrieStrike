@@ -32,6 +32,8 @@ public:
     UFUNCTION(BlueprintCallable)
     void BeginFinalPhase() { bIsFinal = true; };
 
+    virtual void PostLogin(APlayerController* NewPlayer) override;
+
 protected:
     // Create TMap<Controller, StaticMesh> VehicleMeshiesMap
     // UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -56,6 +58,9 @@ private:
     UPROPERTY()
     TArray<ASpawningActor*> SpawningActors;
 
+    UPROPERTY()
+    TArray<APlayerController*> EnablePlayers;
+
     void FillPlayerStartMap();
     void FillSpawningActorsArray();
 
@@ -64,4 +69,6 @@ private:
     void RestartPlayerWithAIController(AController* NewPlayer);
 
     AActor* GetRandomSpawningActorByTag(FName TagName);
+
+    void GameOver();
 };

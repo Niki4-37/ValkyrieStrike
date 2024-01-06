@@ -30,8 +30,6 @@ protected:
     virtual void Tick(float DeltaTime) override;
 
 private:
-    FTimerHandle AimingTimer;
-
     FTimerHandle ChoosingTargetTimer;
 
     UPROPERTY()

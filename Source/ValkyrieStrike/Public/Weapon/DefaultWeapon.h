@@ -8,6 +8,7 @@
 
 class USkeletalMeshComponent;
 class ADefaultProjectile;
+class USoundCue;
 
 UCLASS()
 class VALKYRIESTRIKE_API ADefaultWeapon : public AActor
@@ -25,9 +26,6 @@ protected:
     USceneComponent* WeaponRootComponent;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    USkeletalMeshComponent* WeaponSkeletalMesh;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     UStaticMeshComponent* WeaponStaticMesh;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -39,13 +37,18 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (ClampMin = "0.1", ClampMax = "10.0"))
     float FireRate{0.5f};
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Sound")
+    USoundCue* FireSound;
+
     virtual void BeginPlay() override;
 
 private:
-    FTimerHandle FiringTimer;
+    FTimerHandle FireRateTimer;
+    bool bWeaponIsReady{true};
 
     UFUNCTION()
     void MakeShot(const FVector& AimPosition);
 
-    FTransform GetWeaponSocketTransform(FName SocketName);
+    UFUNCTION(NetMulticast, unreliable)
+    void SpawnSound_Multicast(USoundBase* Sound, USceneComponent* AttachToComponent, FName AttachPointName = NAME_None);
 };

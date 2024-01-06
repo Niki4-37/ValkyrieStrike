@@ -2,6 +2,8 @@
 
 #include "Components/WeaponFXComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 UWeaponFXComponent::UWeaponFXComponent()
 {
@@ -11,4 +13,5 @@ UWeaponFXComponent::UWeaponFXComponent()
 void UWeaponFXComponent::PlayImpactFX(const FHitResult& Hit)
 {
     UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DefaultEffect, Hit.ImpactPoint, Hit.ImpactNormal.Rotation());
+    UGameplayStatics::PlaySoundAtLocation(GetWorld(), ImpactSound, Hit.ImpactPoint);
 }

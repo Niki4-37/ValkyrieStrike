@@ -13,6 +13,7 @@
 void UMenuWidget::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
+
     if (FindSessionButton)
     {
         FindSessionButton->OnClicked.AddDynamic(this, &ThisClass::OnFindGame);

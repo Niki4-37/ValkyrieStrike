@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "RespawnComponent.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnStartRespawnSignature, float);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class VALKYRIESTRIKE_API URespawnComponent : public UActorComponent
@@ -15,10 +16,16 @@ class VALKYRIESTRIKE_API URespawnComponent : public UActorComponent
 public:	
 	URespawnComponent();
 
+    FOnStartRespawnSignature OnStartRespawn;
+
     void StartRespawning(float TimeToRespawn);
+    void UndoRespawn();
 
 private:
     FTimerHandle RespawningTimer;
 
     void RespawnOwner();
+
+    UFUNCTION(Client, reliable)
+    void OnStartRespawn_OnClient(float RespawnDelay);
 };

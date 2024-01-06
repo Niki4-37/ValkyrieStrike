@@ -11,6 +11,7 @@
 #include "Interactables/SpawningActor.h"
 #include "Decorations/DecorationActor.h"
 #include "Components/RespawnComponent.h"
+#include "BrainComponent.h"
 
 #include "Engine.h"
 
@@ -104,6 +105,8 @@ void AFirstLevelGameModeBase::Killed(AController* VictimController, const FTrans
 
     if (const auto ValkyriePlayerState = VictimController->GetPlayerState<AValkyriePlayerState>())
     {
+        // VictimController->ChangeState(NAME_Spectating);
+
         ValkyriePlayerState->SetRespawnTransform(VictimTransform);
         ValkyriePlayerState->ChangeLives(-1);
     }
@@ -111,8 +114,16 @@ void AFirstLevelGameModeBase::Killed(AController* VictimController, const FTrans
     if (VictimController->IsA<AAIController>() && bIsFinal)
     {
         ++Count;
-        // GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("EnemiesKilled: %i"), Count));
+        if (Count < EnemiesToWin) return;
+        GameOver();
     }
+}
+
+void AFirstLevelGameModeBase::PostLogin(APlayerController* NewPlayer)
+{
+    Super::PostLogin(NewPlayer);
+
+    EnablePlayers.Add(NewPlayer);
 }
 
 void AFirstLevelGameModeBase::FillPlayerStartMap()
@@ -160,15 +171,19 @@ void AFirstLevelGameModeBase::RestartPlayerWithPlayerState(AController* NewPlaye
 
     if (!ValkyriePlayerState->IsFirstDead() /*&& PS->IsReconnecting()*/)
     {
-        NewPlayer->GetPawn()->Reset();
+        if (NewPlayer->GetPawn())
+        {
+            NewPlayer->GetPawn()->Reset();
+        }
+
         if (!ValkyriePlayerState->CanRespawn())
         {
-            // spectate
+            NewPlayer->ChangeState(NAME_Spectating);
             return;
         }
 
         FTransform NewTransforn = ValkyriePlayerState->GetRespawnTransform();
-        FVector NewLocation = NewTransforn.GetLocation() + FVector(300.f, 300.f, 100.f);
+        FVector NewLocation = NewTransforn.GetLocation() + FVector(300.f, 300.f, 300.f);
         FRotator NewRotation = FRotator(0.f, NewTransforn.Rotator().Yaw, 0.f);
         NewTransforn.SetLocation(NewLocation);
         NewTransforn.SetRotation(FQuat(NewRotation));
@@ -212,4 +227,39 @@ AActor* AFirstLevelGameModeBase::GetRandomSpawningActorByTag(FName TagName)
         ++IndexCount;
     }
     return IndexesByTag.Num() != 0 ? SpawningActors[IndexesByTag[FMath::RandHelper(IndexesByTag.Num())]] : nullptr;
+}
+
+void AFirstLevelGameModeBase::GameOver()
+{
+    GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Purple, "GameOver");
+
+    for (const auto Player : EnablePlayers)
+    {
+        const auto VehiclePC = Cast<AVehiclePlayerController>(Player);
+        if (!VehiclePC) continue;
+
+        VehiclePC->ChangeGameState_OnClient(EValkyrieGameState::GameOver);
+        // VehiclePC->ChangeState(NAME_Spectating);
+    }
+
+    // for (auto Pawn : TActorRange<APawn>(GetWorld()))
+    //{
+    //     if (Pawn)
+    //     {
+    //         Pawn->TurnOff();
+    //         Pawn->DisableInput(nullptr);
+    //     }
+    // }
+
+    for (auto It = GetWorld()->GetControllerIterator(); It; ++It)
+    {
+        const auto AIController = Cast<AAIController>(It->Get());
+        if (!AIController || !AIController->BrainComponent) continue;
+        AIController->BrainComponent->Cleanup();
+
+        if (const auto RespawnComponentn = AIController->FindComponentByClass<URespawnComponent>())
+        {
+            RespawnComponentn->UndoRespawn();
+        }
+    }
 }

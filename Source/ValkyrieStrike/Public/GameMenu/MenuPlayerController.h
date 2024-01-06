@@ -8,7 +8,7 @@
 #include "MenuPlayerController.generated.h"
 
 class AMenuCameraActor;
-class AMenuVehicleActor;
+class USoundCue;
 
 UCLASS()
 class VALKYRIESTRIKE_API AMenuPlayerController : public APlayerController

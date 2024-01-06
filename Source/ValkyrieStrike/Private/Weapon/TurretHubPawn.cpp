@@ -1,13 +1,11 @@
 // Final work on the SkillBox course "Unreal Engine Junior Developer". All assets are publicly available, links in the ReadMe.
 
 #include "Weapon/TurretHubPawn.h"
-#include "Weapon/DefaultProjectile.h"
-#include "Components/StaticMeshComponent.h"
+// #include "Weapon/DefaultProjectile.h"
 #include "Components/WeaponComponent.h"
 #include "Weapon/BaseVehicleWeapon.h"
 #include "Net/UnrealNetwork.h"
 #include "AI/AITurretController.h"
-#include "TimerManager.h"
 
 ATurretHubPawn::ATurretHubPawn()
 {
@@ -24,9 +22,9 @@ ATurretHubPawn::ATurretHubPawn()
 void ATurretHubPawn::UpdateAimActor(AActor* AimActor, float TimerRate)
 {
     if (!WeaponComp) return;
-    for (const auto& TurretHubPawn : WeaponComp->GetVehicleWeapons())
+    for (const auto VehicleWeapon : WeaponComp->GetVehicleWeapons())
     {
-        TurretHubPawn->UpdateAimActor(AimActor, TimerRate);
+        VehicleWeapon->UpdateAimActor(AimActor, TimerRate);
     }
 }
 

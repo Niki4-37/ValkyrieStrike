@@ -8,6 +8,7 @@
 
 class UHealthComponent;
 class UNiagaraSystem;
+class USoundCue;
 
 UCLASS()
 class VALKYRIESTRIKE_API ADecorationActor : public AActor
@@ -58,6 +59,9 @@ protected:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     float Impulse{25.f};
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+    USoundCue* DestructionSound;
 
     virtual void BeginPlay() override;
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;

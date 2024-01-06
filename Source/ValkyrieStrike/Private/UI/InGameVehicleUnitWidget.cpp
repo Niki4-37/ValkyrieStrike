@@ -4,8 +4,6 @@
 #include "Components/Image.h"
 #include "Materials/MaterialInstance.h"
 
-#include "Engine.h"
-
 void UInGameVehicleUnitWidget::SetUnitData(const FVehicleUnitData& Data)
 {
     if (UnitImage)
@@ -48,7 +46,7 @@ void UInGameVehicleUnitWidget::StartReloading()
     TimerDelegate.BindLambda(
         [&]()
         {
-            if (!CircleBarMaterial) return;
+            if (!CircleBarMaterial || GetWorld()->GetTimerManager().IsTimerPending(ReloadingTimer)) return;
             const float RemainingReloadingTime = GetWorld()->GetTimerManager().GetTimerElapsed(ReloadingTimer);
             CircleBarMaterial->SetScalarParameterValue(PercentParamName, RemainingReloadingTime / ReloadingTime);
         });

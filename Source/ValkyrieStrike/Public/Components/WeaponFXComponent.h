@@ -7,6 +7,7 @@
 #include "WeaponFXComponent.generated.h"
 
 class UNiagaraSystem;
+class USoundCue;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class VALKYRIESTRIKE_API UWeaponFXComponent : public UActorComponent
@@ -21,4 +22,7 @@ public:
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     UNiagaraSystem* DefaultEffect;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Sound")
+    USoundCue* ImpactSound;
 };
