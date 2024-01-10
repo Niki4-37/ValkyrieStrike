@@ -47,6 +47,9 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LevelCongig")
     FName FinalPhaseTagName{"FinalPhase"};
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LevelCongig")
+    FName PlayerSpawnerTagName{"PlayerSpawner"};
+
 private:
     bool bIsFinal{false};
     int32 Count{0};
@@ -57,6 +60,9 @@ private:
 
     UPROPERTY()
     TArray<ASpawningActor*> SpawningActors;
+
+    UPROPERTY()
+    TArray<ASpawningActor*> PlayerSpawners;
 
     UPROPERTY()
     TArray<APlayerController*> EnablePlayers;
@@ -71,4 +77,6 @@ private:
     AActor* GetRandomSpawningActorByTag(FName TagName);
 
     void GameOver();
+
+    bool GetBestSpawnLocation(const FVector& VictimLocation, FVector& BestLocation);
 };

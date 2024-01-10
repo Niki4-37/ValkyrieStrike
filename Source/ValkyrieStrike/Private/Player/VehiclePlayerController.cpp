@@ -102,18 +102,20 @@ void AVehiclePlayerController::OnPauseGame()
 
 void AVehiclePlayerController::ChangeGameState(EValkyrieGameState State)
 {
-    if (State == EValkyrieGameState::InProgress)
-    {
-        // SetInputMode(FInputModeGameOnly());
-        // bShowMouseCursor = false;
-        SetInputMode(FInputModeGameAndUI());
-        bShowMouseCursor = true;
-    }
-    else
-    {
-        SetInputMode(FInputModeUIOnly());
-        bShowMouseCursor = true;
-    }
+    //if (State == EValkyrieGameState::InProgress)
+    //{
+    //    // SetInputMode(FInputModeGameOnly());
+    //    // bShowMouseCursor = false;
+    //    SetInputMode(FInputModeGameAndUI());
+    //    bShowMouseCursor = true;
+    //}
+    //else
+    //{
+    //    SetInputMode(FInputModeUIOnly());
+    //    bShowMouseCursor = true;
+    //}
+    SetInputMode(FInputModeGameAndUI());
+    bShowMouseCursor = true;
 
     OnGameStateChanged.Broadcast(State);
 }

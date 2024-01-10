@@ -47,7 +47,7 @@ AActor* AFirstLevelGameModeBase::ChoosePlayerStart_Implementation(AController* P
     {
         for (TPair<AActor*, bool>& Pair : PlayerStartMap)
         {
-            if (const bool bIsOccupied = Pair.Value == true) continue;
+            if (/*const bool bIsOccupied = */ Pair.Value == true) continue;
             auto FoundEmptyPosition = Pair.Key;
             if (!FoundEmptyPosition) continue;
             Pair.Value = true;
@@ -143,7 +143,11 @@ void AFirstLevelGameModeBase::FillSpawningActorsArray()
     {
         ASpawningActor* SpawningActor = *It;
         if (!SpawningActor) continue;
-        SpawningActors.AddUnique(SpawningActor);
+        SpawningActor->ActorHasTag(PlayerSpawnerTagName)  //
+            ?
+            PlayerSpawners.AddUnique(SpawningActor)  //
+            :
+            SpawningActors.AddUnique(SpawningActor);
     }
 }
 
@@ -169,7 +173,7 @@ void AFirstLevelGameModeBase::RestartPlayerWithPlayerState(AController* NewPlaye
     //      BrokenVehicle->FinishSpawning(VictimTransform);
     //}
 
-    if (!ValkyriePlayerState->IsFirstDead() /*&& PS->IsReconnecting()*/)
+    if (!ValkyriePlayerState->IsFirstDead() && PlayerSpawners.Num() /*&& PS->IsReconnecting()*/)
     {
         if (NewPlayer->GetPawn())
         {
@@ -182,12 +186,14 @@ void AFirstLevelGameModeBase::RestartPlayerWithPlayerState(AController* NewPlaye
             return;
         }
 
-        FTransform NewTransforn = ValkyriePlayerState->GetRespawnTransform();
-        FVector NewLocation = NewTransforn.GetLocation() + FVector(300.f, 300.f, 300.f);
-        FRotator NewRotation = FRotator(0.f, NewTransforn.Rotator().Yaw, 0.f);
-        NewTransforn.SetLocation(NewLocation);
-        NewTransforn.SetRotation(FQuat(NewRotation));
-        RestartPlayerAtTransform(NewPlayer, NewTransforn);
+        FTransform VictimTransform = ValkyriePlayerState->GetRespawnTransform();
+        // FVector NewLocation = NewTransforn.GetLocation() + FVector(300.f, 300.f, 300.f);
+        FVector NewLocation;
+        GetBestSpawnLocation(VictimTransform.GetLocation(), NewLocation);
+        FRotator NewRotation = FRotator(0.f, VictimTransform.Rotator().Yaw, 0.f);
+        VictimTransform.SetLocation(NewLocation);
+        VictimTransform.SetRotation(FQuat(NewRotation));
+        RestartPlayerAtTransform(NewPlayer, VictimTransform);
     }
     else
     {
@@ -262,4 +268,17 @@ void AFirstLevelGameModeBase::GameOver()
             RespawnComponentn->UndoRespawn();
         }
     }
+}
+
+bool AFirstLevelGameModeBase::GetBestSpawnLocation(const FVector& VictimLocation, FVector& BestLocation)
+{
+    float BestDistance = MAX_FLT;
+    for (const auto PlayerSpawner : PlayerSpawners)
+    {
+        const auto DistanceBetween = (PlayerSpawner->GetActorLocation() - VictimLocation).Size();
+        if (DistanceBetween > BestDistance) continue;
+        BestDistance = DistanceBetween;
+        BestLocation = PlayerSpawner->GetActorLocation();
+    }
+    return true;
 }

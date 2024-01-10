@@ -216,7 +216,6 @@ void AModularVehicleBase::UnPossessed()
     }
 
     WeaponComponent->CleanWeapons();
-    GetWorld()->GetTimerManager().ClearTimer(DataTickTimer);
 
     Super::UnPossessed();
     Tags.Empty();
@@ -339,6 +338,11 @@ void AModularVehicleBase::SendMoveControls_Multicast_Implementation(float InMove
 void AModularVehicleBase::OnDeath()
 {
     OnDeathCameraEffect_OnClient();
+
+    GetWorld()->GetTimerManager().ClearTimer(DataTickTimer);
+    MoveForvardAxis = 0.f;
+    MoveSideAxis = 0.f;
+    SendDataTick_Multicast();
 }
 
 void AModularVehicleBase::OnDeathCameraEffect_OnClient_Implementation()
