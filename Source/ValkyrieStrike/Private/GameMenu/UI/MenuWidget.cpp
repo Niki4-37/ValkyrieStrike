@@ -57,6 +57,11 @@ void UMenuWidget::OnFindGame()
     {
         FindingSessionProcess->SetVisibility(ESlateVisibility::Visible);
     }
+
+    if (!IsAnimationPlaying(ShowSessionsAnimation))
+    {
+        PlayAnimation(ShowSessionsAnimation);
+    }
 }
 
 void UMenuWidget::OnFoundSessionData(const FString& SessionID, int32 ConnectionNum, int32 MaxPlayers)

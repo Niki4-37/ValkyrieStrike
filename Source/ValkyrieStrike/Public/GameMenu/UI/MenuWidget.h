@@ -39,6 +39,9 @@ protected:
     UPROPERTY(EditDefaultsOnly)
     TSubclassOf<UUserWidget> JionSessionWidgetClass;
 
+    UPROPERTY(Transient, meta = (BindWidgetAnim))
+    UWidgetAnimation* ShowSessionsAnimation;
+
     virtual void NativeOnInitialized() override;
 
 private:
