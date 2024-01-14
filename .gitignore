@@ -21,3 +21,4 @@ Config/steamvr_ue_editor_app.json
 Content/Assets
 Content/MapsForGame/GameFirstLevel_BuiltData.uasset
 Content/Maps/VehicleExampleMap_BuiltData.uasset
+Content/MapsForGame/GameLobbyMap_BuiltData.uasset

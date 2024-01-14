@@ -48,7 +48,7 @@ void ADefaultWeapon::MakeShot(const FVector& AimPosition)
 
     const FVector Direction = (AimPosition - MuzzleLocation).GetSafeNormal();
 
-    const auto BulletSpread = 7.f;
+    const auto BulletSpread = 10.f;
     const auto HalfRad = FMath::DegreesToRadians(BulletSpread);
     const FVector ShootDirection = FMath::VRandCone(Direction, HalfRad);
 

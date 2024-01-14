@@ -102,18 +102,18 @@ void AVehiclePlayerController::OnPauseGame()
 
 void AVehiclePlayerController::ChangeGameState(EValkyrieGameState State)
 {
-    //if (State == EValkyrieGameState::InProgress)
+    // if (State == EValkyrieGameState::InProgress)
     //{
-    //    // SetInputMode(FInputModeGameOnly());
-    //    // bShowMouseCursor = false;
-    //    SetInputMode(FInputModeGameAndUI());
-    //    bShowMouseCursor = true;
-    //}
-    //else
+    //     // SetInputMode(FInputModeGameOnly());
+    //     // bShowMouseCursor = false;
+    //     SetInputMode(FInputModeGameAndUI());
+    //     bShowMouseCursor = true;
+    // }
+    // else
     //{
-    //    SetInputMode(FInputModeUIOnly());
-    //    bShowMouseCursor = true;
-    //}
+    //     SetInputMode(FInputModeUIOnly());
+    //     bShowMouseCursor = true;
+    // }
     SetInputMode(FInputModeGameAndUI());
     bShowMouseCursor = true;
 
