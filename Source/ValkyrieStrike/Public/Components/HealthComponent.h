@@ -47,6 +47,5 @@ private:
     UFUNCTION(NetMulticast, unreliable)
     void OnHealthChanged_Multicast(float Value, float MaxValue);
 
-    UFUNCTION(Client, unreliable)
-    void ShakeCamera_OnClient();
+    void ShakeCamera();
 };

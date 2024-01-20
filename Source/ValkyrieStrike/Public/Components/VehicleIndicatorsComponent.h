@@ -30,7 +30,7 @@ private:
     float FuelValue{0.f};
     float MaxFuelValue{100.f};
     UPROPERTY(Replicated)
-    float FuelConsumptionModifier{1.f};
+    float FuelConsumptionModifier{0.2f};
 
     FTimerHandle FuelChangeTimer;
 

@@ -28,6 +28,8 @@ public:
     UFUNCTION(Client, reliable)
     void CheckMusicTheme_OnClient(bool bHasAim);
 
+    virtual void GameHasEnded(class AActor* EndGameFocus = nullptr, bool bIsWinner = false) override;
+
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     URespawnComponent* RespawnComponent;

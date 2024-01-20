@@ -24,6 +24,7 @@ void ATurretHubPawn::UpdateAimActor(AActor* AimActor, float TimerRate)
     if (!WeaponComp) return;
     for (const auto VehicleWeapon : WeaponComp->GetVehicleWeapons())
     {
+        if (!VehicleWeapon) continue;
         VehicleWeapon->UpdateAimActor(AimActor, TimerRate);
     }
 }

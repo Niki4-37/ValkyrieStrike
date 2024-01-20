@@ -14,7 +14,7 @@ class VALKYRIESTRIKE_API USettingsWidget : public UUserWidget
     GENERATED_BODY()
 
 protected:
-    UPROPERTY(meta = (BindWidget))
+    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
     UButton* GoBackButton;
 
     virtual void NativeOnInitialized() override;

@@ -79,12 +79,9 @@ void UHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const
         Killed();
     }
 
-    if (DamageType)
+    if (DamageType && DamageType->IsA<UExplosionDamageType>())
     {
-        if (DamageType->IsA<UExplosionDamageType>())
-        {
-            ShakeCamera_OnClient();
-        }
+        ShakeCamera();
     }
 }
 
@@ -93,10 +90,8 @@ void UHealthComponent::OnHealthChanged_Multicast_Implementation(float Value, flo
     OnItemValueChanged.Broadcast(EItemPropertyType::Endurance, Value, MaxValue);
 }
 
-void UHealthComponent::ShakeCamera_OnClient_Implementation()
+void UHealthComponent::ShakeCamera()
 {
-    if (!GetOwner()) return;
-    const auto PlayerController = GetOwner()->GetInstigatorController<APlayerController>();
-    if (!PlayerController || !PlayerController->PlayerCameraManager) return;
-    PlayerController->PlayerCameraManager->StartCameraShake(ExplosionCameraShake);
+    if (!GetOwner() || !GetOwner()->GetInstigatorController<APlayerController>()) return;
+    GetOwner()->GetInstigatorController<APlayerController>()->ClientStartCameraShake(ExplosionCameraShake);
 }

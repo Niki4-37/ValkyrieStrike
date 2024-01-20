@@ -101,15 +101,18 @@ void AFirstLevelGameModeBase::Killed(AController* VictimController, const FTrans
 {
     if (!VictimController) return;
 
-    StartRespawning(VictimController);
-
     if (const auto ValkyriePlayerState = VictimController->GetPlayerState<AValkyriePlayerState>())
     {
-        // VictimController->ChangeState(NAME_Spectating);
-
-        ValkyriePlayerState->SetRespawnTransform(VictimTransform);
         ValkyriePlayerState->ChangeLives(-1);
+        if (!ValkyriePlayerState->CanRespawn())
+        {
+            VictimController->GameHasEnded();
+            return;
+        }
+        ValkyriePlayerState->SetRespawnTransform(VictimTransform);
     }
+
+    StartRespawning(VictimController);
 
     if (VictimController->IsA<AAIController>() && bIsFinal)
     {
@@ -166,13 +169,6 @@ void AFirstLevelGameModeBase::RestartPlayerWithPlayerState(AController* NewPlaye
     const auto ValkyriePlayerState = NewPlayer->GetPlayerState<AValkyriePlayerState>();
     if (!ValkyriePlayerState) return;
 
-    //  const auto BrokenVehicle = GetWorld()->SpawnActorDeferred<ADecorationActor>(ADecorationActor::StaticClass(), VictimTransform);
-    //  if (BrokenVehicle)
-    //{
-    //      BrokenVehicle->SetupDecoration(BrokenVehicleMesh);
-    //      BrokenVehicle->FinishSpawning(VictimTransform);
-    //}
-
     if (!ValkyriePlayerState->IsFirstDead() && PlayerSpawners.Num() /*&& PS->IsReconnecting()*/)
     {
         if (NewPlayer->GetPawn())
@@ -180,14 +176,7 @@ void AFirstLevelGameModeBase::RestartPlayerWithPlayerState(AController* NewPlaye
             NewPlayer->GetPawn()->Reset();
         }
 
-        if (!ValkyriePlayerState->CanRespawn())
-        {
-            NewPlayer->ChangeState(NAME_Spectating);
-            return;
-        }
-
         FTransform VictimTransform = ValkyriePlayerState->GetRespawnTransform();
-        // FVector NewLocation = NewTransforn.GetLocation() + FVector(300.f, 300.f, 300.f);
         FVector NewLocation;
         GetBestSpawnLocation(VictimTransform.GetLocation(), NewLocation);
         FRotator NewRotation = FRotator(0.f, VictimTransform.Rotator().Yaw, 0.f);
@@ -241,11 +230,15 @@ void AFirstLevelGameModeBase::GameOver()
 
     for (const auto Player : EnablePlayers)
     {
-        const auto VehiclePC = Cast<AVehiclePlayerController>(Player);
-        if (!VehiclePC) continue;
+        // const auto VehiclePC = Cast<AVehiclePlayerController>(Player);
+        // if (!VehiclePC) continue;
 
-        VehiclePC->ChangeGameState_OnClient(EValkyrieGameState::GameOver);
+        // VehiclePC->ChangeGameState_OnClient(EValkyrieGameState::GameOver);
         // VehiclePC->ChangeState(NAME_Spectating);
+        // DisableInput(VehiclePC);
+
+        if (!Player) continue;
+        Player->GameHasEnded();
     }
 
     // for (auto Pawn : TActorRange<APawn>(GetWorld()))

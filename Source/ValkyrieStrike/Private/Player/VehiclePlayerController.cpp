@@ -40,6 +40,15 @@ void AVehiclePlayerController::CheckMusicTheme_OnClient_Implementation(bool bHas
     }
 }
 
+void AVehiclePlayerController::GameHasEnded(AActor* EndGameFocus, bool bIsWinner) 
+{
+    Super::GameHasEnded(EndGameFocus, bIsWinner);
+
+    ChangeGameState_OnClient(EValkyrieGameState::GameOver);
+    PopInputComponent(InputComponent);
+    ChangeState(NAME_Spectating);
+}
+
 void AVehiclePlayerController::BeginPlay()
 {
     Super::BeginPlay();
