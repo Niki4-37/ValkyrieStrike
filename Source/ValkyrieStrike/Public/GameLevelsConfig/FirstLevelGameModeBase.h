@@ -32,16 +32,11 @@ public:
     UFUNCTION(BlueprintCallable)
     void BeginFinalPhase() { bIsFinal = true; };
 
-    virtual void PostLogin(APlayerController* NewPlayer) override;
-
 protected:
-    // Create TMap<Controller, StaticMesh> VehicleMeshiesMap
-    // UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-    // UStaticMesh* BrokenVehicleMesh;
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LevelConfig")
     TMap<TSubclassOf<AActor>, float> EnemySpawnClassesWithChance;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LevelConfig", meta = (ClampMin = "0", ClampMax = "1000"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LevelConfig", meta = (ClampMin = "1", ClampMax = "1000"))
     int32 EnemiesToWin{10};
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LevelCongig")
@@ -63,9 +58,6 @@ private:
 
     UPROPERTY()
     TArray<ASpawningActor*> PlayerSpawners;
-
-    UPROPERTY()
-    TArray<APlayerController*> EnablePlayers;
 
     void FillPlayerStartMap();
     void FillSpawningActorsArray();

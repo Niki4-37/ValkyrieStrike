@@ -108,7 +108,7 @@ struct FLevelData
     FName LevelDisplayName = NAME_None;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game")
-    UTexture2D* LevelThumb;
+    UTexture2D* LevelThumb{nullptr};
 };
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnLevelSelectedSignature, const FLevelData&);
@@ -134,13 +134,13 @@ struct FVehicleUnitData : public FTableRowBase
     GENERATED_USTRUCT_BODY()
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    EVehicleUnitType UnitType;
+    EVehicleUnitType UnitType{EVehicleUnitType::NoType};
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     FString UnitDescription;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    UTexture2D* UnitThumb;
+    UTexture2D* UnitThumb{nullptr};
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     TSubclassOf<AActor> UnitSpawnClass;
@@ -172,13 +172,13 @@ struct FInteractionData
     GENERATED_USTRUCT_BODY()
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    EItemPropertyType Type;
+    EItemPropertyType Type{EItemPropertyType::NoType};
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     int32 Amount;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    UTexture2D* ItemTumb;
+    UTexture2D* ItemTumb{nullptr};
 
     FInteractionData(EItemPropertyType InType, int32 InAmount, UTexture2D* InItemTumb = nullptr) : Type(InType), Amount(InAmount), ItemTumb(InItemTumb) {}
     FInteractionData()
@@ -218,7 +218,7 @@ struct FWheelData
     GENERATED_USTRUCT_BODY()
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    USceneComponent* WheelRoot;
+    USceneComponent* WheelRoot{nullptr};
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     float LastContactDistance;
@@ -250,7 +250,7 @@ struct FWheelsGroup
     float SuspensionStiffness;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    UPrimitiveComponent* RootSimulatedComponent;
+    UPrimitiveComponent* RootSimulatedComponent{nullptr};
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     FName RootSimulatedBoneName;

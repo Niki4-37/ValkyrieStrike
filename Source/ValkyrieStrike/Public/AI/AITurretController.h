@@ -18,6 +18,7 @@ public:
     AAITurretController();
 
     void StartChoosingTarget();
+    virtual void GameHasEnded(class AActor* EndGameFocus = nullptr, bool bIsWinner = false) override;
 
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

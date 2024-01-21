@@ -16,6 +16,11 @@ void AAITurretController::StartChoosingTarget()
     GetWorldTimerManager().SetTimer(ChoosingTargetTimer, this, &AAITurretController::RotateToTarget, AimingUpdateRate, true);
 }
 
+void AAITurretController::GameHasEnded(AActor* EndGameFocus, bool bIsWinner) 
+{
+    GetWorldTimerManager().ClearTimer(ChoosingTargetTimer);
+}
+
 void AAITurretController::OnPossess(APawn* InPawn)
 {
     Super::OnPossess(InPawn);

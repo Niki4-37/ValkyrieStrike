@@ -122,13 +122,6 @@ void AFirstLevelGameModeBase::Killed(AController* VictimController, const FTrans
     }
 }
 
-void AFirstLevelGameModeBase::PostLogin(APlayerController* NewPlayer)
-{
-    Super::PostLogin(NewPlayer);
-
-    EnablePlayers.Add(NewPlayer);
-}
-
 void AFirstLevelGameModeBase::FillPlayerStartMap()
 {
     for (TActorIterator<APlayerStart> It(GetWorld()); It; ++It)
@@ -226,19 +219,12 @@ AActor* AFirstLevelGameModeBase::GetRandomSpawningActorByTag(FName TagName)
 
 void AFirstLevelGameModeBase::GameOver()
 {
-    GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Purple, "GameOver");
-
-    for (const auto Player : EnablePlayers)
+    for (FConstControllerIterator ControlletIterator = GetWorld()->GetControllerIterator(); ControlletIterator; ++ControlletIterator)
     {
-        // const auto VehiclePC = Cast<AVehiclePlayerController>(Player);
-        // if (!VehiclePC) continue;
-
-        // VehiclePC->ChangeGameState_OnClient(EValkyrieGameState::GameOver);
-        // VehiclePC->ChangeState(NAME_Spectating);
-        // DisableInput(VehiclePC);
-
-        if (!Player) continue;
-        Player->GameHasEnded();
+        if (auto Controller = ControlletIterator->Get())
+        {
+            Controller->GameHasEnded();
+        }
     }
 
     // for (auto Pawn : TActorRange<APawn>(GetWorld()))
