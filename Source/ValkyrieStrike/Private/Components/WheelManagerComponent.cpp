@@ -4,6 +4,8 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Net/UnrealNetwork.h"
 
+#include "Engine.h"
+
 UWheelManagerComponent::UWheelManagerComponent()
 {
     PrimaryComponentTick.bCanEverTick = true;
@@ -40,7 +42,12 @@ bool UWheelManagerComponent::GetWheelsGroups(TArray<FWheelsGroup>& OutWheelsGrou
 
 void UWheelManagerComponent::StartSendData(float SendDataRate)
 {
-    GetWorld()->GetTimerManager().SetTimer(ManageWheelsTimer, this, &UWheelManagerComponent::ManageWheels, SendDataRate, true);
+    //GetWorld()->GetTimerManager().SetTimer(ManageWheelsTimer, this, &UWheelManagerComponent::ManageWheels, SendDataRate, true);
+}
+
+void UWheelManagerComponent::StopSendData()
+{
+    GetWorld()->GetTimerManager().ClearTimer(ManageWheelsTimer);
 }
 
 void UWheelManagerComponent::BeginPlay()
@@ -52,13 +59,15 @@ void UWheelManagerComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-    DOREPLIFETIME(UWheelManagerComponent, WheelsGroups);
+    //DOREPLIFETIME(UWheelManagerComponent, WheelsGroups);
     DOREPLIFETIME(UWheelManagerComponent, bIsWheelContact);
 }
 
 void UWheelManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+    ManageWheels();
 }
 
 bool UWheelManagerComponent::WheelSphereTrace(const FWheelData& Wheel, FHitResult& Hit)

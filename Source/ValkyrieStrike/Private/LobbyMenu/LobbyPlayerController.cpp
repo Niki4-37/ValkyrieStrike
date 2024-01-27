@@ -9,8 +9,6 @@
 #include "Subsystems/SessionSubsystem.h"
 #include "GameUtils.h"
 
-#include "Engine.h"
-
 void ALobbyPlayerController::SetNewView(EMenuState MenuState)
 {
     if (MenuState == EMenuState::GameConfig && DummyVehicle)
@@ -28,8 +26,6 @@ void ALobbyPlayerController::SetNewView(EMenuState MenuState)
 
 void ALobbyPlayerController::GoToMainMenu()
 {
-    // GetNetMode() != NM_Client ? GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Purple, TEXT("SERVER")) : GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Orange, TEXT("CLIENT"));
-
     if (const auto SessionSubsystem = GetGameInstance()->GetSubsystem<USessionSubsystem>())
     {
         // GetNetMode() != NM_Client ? SessionSubsystem->DestroySession() : SessionSubsystem->EndSession();

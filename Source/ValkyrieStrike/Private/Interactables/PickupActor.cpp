@@ -4,8 +4,6 @@
 #include "Components/SphereComponent.h"
 #include "Interfaces/GameInterface.h"
 
-#include "Engine.h"
-
 APickupActor::APickupActor()
 {
     bReplicates = true;

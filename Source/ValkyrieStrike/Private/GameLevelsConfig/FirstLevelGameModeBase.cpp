@@ -13,8 +13,6 @@
 #include "Components/RespawnComponent.h"
 #include "BrainComponent.h"
 
-#include "Engine.h"
-
 AFirstLevelGameModeBase::AFirstLevelGameModeBase()
 {
     PlayerControllerClass = AVehiclePlayerController::StaticClass();

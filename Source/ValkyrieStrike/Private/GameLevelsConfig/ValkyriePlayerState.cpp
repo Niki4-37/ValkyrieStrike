@@ -48,8 +48,5 @@ void AValkyriePlayerState::OverrideWith(APlayerState* PlayerState)
 
 void AValkyriePlayerState::OnLivesChanged_OnClient_Implementation(int32 Amount)
 {
-    // if (GetLocalRole() == ENetRole::ROLE_Authority)
-    //{
     OnLivesChanged.Broadcast(Amount);
-    //}
 }

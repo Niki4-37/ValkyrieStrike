@@ -5,8 +5,6 @@
 #include "Interfaces/GameInterface.h"
 #include "Net/UnrealNetwork.h"
 
-#include "Engine.h"
-
 UWorkshopComponent::UWorkshopComponent()
 {
     PrimaryComponentTick.bCanEverTick = false;
@@ -71,7 +69,12 @@ void UWorkshopComponent::MakeMaintenance(EItemPropertyType Type)
     }
     else
     {
-        if (GameInterface->AddAmount(FInteractionData(Type, Coins)))
+        if (TaskPrice == 0)
+        {
+            GameInterface->AddAmount(FInteractionData(Type, ValueToAdd));
+            return;
+        }
+        if (GameInterface->AddAmount(FInteractionData(Type, Coins / TaskPrice)))
         {
             AddCoins(-Coins);
         }

@@ -15,9 +15,6 @@
 #include "Decorations/DecorationActor.h"
 #include "NiagaraComponent.h"
 
-#include "Engine.h"
-#include "DrawDebugHelpers.h"
-
 AModularVehicleBase::AModularVehicleBase()
 {
     PrimaryActorTick.bCanEverTick = true;

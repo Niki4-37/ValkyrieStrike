@@ -35,7 +35,7 @@ public:
     const TArray<FVehicleUnitData>& GetVehicleUnits() const
     {
         if (VehicleUnits.Num()) return VehicleUnits;
-        /* debug used only */
+        /* Default settings */
         return DebugVehicleUnits;
         /* --------------- */
     };
@@ -53,7 +53,7 @@ protected:
     UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadWrite)
     int32 Lives{5};
 
-    /* debug used only */
+    /* Default settings */
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     TArray<FVehicleUnitData> DebugVehicleUnits;
     /* --------------- */

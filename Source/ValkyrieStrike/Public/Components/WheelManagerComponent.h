@@ -26,6 +26,8 @@ public:
     bool IsWheelContact() const { return bIsWheelContact; }
 
     void StartSendData(float SendDataRate);
+    void StopSendData();
+    ACharacter* NewChar;
 
 protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -62,7 +64,7 @@ public:
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
-    UPROPERTY(Replicated)
+    //UPROPERTY(Replicated)
     TArray<FWheelsGroup> WheelsGroups;
 
     UPROPERTY(Replicated)

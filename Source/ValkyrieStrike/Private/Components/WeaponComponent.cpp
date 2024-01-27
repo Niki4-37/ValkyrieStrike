@@ -108,7 +108,6 @@ void UWeaponComponent::CleanWeapons()
     for (auto Weapon : VehicleWeapons)
     {
         if (!Weapon) continue;
-        // detach, simulate physics
         Weapon->Destroy();
     }
 }

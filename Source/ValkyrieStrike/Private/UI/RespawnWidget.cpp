@@ -16,7 +16,6 @@ void URespawnWidget::NativeOnInitialized()
 
     if (CountdownBarImage && CountdownBarImage->GetDynamicMaterial())
     {
-        // CountdownBarImage->SetBrushSize(FVector2D(150.f));
         CountdownBarMaterial = CountdownBarImage->GetDynamicMaterial();
         CountdownBarMaterial->SetScalarParameterValue(SectionsParamName, 0);
         CountdownBarMaterial->SetVectorParameterValue(BaseColorParamName, FLinearColor(FColor::Red));

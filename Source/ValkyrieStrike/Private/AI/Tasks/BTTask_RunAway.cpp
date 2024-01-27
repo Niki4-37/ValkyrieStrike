@@ -2,11 +2,7 @@
 
 #include "AI/Tasks/BTTask_RunAway.h"
 #include "BehaviorTree/BlackboardComponent.h"
-
 #include "AIController.h"
-
-#include "DrawDebugHelpers.h"
-#include "Engine.h"
 
 EBTNodeResult::Type UBTTask_RunAway::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
@@ -26,15 +22,10 @@ EBTNodeResult::Type UBTTask_RunAway::ExecuteTask(UBehaviorTreeComponent& OwnerCo
     const FVector TraceStart = AIController->GetPawn()->GetActorLocation() + ProjectXY * RunAwayDistance;
     const FVector TraceEnd = TraceStart + AIController->GetPawn()->GetActorUpVector() * 1000.f * DirectionModifier;
     FCollisionQueryParams CollisionParams;
-    // CollisionParams.AddIgnoredActor(GetOwner());
     GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, CollisionParams);
     if (Hit.bBlockingHit)
     {
         Blackboard->SetValueAsVector(DestinationPointKey.SelectedKeyName, Hit.ImpactPoint);
-
-        //DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 50.f, 16, FColor::Blue, false, 5.f);
-        //DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Cyan, false, 5.f);
-
         return EBTNodeResult::Succeeded;
     }
     return EBTNodeResult::Failed;
