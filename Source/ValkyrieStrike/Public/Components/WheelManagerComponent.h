@@ -27,7 +27,6 @@ public:
 
     void StartSendData(float SendDataRate);
     void StopSendData();
-    ACharacter* NewChar;
 
 protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -58,16 +57,13 @@ protected:
     // float WheelSlideResist{1.f};
 
     virtual void BeginPlay() override;
-    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
-    //UPROPERTY(Replicated)
     TArray<FWheelsGroup> WheelsGroups;
 
-    UPROPERTY(Replicated)
     bool bIsWheelContact{false};
 
     float ControlInput;

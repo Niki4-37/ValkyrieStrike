@@ -66,6 +66,7 @@ void ULobbyHUDWidget::OnBackClicked()
 
 void ULobbyHUDWidget::OnBeginPlayClicked()
 {
+    if (!GetWorld()) return;
     const auto LobbyGameMode = GetWorld()->GetAuthGameMode<ALobbyGameModeBase>();
     if (!LobbyGameMode) return;
 
@@ -74,7 +75,7 @@ void ULobbyHUDWidget::OnBeginPlayClicked()
 
 void ULobbyHUDWidget::InitLevelItems()
 {
-    if (!LevelTilesBox) return;
+    if (!GetWorld() || !LevelTilesBox) return;
     LevelTilesBox->ClearChildren();
 
     if (!UKismetSystemLibrary::IsServer(GetWorld())) return;

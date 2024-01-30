@@ -9,7 +9,6 @@
 UWheelManagerComponent::UWheelManagerComponent()
 {
     PrimaryComponentTick.bCanEverTick = true;
-    SetIsReplicatedByDefault(true);
 }
 
 void UWheelManagerComponent::SetControlInput(float Value)
@@ -42,25 +41,19 @@ bool UWheelManagerComponent::GetWheelsGroups(TArray<FWheelsGroup>& OutWheelsGrou
 
 void UWheelManagerComponent::StartSendData(float SendDataRate)
 {
-    //GetWorld()->GetTimerManager().SetTimer(ManageWheelsTimer, this, &UWheelManagerComponent::ManageWheels, SendDataRate, true);
+    if (!GetWorld()) return;
+    GetWorld()->GetTimerManager().SetTimer(ManageWheelsTimer, this, &UWheelManagerComponent::ManageWheels, SendDataRate, true);
 }
 
 void UWheelManagerComponent::StopSendData()
 {
+    if (!GetWorld()) return;
     GetWorld()->GetTimerManager().ClearTimer(ManageWheelsTimer);
 }
 
 void UWheelManagerComponent::BeginPlay()
 {
     Super::BeginPlay();
-}
-
-void UWheelManagerComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-    //DOREPLIFETIME(UWheelManagerComponent, WheelsGroups);
-    DOREPLIFETIME(UWheelManagerComponent, bIsWheelContact);
 }
 
 void UWheelManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

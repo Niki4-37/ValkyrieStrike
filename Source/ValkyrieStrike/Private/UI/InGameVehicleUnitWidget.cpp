@@ -35,7 +35,7 @@ void UInGameVehicleUnitWidget::UpdateAmmoCapacityBar(int32 NewValue)
 
 void UInGameVehicleUnitWidget::StartReloading()
 {
-    if (GetWorld()->GetTimerManager().IsTimerActive(ReloadingTimer) || !CircleBarMaterial) return;
+    if (!GetWorld() || GetWorld()->GetTimerManager().IsTimerActive(ReloadingTimer) || !CircleBarMaterial) return;
 
     CircleBarMaterial->SetVectorParameterValue(BaseColorParamName, FLinearColor(FVector(0.f, 0.9f, 1.f)));
     CircleBarMaterial->SetScalarParameterValue(PercentParamName, 0.f);
@@ -66,8 +66,11 @@ void UInGameVehicleUnitWidget::BeginDestroy()
 
 void UInGameVehicleUnitWidget::EndReloading()
 {
-    GetWorld()->GetTimerManager().ClearTimer(ReloadingTimer);
-    GetWorld()->GetTimerManager().ClearTimer(ProgressTimer);
+    if (GetWorld())
+    {
+        GetWorld()->GetTimerManager().ClearTimer(ReloadingTimer);
+        GetWorld()->GetTimerManager().ClearTimer(ProgressTimer);
+    }
 
     if (!CircleBarMaterial) return;
     CircleBarMaterial->SetVectorParameterValue(BaseColorParamName, FLinearColor(FVector(0.f, 1.f, 0.f)));

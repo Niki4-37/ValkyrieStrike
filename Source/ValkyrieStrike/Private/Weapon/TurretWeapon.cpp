@@ -47,7 +47,7 @@ void ATurretWeapon::MakeShot()
 {
     Super::MakeShot();
 
-    if (!HasAim() || IsReloading() || IsEmpty() || !bIsTurnedOn) return;
+    if (!GetWorld() || !HasAim() || IsReloading() || IsEmpty() || !bIsTurnedOn) return;
 
     const FRotator MuzzleRotation = Gun->GetSocketRotation(MuzzleSocketName);
     const FVector MuzzleLocation = Gun->GetSocketLocation(MuzzleSocketName);

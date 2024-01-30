@@ -24,7 +24,7 @@ void URespawnWidget::NativeOnInitialized()
 
 void URespawnWidget::OnStartRespawn(float RespawnDelay)
 {
-    if (GetWorld()->GetTimerManager().IsTimerActive(RespawnTimer) || !CountdownBarMaterial || !RespawnDelay) return;
+    if (!GetWorld() || GetWorld()->GetTimerManager().IsTimerActive(RespawnTimer) || !CountdownBarMaterial || !RespawnDelay) return;
 
     GetWorld()->GetTimerManager().SetTimer(RespawnTimer, this, &URespawnWidget::RespawnEnd, RespawnDelay);
     CountdownBarMaterial->SetScalarParameterValue(PercentParamName, 1.f);
@@ -44,6 +44,7 @@ void URespawnWidget::OnStartRespawn(float RespawnDelay)
 
 void URespawnWidget::RespawnEnd()
 {
+    if (!GetWorld()) return;
     GetWorld()->GetTimerManager().ClearTimer(RespawnTimer);
     GetWorld()->GetTimerManager().ClearTimer(ProgressTimer);
 }

@@ -7,7 +7,7 @@
 
 void UOneTypeUnitsSelectWidget::AddUnit(const FVehicleUnitData& Unit)
 {
-    if (!UnitsWrapBox) return;
+    if (!GetWorld() || !UnitsWrapBox) return;
 
     const auto VehicleUnitWidget = CreateWidget<UVehicleUnitWidget>(GetWorld(), VehicleUnitWidgetClass);
     if (!VehicleUnitWidget) return;

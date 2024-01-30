@@ -63,6 +63,8 @@ void ALobbyPlayerController::BeginPlay()
 {
     Super::BeginPlay();
 
+    check(GetWorld());
+
     SetInputMode(FInputModeUIOnly());
     bShowMouseCursor = true;
 

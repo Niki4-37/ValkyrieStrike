@@ -26,6 +26,8 @@ void UWorkshopWidget::OnWorkshopTasksUpdated(const TArray<FInteractionData>& Tas
 {
     checkf(WorkshopTaskWidgetClass, TEXT("WorkshopTaskWidgetClass not define!"));
 
+    if (!GetWorld()) return;
+
     if (!WorkshopTaskSlots || !Tasks.Num())
     {
         //GetOwningPlayer()->bShowMouseCursor = false;
@@ -36,7 +38,6 @@ void UWorkshopWidget::OnWorkshopTasksUpdated(const TArray<FInteractionData>& Tas
 
     GetOwningPlayer()->bShowMouseCursor = true;
     SetVisibility(ESlateVisibility::Visible);
-    
 
     WorkshopTaskSlots->ClearChildren();
     TaskMap.Empty();

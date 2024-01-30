@@ -127,15 +127,15 @@ void AModularVehicleBase::BeginPlay()
     check(EngineSound);
     check(RareLeftWheelDust);
     check(RareRightWheelDust);
+    check(GetWorld());
 
     Tags.Add("Player");
 
     if (HasAuthority())
     {
-        WheelManagerComponent->StartSendData(SendDataRate);
-
         GetWorld()->GetTimerManager().SetTimer(DataTickTimer, this, &AModularVehicleBase::SendDataTick_Multicast, SendDataRate, true);
     }
+    //WheelManagerComponent->StartSendData(SendDataRate);
 
     EngineSound->Play();
 
@@ -182,8 +182,8 @@ void AModularVehicleBase::Restart()
 
     if (const auto ValkyriePlayerState = GetPlayerState<AValkyriePlayerState>())
     {
-        // GetNetMode() != NM_Client ? GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Purple, TEXT("SERVER, EnablePlayerState")) :
-        //                             GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Orange, TEXT("CLIENT, EnablePlayerState"));
+         GetNetMode() != NM_Client ? GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Purple, TEXT("SERVER, EnablePlayerState")) :
+                                     GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Orange, TEXT("CLIENT, EnablePlayerState"));
 
         const auto UnitPtr = ValkyriePlayerState->GetVehicleUnits().FindByPredicate([](const FVehicleUnitData& Data) { return Data.UnitType == EVehicleUnitType::Body; });
 
@@ -336,7 +336,10 @@ void AModularVehicleBase::OnDeath()
 {
     OnDeathCameraEffect_OnClient();
 
-    GetWorld()->GetTimerManager().ClearTimer(DataTickTimer);
+    if (GetWorld())
+    {
+        GetWorld()->GetTimerManager().ClearTimer(DataTickTimer);
+    }
     MoveForvardAxis = 0.f;
     MoveSideAxis = 0.f;
     SendDataTick_Multicast();

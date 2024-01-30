@@ -7,7 +7,7 @@
 EBTNodeResult::Type UBTTask_RunAway::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
     const auto Blackboard = OwnerComp.GetBlackboardComponent();
-    if (!Blackboard) return EBTNodeResult::Failed;
+    if (!Blackboard || !GetWorld()) return EBTNodeResult::Failed;
 
     const auto DirectionSpread = 25.f;
     const auto HalfRad = FMath::DegreesToRadians(DirectionSpread);

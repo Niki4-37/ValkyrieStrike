@@ -9,6 +9,7 @@
 
 EBTNodeResult::Type UBTTask_FindNewBomb::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
+    if (!GetWorld()) return EBTNodeResult::Failed;
     const auto FirstLevelGameMode = GetWorld()->GetAuthGameMode<AFirstLevelGameModeBase>();
     if (!FirstLevelGameMode) return EBTNodeResult::Failed;
     

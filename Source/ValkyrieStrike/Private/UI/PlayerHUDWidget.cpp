@@ -7,8 +7,6 @@
 #include "Player/VehiclePlayerController.h"
 #include "Interfaces/GameInterface.h"
 
-#include "Engine.h"
-
 void UPlayerHUDWidget::NativeOnInitialized()
 {
     checkf(VehicleEndurenceWidgetClass, TEXT("VehicleEndurenceWidgetClass not define!"));
@@ -17,6 +15,8 @@ void UPlayerHUDWidget::NativeOnInitialized()
     checkf(CoinsValueWidgetClass, TEXT("CoinsValueWidgetClass not define!"));
     checkf(LivesWidgetClass, TEXT("LivesWidgetClass not define!"));
     checkf(WorkshopWidgetClass, TEXT("WorkshopWidgetClass not define!"));
+
+    check(GetWorld());
 
     if (VehicleEndurancePosition)
     {
@@ -114,13 +114,12 @@ void UPlayerHUDWidget::OnNewPawn(APawn* NewPawn)
 {
     // add fails counter
     // add check to avoid endless repeat
+    if (!GetWorld()) return;
+
     FTimerDelegate TimerDelegate;
     TimerDelegate.BindLambda(
         [&]()
         {
-            FString Test = GetOwningPlayerPawn() ? GetOwningPlayerPawn()->GetName() : "No Pawn!";
-            GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Yellow, Test);
-
             if (GetOwningPlayer()->GetSpectatorPawn())
             {
                 GetWorld()->GetTimerManager().ClearTimer(FindingPawnTimer);

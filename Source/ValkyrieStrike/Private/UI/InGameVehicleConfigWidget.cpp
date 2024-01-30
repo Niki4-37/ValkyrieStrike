@@ -41,6 +41,7 @@ void UInGameVehicleConfigWidget::OnNewPawn(APawn* NewPawn)
 
 void UInGameVehicleConfigWidget::OnUnitMount(const FVehicleUnitData& Data)
 {
+    if (!GetWorld()) return;
     const auto UnitWidget = CreateWidget<UInGameVehicleUnitWidget>(GetWorld(), InGameVehicleUnitWidgetClass);
     if (UnitsBox && UnitWidget)
     {

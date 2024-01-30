@@ -32,7 +32,7 @@ void UVehicleIndicatorsComponent::BeginPlay()
 {
     Super::BeginPlay();
 
-    if (GetOwnerRole() == ENetRole::ROLE_Authority)
+    if (GetWorld() && GetOwnerRole() == ENetRole::ROLE_Authority)
     {
         checkf(MaxFuelValue > 0, TEXT("MaxFuelValue can't be less or equals 0!"));
         AddFuel(MaxFuelValue);

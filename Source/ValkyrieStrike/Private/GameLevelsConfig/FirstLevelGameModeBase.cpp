@@ -122,6 +122,7 @@ void AFirstLevelGameModeBase::Killed(AController* VictimController, const FTrans
 
 void AFirstLevelGameModeBase::FillPlayerStartMap()
 {
+    if (!GetWorld()) return;
     for (TActorIterator<APlayerStart> It(GetWorld()); It; ++It)
     {
         APlayerStart* Start = *It;
@@ -133,6 +134,7 @@ void AFirstLevelGameModeBase::FillPlayerStartMap()
 
 void AFirstLevelGameModeBase::FillSpawningActorsArray()
 {
+    if (!GetWorld()) return;
     for (TActorIterator<ASpawningActor> It(GetWorld()); It; ++It)
     {
         ASpawningActor* SpawningActor = *It;
@@ -217,6 +219,7 @@ AActor* AFirstLevelGameModeBase::GetRandomSpawningActorByTag(FName TagName)
 
 void AFirstLevelGameModeBase::GameOver()
 {
+    if (!GetWorld()) return;
     for (FConstControllerIterator ControlletIterator = GetWorld()->GetControllerIterator(); ControlletIterator; ++ControlletIterator)
     {
         if (auto Controller = ControlletIterator->Get())

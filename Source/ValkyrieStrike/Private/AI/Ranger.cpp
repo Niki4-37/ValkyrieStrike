@@ -35,7 +35,7 @@ void ARanger::OnDeath()
 
 void ARanger::SpawnAndAttachWeapon()
 {
-    if (OwnedWeapon) return;
+    if (!GetWorld() || OwnedWeapon) return;
 
     FActorSpawnParameters SpawnParams;
     SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;

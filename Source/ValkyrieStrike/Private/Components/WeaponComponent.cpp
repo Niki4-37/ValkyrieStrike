@@ -40,6 +40,7 @@ void UWeaponComponent::InitWeapons()
 {
     /** spawn turret hub */
     checkf(TurretHubClass, TEXT("TurretHubClass not define!"));
+    if (!GetWorld()) return;
     FActorSpawnParameters SpawnParams;
     SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
     SpawnParams.Owner = GetOwner();
@@ -66,7 +67,7 @@ void UWeaponComponent::InitWeapons()
     {
         if (Unit.UnitType == EVehicleUnitType::Turret || Unit.UnitType == EVehicleUnitType::SecondWeapon)
         {
-            if (!GetWorld() || !Unit.UnitComponents.Num() || !Unit.UnitSpawnClass) continue;
+            if (!Unit.UnitComponents.Num() || !Unit.UnitSpawnClass) continue;
 
             auto VehicleWeapon = GetWorld()->SpawnActor<ABaseVehicleWeapon>(Unit.UnitSpawnClass);  // how to undo unittyte checking?
 

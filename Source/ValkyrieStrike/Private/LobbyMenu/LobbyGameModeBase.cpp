@@ -23,6 +23,7 @@ void ALobbyGameModeBase::InitGame(const FString& MapName, const FString& Options
     Super::InitGame(MapName, Options, ErrorMessage);
 
     checkf(DummyVehicleClass, TEXT("DummyVehicleClass not define!"));
+    check(GetWorld());
 
     for (const auto& FoundActor : TActorRange<APlayerStart>(GetWorld()))
     {

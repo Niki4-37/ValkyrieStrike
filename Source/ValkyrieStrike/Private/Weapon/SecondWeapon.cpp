@@ -69,6 +69,7 @@ void ASecondWeapon::SpawnTraceFX_Multicast_Implementation(const FVector& TraceSt
 
 void ASecondWeapon::SpawnTraceFX(const FVector& TraceStart, const FVector& TraceEnd)
 {
+    if (!GetWorld()) return;
     const auto TraceFXComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), TraceFX, TraceStart);
     if (TraceFXComponent)
     {

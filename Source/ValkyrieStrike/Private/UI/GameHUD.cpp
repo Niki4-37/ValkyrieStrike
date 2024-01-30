@@ -8,6 +8,8 @@ void AGameHUD::BeginPlay()
 {
     Super::BeginPlay();
 
+    check(GetWorld());
+
     GameStateWidgetsMap.Add(EValkyrieGameState::InProgress, CreateWidget<UUserWidget>(GetWorld(), PlayerHUDWidgetClass));
     GameStateWidgetsMap.Add(EValkyrieGameState::Pause, CreateWidget<UUserWidget>(GetWorld(), PauseMenuWidgetClass));
     GameStateWidgetsMap.Add(EValkyrieGameState::GameSettings, CreateWidget<UUserWidget>(GetWorld(), SettingsWidgetClass));

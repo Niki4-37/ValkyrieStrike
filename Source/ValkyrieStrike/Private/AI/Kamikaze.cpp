@@ -62,7 +62,7 @@ void AKamikaze::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 
 void AKamikaze::TakeBomb()
 {
-    if (ExplosiveBomb) return;
+    if (!GetWorld() || ExplosiveBomb) return;
     ExplosiveBomb = GetWorld()->SpawnActor<ADecorationActor>(BombClass, GetActorTransform());
     if (!ExplosiveBomb) return;
     ExplosiveBomb->SetOwner(this);
