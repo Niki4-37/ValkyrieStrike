@@ -8,6 +8,7 @@
 UWorkshopComponent::UWorkshopComponent()
 {
     PrimaryComponentTick.bCanEverTick = false;
+    SetIsReplicatedByDefault(true);
 
     for (EItemPropertyType Type = EItemPropertyType::Begin; Type != EItemPropertyType::End; ++Type)
     {
@@ -15,7 +16,7 @@ UWorkshopComponent::UWorkshopComponent()
     }
 }
 
-void UWorkshopComponent::AddCoins(int32 Value)
+void UWorkshopComponent::AddCoins_OnServer_Implementation(int32 Value)
 {
     Coins += Value;
     OnRep_Coins();
@@ -64,7 +65,7 @@ void UWorkshopComponent::MakeMaintenance(EItemPropertyType Type)
     {
         if (GameInterface->AddAmount(FInteractionData(Type, ValueToAdd)))
         {
-            AddCoins(-TotalCost);
+            AddCoins_OnServer(-TotalCost);
         }
     }
     else
@@ -76,7 +77,7 @@ void UWorkshopComponent::MakeMaintenance(EItemPropertyType Type)
         }
         if (GameInterface->AddAmount(FInteractionData(Type, Coins / TaskPrice)))
         {
-            AddCoins(-Coins);
+            AddCoins_OnServer(-Coins);
         }
     }
 }

@@ -19,7 +19,8 @@ public:
     FOnUpdateCostSignature OnUpdateCost;
     FOnCoinsChangedSignature OnCoinsChanged;
 
-    void AddCoins(int32 Value);
+    UFUNCTION(Server, reliable)
+    void AddCoins_OnServer(int32 Value);
     int32 GetCoins() const { return Coins; }
 
     void SetWorkshopTasks(const TArray<FInteractionData>& Tasks);

@@ -79,7 +79,7 @@ bool AModularVehicleBase::AddAmount(const FInteractionData& Data)
     {
         case EItemPropertyType::Ammo: bResult = WeaponComponent->AddAmmo(Data.Amount); break;
         case EItemPropertyType::Money:
-            WorkshopComponent->AddCoins(Data.Amount);
+            WorkshopComponent->AddCoins_OnServer(Data.Amount);
             bResult = true;
             break;
         case EItemPropertyType::Endurance:
@@ -135,7 +135,7 @@ void AModularVehicleBase::BeginPlay()
     {
         GetWorld()->GetTimerManager().SetTimer(DataTickTimer, this, &AModularVehicleBase::SendDataTick_Multicast, SendDataRate, true);
     }
-    //WheelManagerComponent->StartSendData(SendDataRate);
+    // WheelManagerComponent->StartSendData(SendDataRate);
 
     EngineSound->Play();
 
@@ -182,8 +182,8 @@ void AModularVehicleBase::Restart()
 
     if (const auto ValkyriePlayerState = GetPlayerState<AValkyriePlayerState>())
     {
-         GetNetMode() != NM_Client ? GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Purple, TEXT("SERVER, EnablePlayerState")) :
-                                     GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Orange, TEXT("CLIENT, EnablePlayerState"));
+        GetNetMode() != NM_Client ? GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Purple, TEXT("SERVER, EnablePlayerState")) :
+                                    GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Orange, TEXT("CLIENT, EnablePlayerState"));
 
         const auto UnitPtr = ValkyriePlayerState->GetVehicleUnits().FindByPredicate([](const FVehicleUnitData& Data) { return Data.UnitType == EVehicleUnitType::Body; });
 
@@ -192,7 +192,7 @@ void AModularVehicleBase::Restart()
             VehicleBody->SetStaticMesh(UnitPtr->UnitComponents[0].UnitComponentMesh);
         }
 
-        WorkshopComponent->AddCoins(ValkyriePlayerState->GetCoins());
+        WorkshopComponent->AddCoins_OnServer(ValkyriePlayerState->GetCoins());
     }
 
     if (HasAuthority())
@@ -342,7 +342,7 @@ void AModularVehicleBase::OnDeath()
     }
     MoveForvardAxis = 0.f;
     MoveSideAxis = 0.f;
-    SendDataTick_Multicast();
+    //SendDataTick_Multicast();
 }
 
 void AModularVehicleBase::OnDeathCameraEffect_OnClient_Implementation()
